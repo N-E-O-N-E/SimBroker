@@ -3,7 +3,7 @@ package de.neone.simbroker.ui.navigation
 import de.neone.simbroker.MainActivity
 import de.neone.simbroker.R
 
-enum class NavigationItem (
+enum class NavigationItem(
     val label: String,
     val icon: Int,
     val route: Any,
@@ -23,9 +23,13 @@ enum class NavigationItem (
         label = "Konto",
         icon = R.drawable.baseline_account_circle_48,
         route = MainActivity.KontoRoute
+    ),
+    Logout(
+        label = "Logout",
+        icon = R.drawable.baseline_logout_48,
+        route = MainActivity.LogoutRoute
     )
 }
-
 
 
 
