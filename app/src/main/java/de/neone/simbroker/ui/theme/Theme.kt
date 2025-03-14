@@ -265,8 +265,8 @@ fun SimBrokerTheme(
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
-        darkTheme -> highContrastDarkColorScheme
-        else -> highContrastLightColorScheme
+        darkTheme -> darkScheme
+        else -> mediumContrastLightColorScheme
     }
 
     MaterialTheme(
