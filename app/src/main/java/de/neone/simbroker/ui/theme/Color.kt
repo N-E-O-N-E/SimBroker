@@ -1,6 +1,11 @@
 package de.neone.simbroker.ui.theme
 import androidx.compose.ui.graphics.Color
 
+val topBarColor = Color(0xFF67BCF0)
+val navBarColor = Color(0xFF22456B)
+
+
+
 val primaryLight = Color(0xFF2C638B)
 val onPrimaryLight = Color(0xFFFFFFFF)
 val primaryContainerLight = Color(0xFFCCE5FF)

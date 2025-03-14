@@ -2,9 +2,8 @@ package de.neone.simbroker.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.font.FontFamily
-
-import androidx.compose.ui.text.googlefonts.GoogleFont
 import androidx.compose.ui.text.googlefonts.Font
+import androidx.compose.ui.text.googlefonts.GoogleFont
 import de.neone.simbroker.R
 
 val provider = GoogleFont.Provider(
@@ -13,19 +12,20 @@ val provider = GoogleFont.Provider(
     certificates = R.array.com_google_android_gms_fonts_certs
 )
 
-val bodyFontFamily = FontFamily(
+val displayFontFamily = FontFamily(
     Font(
-        googleFont = GoogleFont("Kanit"),
+        googleFont = GoogleFont("Noto Sans Japanese"),
         fontProvider = provider,
     )
 )
 
-val displayFontFamily = FontFamily(
+val bodyFontFamily = FontFamily(
     Font(
-        googleFont = GoogleFont("Sriracha"),
+        googleFont = GoogleFont("Noto Sans Japanese"),
         fontProvider = provider,
     )
 )
+
 
 // Default Material 3 typography values
 val baseline = Typography()
