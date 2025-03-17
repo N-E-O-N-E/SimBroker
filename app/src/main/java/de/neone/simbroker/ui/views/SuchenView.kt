@@ -55,7 +55,7 @@ fun SuchenView(
                 Card(
                     modifier = Modifier.padding(8.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f),
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.5f),
                     )
                 ) {
                     Column(modifier = Modifier
