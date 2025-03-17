@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import de.neone.simbroker.MainActivity.KontoRoute
 import de.neone.simbroker.MainActivity.LogoutRoute
@@ -20,7 +21,7 @@ fun NavHostComponent(
     navController: NavHostController,
     action: () -> Unit,
 ) {
-    androidx.navigation.compose.NavHost(
+    NavHost(
         navController = navController,
         startDestination = PortfolioRoute,
         modifier = Modifier.padding(innerPadding)

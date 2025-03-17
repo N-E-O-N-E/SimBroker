@@ -10,12 +10,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import de.neone.simbroker.R
+import de.neone.simbroker.ui.SimBrokerViewModel
 import de.neone.simbroker.ui.components.ViewWallpaperImageBox
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun KontoView(
     modifier: Modifier = Modifier,
     innerPadding: PaddingValues,
+    viewModel: SimBrokerViewModel = koinViewModel(),
 ) {
     ViewWallpaperImageBox(
         toMainActivity = { },
