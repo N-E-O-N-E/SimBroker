@@ -2,7 +2,6 @@ package de.neone.simbroker.ui.views
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
@@ -16,7 +15,6 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun PortfolioView(
-    innerPadding: PaddingValues,
     viewModel: SimBrokerViewModel = koinViewModel(),
 ) {
     ViewWallpaperImageBox(
@@ -28,7 +26,7 @@ fun PortfolioView(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(innerPadding),
+            .padding(),
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.Top
     ) {

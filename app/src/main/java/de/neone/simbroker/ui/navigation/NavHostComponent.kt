@@ -27,13 +27,13 @@ fun NavHostComponent(
         modifier = Modifier.padding(innerPadding)
     ) {
         composable<PortfolioRoute> {
-            PortfolioView(innerPadding = innerPadding)
+            PortfolioView()
         }
         composable<SucheRoute> {
-            SuchenView(innerPadding = innerPadding)
+            SuchenView()
         }
         composable<KontoRoute> {
-            KontoView(innerPadding = innerPadding)
+            KontoView()
         }
         composable<LogoutRoute> {
             action()
