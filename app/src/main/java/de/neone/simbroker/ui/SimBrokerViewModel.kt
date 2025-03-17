@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 class SimBrokerViewModel(
     application: Application,
     private val repository: SimBrokerRepositoryInterface,
-) : AndroidViewModel(application) {
+    ) : AndroidViewModel(application) {
 
     private val _coinList = MutableStateFlow<List<Coin>>(emptyList())
     val coinList: StateFlow<List<Coin>> = _coinList
