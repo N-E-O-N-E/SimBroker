@@ -7,6 +7,9 @@ val bottomBarColorLight = Color(0xFFC2D7ED)
 val topBarColorDark = Color(0xFF4779A0)
 val bottomBarColorDark = Color(0xFF13365E)
 
+val colorUp = Color(0xFF4ABB36)
+val colorDown = Color(0xFFFF2020)
+
 
 val primaryLightMediumContrast = Color(0xFF205B93)
 val onPrimaryLightMediumContrast = Color(0xFFFFFFFF)

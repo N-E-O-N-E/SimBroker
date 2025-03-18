@@ -62,27 +62,3 @@ data class PriceHistory(
 )
 
 
-data class OhlcDto(
-    val status: String,
-    val data: OHLCData
-)
-
-data class OHLCData (
-    val ohlc: List<OHLC>
-)
-
-data class OHLC(
-    val startingAt: Long,
-    val endingAt: Long,
-    val open: String,
-    val high: String,
-    val low: String,
-    val close: String,
-    val avg: String,
-    @Json(name = "24hVolume")
-    val h24Volume: String,
-    val intervalVolume: String?
-)
-
-
-

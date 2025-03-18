@@ -1,26 +1,31 @@
-package de.neone.simbroker.ui.components.profile
+package de.neone.simbroker.ui.components.suche
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import de.neone.simbroker.data.local.PortfolioData
 import de.neone.simbroker.data.remote.Coin
-import java.util.Date
+import de.neone.simbroker.ui.theme.colorDown
+import de.neone.simbroker.ui.theme.colorUp
 
 @Composable
-fun CoinListItem(
+fun SucheCoinListItem(
     coin: Coin,
     toPortfolio: (PortfolioData) -> Unit,
 ) {
@@ -37,54 +42,52 @@ fun CoinListItem(
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
-                Column {
+                AsyncImage(
+                    modifier = Modifier
+                        .padding(end = 15.dp)
+                        .width(50.dp)
+                        .height(50.dp)
+                        .clip(shape = MaterialTheme.shapes.extraLarge),
+                    model = coin.iconUrl,
+                    contentDescription = coin.name,
+                    contentScale = ContentScale.Fit,
+                    clipToBounds = false
+                )
+
+                Column(modifier = Modifier.weight(1f)) {
                     Row {
-                        Text(text = "${coin.rank}.")
-                        Text(text = "${coin.name}, ${coin.symbol}")
+                        Text(text = "${coin.name.take(22)}  ", style = MaterialTheme.typography.bodyLarge)
+                        Text(text = coin.symbol, style = MaterialTheme.typography.titleSmall)
                     }
-                    Text(text = coin.price)
+                    Text(text = "${coin.price} EUR", style = MaterialTheme.typography.bodySmall)
                 }
 
-
-
-                Button(onClick = {
-                       val newEntry = PortfolioData(
-                            coinUuid = coin.uuid,
-                            amount = 1.0,
-                            averageBuyPrice = coin.price.toDouble(),
-                            firstBuyTimestamp = Date().time,
-                            lastUpdateTimestamp = Date().time,
-                            symbol = coin.symbol,
-                            name = coin.name,
-                            iconUrl = coin.iconUrl
-                        )
-
-                    toPortfolio(newEntry)
-
-                }) {
-                    Text(text = "Buy")
-                }
+                Text(
+                    text = "${coin.change} %",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = if (coin.change.contains("-")) colorDown else colorUp
+                )
             }
         }
     }
 }
 
 @Preview(
-    name = "profileTransactionPreview", showSystemUi = false, showBackground = false,
+    name = "SucheCoinListPreview", showBackground = false,
     uiMode = Configuration.UI_MODE_NIGHT_NO or Configuration.UI_MODE_TYPE_NORMAL,
-    device = "id:pixel_7_pro"
+    device = "id:pixel_7_pro", showSystemUi = false
 )
 @Composable
-private fun TransactionPreview() {
-    CoinListItem(
+private fun SucheCoinListPreview() {
+    SucheCoinListItem(
         coin = Coin(
             "1",
             "BTC",
             "Bitcoin",
             "#f7931a",
-            "https://example.com/btc.png",
+            "https://pixabay.com/vectors/hill-tree-mountain-landscape-9026381/",
             "67000.0654897",
             "1300000000000",
             1234567890L,

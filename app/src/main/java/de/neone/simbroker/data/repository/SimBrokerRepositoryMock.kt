@@ -5,11 +5,11 @@ import de.neone.simbroker.data.repository.mockdata.coins_Mockdata
 
 class SimBrokerRepositoryMock(): SimBrokerRepositoryInterface {
 
-    override suspend fun getCoins(): List<Coin> {
+    override suspend fun getCoins(page: Int): List<Coin> {
         return coins_Mockdata
     }
 
-    override suspend fun getCoin(uuid: String): Coin {
+    override suspend fun getCoin(uuid: String, timePeriod: String): Coin {
         val result = coins_Mockdata.first { it.uuid == uuid }
         return result
     }

@@ -13,7 +13,7 @@ interface PortfolioDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPortfolioData(portfolioData: PortfolioData)
 
-    @Query("SELECT * FROM portfolioData")
+    @Query("SELECT * FROM portfolioData ORDER BY name ASC")
     fun getAllPortfolioData(): Flow<List<PortfolioData>>
 
     @Delete
