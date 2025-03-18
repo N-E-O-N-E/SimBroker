@@ -17,7 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import de.neone.simbroker.ui.components.MainActivityTopBar
+import de.neone.simbroker.ui.components.activites.MainActivityTopBar
 import de.neone.simbroker.ui.navigation.MainActivityBottomBar
 import de.neone.simbroker.ui.navigation.NavHostComponent
 import de.neone.simbroker.ui.theme.SimBrokerTheme

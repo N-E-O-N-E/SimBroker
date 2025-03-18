@@ -15,7 +15,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Scaffold
-import de.neone.simbroker.ui.components.StartActivityImageBox
+import de.neone.simbroker.ui.components.activites.StartActivityImageBox
 import de.neone.simbroker.ui.theme.SimBrokerTheme
 
 class StartActivity : ComponentActivity() {
