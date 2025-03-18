@@ -2,6 +2,7 @@ package de.neone.simbroker.data.remote
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import de.neone.simbroker.BuildConfig
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -19,7 +20,7 @@ val loggingInterceptor = HttpLoggingInterceptor().apply {
 
 val headerInterceptor = okhttp3.Interceptor { chain ->
     val request = chain.request().newBuilder()
-        .addHeader("X-RapidAPI-Key", "a51a522017msha97b7e9335c6bf8p19d74ajsnd7326aa11de8")
+        .addHeader("X-RapidAPI-Key", BuildConfig.API_KEY)
         .addHeader("X-RapidAPI-Host", "coinranking1.p.rapidapi.com")
         .build()
     chain.proceed(request)

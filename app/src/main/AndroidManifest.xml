@@ -14,8 +14,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SimBroker"
         tools:targetApi="31"
-        android:name =".di.App"
-        >
+        android:name =".di.App">
+
         <activity
             android:name=".StartActivity"
             android:exported="true"

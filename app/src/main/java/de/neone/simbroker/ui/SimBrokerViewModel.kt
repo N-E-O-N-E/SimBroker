@@ -19,7 +19,8 @@ class SimBrokerViewModel(
 ) : AndroidViewModel(application) {
 
     // Room
-    private val portfolioDao = PortfolioDatabase.getDatabase(application.applicationContext).portfolioDao()
+    private val portfolioDao =
+        PortfolioDatabase.getDatabase(application.applicationContext).portfolioDao()
     val portfolioCoins = portfolioDao.getAllPortfolioData().stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
