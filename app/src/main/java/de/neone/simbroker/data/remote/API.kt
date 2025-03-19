@@ -25,6 +25,7 @@ val headerInterceptor = okhttp3.Interceptor { chain ->
         .build()
     chain.proceed(request)
 }
+
 private val okHttpClient = OkHttpClient.Builder()
     .addInterceptor(loggingInterceptor)
     .addInterceptor(headerInterceptor)
