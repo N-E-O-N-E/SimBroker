@@ -5,12 +5,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import de.neone.simbroker.R
 import de.neone.simbroker.ui.SimBrokerViewModel
@@ -30,7 +28,6 @@ fun SuchenView(
     )
 
     val coinList by viewModel.coinList.collectAsState()
-    val listState = rememberLazyListState()
 
     LaunchedEffect(Unit) {
         viewModel.fetchCoins()
@@ -42,9 +39,7 @@ fun SuchenView(
         verticalArrangement = Arrangement.Top
     ) {
 
-        LazyColumn(
-            state = listState
-        ) {
+        LazyColumn() {
             items(coinList, key = { it.uuid }) { coin ->
                 SucheCoinListItem(
                     coin = coin,
@@ -52,14 +47,5 @@ fun SuchenView(
                 )
             }
         }
-    }
-
-    LaunchedEffect(listState) {
-        snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index }
-            .collect { lastVisibleIndex ->
-                if (lastVisibleIndex != null && lastVisibleIndex >= coinList.size - 5) {
-                    viewModel.fetchCoins()
-                }
-            }
     }
 }

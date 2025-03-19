@@ -50,10 +50,10 @@ interface APIService {
     suspend fun getCoins(
         @Query("referenceCurrencyUuid") referenceCurrencyUuid: String = "5k-_VTxqtCEI",
         @Query("tiers") tiers: String = "1",
-        @Query("orderBy") orderBy: String = "price",
+        @Query("orderBy") orderBy: String = "marketCap",
         @Query("orderDirection") orderDirection: String = "desc",
-        @Query("limit") limit: Int = 10,
-        @Query("offset") offset: Int = 10,
+        @Query("limit") limit: Int = 50,
+        @Query("offset") offset: Int = 0,
         @Query("timePeriod") timePeriod: String = "24h",
     ): CoinsResponse
 

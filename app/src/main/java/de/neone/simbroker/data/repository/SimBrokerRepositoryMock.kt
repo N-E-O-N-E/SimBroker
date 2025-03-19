@@ -5,7 +5,7 @@ import de.neone.simbroker.data.repository.mockdata.coins_Mockdata
 
 class SimBrokerRepositoryMock(): SimBrokerRepositoryInterface {
 
-    override suspend fun getCoins(page: Int): List<Coin> {
+    override suspend fun getCoins(): List<Coin> {
         return coins_Mockdata
     }
 

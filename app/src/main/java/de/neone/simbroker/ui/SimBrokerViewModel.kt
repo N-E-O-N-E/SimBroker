@@ -17,8 +17,6 @@ class SimBrokerViewModel(
     application: Application,
     private val repository: SimBrokerRepositoryInterface,
 ) : AndroidViewModel(application) {
-    private var currentPage = 1
-    private var isLoading = false
 
     // Room
     private val portfolioDao =
@@ -34,19 +32,13 @@ class SimBrokerViewModel(
     private val _coinList = MutableStateFlow<List<Coin>>(emptyList())
     val coinList: StateFlow<List<Coin>> = _coinList
 
-    suspend fun fetchCoins() {
-        if (isLoading) return
-        isLoading = true
-
+    fun fetchCoins() {
         viewModelScope.launch {
             try {
-                val newCoins = repository.getCoins(page = currentPage) // API Call mit Pagination
+                val newCoins = repository.getCoins()
                 _coinList.value += newCoins
-                currentPage++
             } catch (e: Exception) {
 
-            } finally {
-                isLoading = false
             }
         }
     }
@@ -66,5 +58,4 @@ class SimBrokerViewModel(
             portfolioDao.insertPortfolioData(portfolioData)
         }
     }
-
 }

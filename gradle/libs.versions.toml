@@ -12,7 +12,6 @@ composeBom = "2025.03.00"
 koinBom = "4.1.0-Beta5"             # DI
 loggingInterceptor = "4.12.0"       # HTTP Logging
 moshiVersion = "1.15.2"             # Moshi JSON Parser
-pagingCompose = "3.3.0-alpha05"     # Paging
 retrofitVersion = "2.11.0"          # Retrofit HTTP Client
 roomRuntime = "2.6.1"               # Room Database
 kspVersion = "2.0.21-1.0.27"        # KSP für Room
@@ -26,7 +25,6 @@ coilCompose = "3.0.0-rc02"          # AsyncImage KOIL
 [libraries]
 androidx-compose-bom-v20250101 = { module = "androidx.compose:compose-bom", version.ref = "composeBomVersion" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
-androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "pagingCompose" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
