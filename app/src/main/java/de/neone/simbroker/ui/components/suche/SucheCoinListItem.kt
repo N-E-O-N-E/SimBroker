@@ -44,6 +44,7 @@ fun SucheCoinListItem(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
+
                 AsyncImage(
                     modifier = Modifier
                         .padding(end = 15.dp)

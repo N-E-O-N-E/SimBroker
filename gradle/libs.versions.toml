@@ -1,6 +1,5 @@
 [versions]
 agp = "8.9.0"
-composeBomVersion = "2025.01.01"
 kotlin = "2.1.10"
 coreKtx = "1.15.0"
 junit = "4.13.2"
@@ -15,7 +14,6 @@ moshiVersion = "1.15.2"             # Moshi JSON Parser
 retrofitVersion = "2.11.0"          # Retrofit HTTP Client
 roomRuntime = "2.6.1"               # Room Database
 kspVersion = "2.0.21-1.0.27"        # KSP für Room
-#noinspection GradleDependency
 kotlinSerialization = "1.8.0"       # Kotlin Serialization Plugin
 navigationCompose = "2.8.9"         # Navigation in Compose
 datastorePreferences = "1.1.3"      # DataStore Preferences
@@ -23,7 +21,6 @@ uiTextGoogleFonts = "1.7.8"         # Google Fonts für Text
 coilCompose = "3.0.0-rc02"          # AsyncImage KOIL
 
 [libraries]
-androidx-compose-bom-v20250101 = { module = "androidx.compose:compose-bom", version.ref = "composeBomVersion" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }

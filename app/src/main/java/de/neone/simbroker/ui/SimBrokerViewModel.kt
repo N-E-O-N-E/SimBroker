@@ -1,6 +1,7 @@
 package de.neone.simbroker.ui
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import de.neone.simbroker.data.local.PortfolioData
@@ -38,7 +39,7 @@ class SimBrokerViewModel(
                 val newCoins = repository.getCoins()
                 _coinList.value += newCoins
             } catch (e: Exception) {
-
+                Log.e("SimBrokerViewModel", "Fehler beim Laden der Coins", e)
             }
         }
     }
@@ -49,6 +50,7 @@ class SimBrokerViewModel(
             _coinList.value = listOf(coin)
 
         } catch (e: Exception) {
+            Log.e("SimBrokerViewModel", "Fehler beim Laden des Coins", e)
 
         }
     }

@@ -23,7 +23,7 @@ fun NavHostComponent(
 ) {
     NavHost(
         navController = navController,
-        startDestination = PortfolioRoute,
+        startDestination = SucheRoute,
         modifier = Modifier.padding(innerPadding)
     ) {
         composable<PortfolioRoute> {
