@@ -17,9 +17,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
+import coil3.request.error
+import de.neone.simbroker.R
 import de.neone.simbroker.data.remote.Coin
 import de.neone.simbroker.ui.theme.colorDown
 import de.neone.simbroker.ui.theme.colorUp
@@ -29,6 +34,12 @@ fun SucheCoinListItem(
     coin: Coin,
     onListSearchItemSelected: () -> Unit,
 ) {
+    val imageRequest = ImageRequest.Builder(LocalContext.current)
+        .data(coin.iconUrl)
+        .crossfade(true)
+        .error(R.drawable.coinplaceholder)
+        .build()
+
     Card(
         modifier = Modifier
             .clickable { onListSearchItemSelected() }
@@ -53,7 +64,7 @@ fun SucheCoinListItem(
                         .width(50.dp)
                         .height(50.dp)
                         .clip(shape = MaterialTheme.shapes.extraLarge),
-                    model = coin.iconUrl,
+                    model = imageRequest,
                     contentDescription = coin.name,
                     contentScale = ContentScale.Fit,
                     clipToBounds = false
@@ -113,5 +124,5 @@ private fun SucheCoinListPreview() {
         1710676800000L,
         listOf("store-of-value")
     )
-    SucheCoinListItem(testCoin, onListSearchItemSelected = {  })
+    SucheCoinListItem(testCoin, onListSearchItemSelected = { })
 }
