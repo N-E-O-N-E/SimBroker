@@ -67,7 +67,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun startStartActivity() {
-        Log.d("test", "startStartActivity() aufgerufen")
+        Log.d("simDebug", "StartActivity aufgerufen")
         val intent = Intent(this, StartActivity::class.java)
         startActivity(intent)
         finish()
