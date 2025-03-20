@@ -52,8 +52,7 @@ private fun PortfolioCoinListPreview() {
             coinUuid = "1",
             amount = 1.0,
             averageBuyPrice = 67000.1321,
-            firstBuyTimestamp = 123456789,
-            lastUpdateTimestamp = 123456789,
+            buyTimestamp = 123456789,
             symbol = "BTC",
             name = "Bitcoin",
             iconUrl = "https://example.com/btc.png"

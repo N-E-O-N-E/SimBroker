@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -26,9 +27,11 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.request.error
 import de.neone.simbroker.R
+import de.neone.simbroker.data.local.PortfolioData
 import de.neone.simbroker.data.remote.Coin
 import de.neone.simbroker.ui.SimBrokerViewModel
 import org.koin.androidx.compose.koinViewModel
+import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,7 +39,7 @@ fun CoinDetailSheet(
     modifier: Modifier = Modifier,
     viewModel: SimBrokerViewModel = koinViewModel(),
     onDismiss: () -> Unit,
-    coin: Coin,
+    selectedCoin: Coin,
 ) {
 
     val skipPartiallyExpanded by rememberSaveable { mutableStateOf(false) }
@@ -44,7 +47,7 @@ fun CoinDetailSheet(
         rememberModalBottomSheetState(skipPartiallyExpanded = skipPartiallyExpanded)
 
     val imageRequest = ImageRequest.Builder(LocalContext.current)
-        .data(coin.iconUrl)
+        .data(selectedCoin.iconUrl)
         .crossfade(true)
         .error(R.drawable.coinplaceholder)
         .build()
@@ -62,8 +65,11 @@ fun CoinDetailSheet(
             verticalArrangement = Arrangement.Top
         ) {
 
-            Text(text = coin.name, style = MaterialTheme.typography.titleMedium)
-            Text(text = coin.uuid, style = MaterialTheme.typography.bodyMedium)
+            Text(text = selectedCoin.uuid, style = MaterialTheme.typography.bodyMedium)
+            Text(text = selectedCoin.symbol, style = MaterialTheme.typography.titleMedium)
+            Text(text = selectedCoin.name, style = MaterialTheme.typography.bodyMedium)
+            Text(text = selectedCoin.change, style = MaterialTheme.typography.bodyMedium)
+            Text(text = selectedCoin.price, style = MaterialTheme.typography.bodyMedium)
 
             AsyncImage(
                 modifier = Modifier
@@ -73,10 +79,29 @@ fun CoinDetailSheet(
                     .clip(shape = MaterialTheme.shapes.extraLarge),
                 onError = { Log.e("simDebug", "Error loading image") },
                 model = imageRequest,
-                contentDescription = coin.name,
+                contentDescription = selectedCoin.name,
                 contentScale = ContentScale.Fit,
                 clipToBounds = true,
             )
+
+            Button(onClick = {
+                Log.d("simDebug", "Kaufen gedrückt")
+                viewModel.addCoinToPortfolio(
+                    PortfolioData(
+                        coinUuid = selectedCoin.uuid,
+                        amount = 1.0,
+                        averageBuyPrice = selectedCoin.price.toDouble(),
+                        buyTimestamp = Date().time,
+                        symbol = selectedCoin.symbol,
+                        name = selectedCoin.name,
+                        iconUrl = selectedCoin.iconUrl
+                    )
+                )
+                onDismiss()
+
+            }) {
+                Text(text = "Kaufen")
+            }
         }
     }
 }

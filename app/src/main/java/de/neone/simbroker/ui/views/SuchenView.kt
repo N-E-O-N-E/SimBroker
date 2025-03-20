@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -31,6 +32,7 @@ import de.neone.simbroker.ui.SimBrokerViewModel
 import de.neone.simbroker.ui.components.activites.ViewWallpaperImageBox
 import de.neone.simbroker.ui.components.sheets.CoinDetailSheet
 import de.neone.simbroker.ui.components.sheets.SucheSheet
+import de.neone.simbroker.ui.components.suche.LoadingIndicator
 import de.neone.simbroker.ui.components.suche.SucheCoinListItem
 import org.koin.androidx.compose.koinViewModel
 
@@ -49,13 +51,10 @@ fun SuchenView(
     var selectedCoin by remember { mutableStateOf<Coin?>(null) }
     var openSucheSheet by rememberSaveable { mutableStateOf(false) }
     var openCoinDetailSheet by rememberSaveable { mutableStateOf(false) }
-    val isFetched = rememberSaveable { mutableStateOf(false) }
+    val timer by viewModel.refreshTimer.collectAsState()
 
     LaunchedEffect(Unit) {
-        if (!isFetched.value) {
-            viewModel.fetchCoins()
-            isFetched.value = true
-        }
+        viewModel.loadMoreCoins()
     }
 
     Column(
@@ -69,8 +68,10 @@ fun SuchenView(
                 .height(25.dp)
                 .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f))
                 .padding(horizontal = 10.dp),
-            horizontalArrangement = Arrangement.End
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
+            Text("RealoadTime: $timer")
+
             IconButton(onClick = {
                 openSucheSheet = !openSucheSheet
             }) {
@@ -92,13 +93,25 @@ fun SuchenView(
                     },
                 )
             }
+            // Pagination zeigt den Loader, wenn die Liste nicht leer ist
+
+            item {
+                if (coinList.isNotEmpty()) {
+                    LoadingIndicator()
+                    LaunchedEffect(Unit) {
+                        viewModel.loadMoreCoins()
+                    }
+                }
+            }
         }
     }
 
     if (openSucheSheet) {
         SucheSheet(
             coinList = coinList,
-            onDismiss = { openSucheSheet = false },
+            onDismiss = {
+                openSucheSheet = false
+            },
             selectedCoin = {
                 selectedCoin = it
                 openSucheSheet = false
@@ -112,10 +125,13 @@ fun SuchenView(
     if (openCoinDetailSheet) {
         selectedCoin?.let {
             CoinDetailSheet(
-                coin = it,
-                onDismiss = { openCoinDetailSheet = false },
+                selectedCoin = it,
+                onDismiss = {
+                    openCoinDetailSheet = false
+                },
             )
         }
     }
 }
+
 

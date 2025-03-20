@@ -9,7 +9,8 @@ import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface PortfolioDao {
+interface SimBrokerDAO {
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPortfolioData(portfolioData: PortfolioData)
 

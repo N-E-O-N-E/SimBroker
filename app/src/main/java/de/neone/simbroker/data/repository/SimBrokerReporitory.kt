@@ -4,7 +4,7 @@ import de.neone.simbroker.data.remote.APIService
 import de.neone.simbroker.data.remote.Coin
 
 interface SimBrokerRepositoryInterface {
-    suspend fun getCoins(): List<Coin>
+    suspend fun getCoins(limit: Int, offset: Int): List<Coin>
     suspend fun getCoin(uuid: String, timePeriod: String): Coin
 
 }
@@ -13,8 +13,8 @@ class SimBrokerRepositoryImpl(
     private val apiService: APIService
 ) : SimBrokerRepositoryInterface {
 
-    override suspend fun getCoins(): List<Coin> {
-        return apiService.getCoins().data.coins
+    override suspend fun getCoins(limit: Int, offset: Int): List<Coin> {
+        return apiService.getCoins(limit = limit, offset = offset).data.coins
     }
 
     override suspend fun getCoin(uuid: String, timePeriod: String): Coin {

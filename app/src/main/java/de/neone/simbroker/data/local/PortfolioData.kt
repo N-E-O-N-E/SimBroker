@@ -5,13 +5,14 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "portfolioData")
 data class PortfolioData(
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
     val coinUuid: String,
     val amount: Double,
     val averageBuyPrice: Double,
-    val firstBuyTimestamp: Long,
-    val lastUpdateTimestamp: Long,
+    val buyTimestamp: Long,
     val symbol: String,
     val name: String,
     val iconUrl: String
 )
+

@@ -6,16 +6,16 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(entities = [PortfolioData::class], version = 1, exportSchema = false)
-abstract class PortfolioDatabase : RoomDatabase() {
-    abstract fun portfolioDao(): PortfolioDao
+abstract class SimBrokerDatabase : RoomDatabase() {
+    abstract fun portfolioDao(): SimBrokerDAO
 
     companion object {
         @Volatile
-        private var Instance: PortfolioDatabase? = null
+        private var Instance: SimBrokerDatabase? = null
 
-        fun getDatabase(context: Context): PortfolioDatabase {
+        fun getDatabase(context: Context): SimBrokerDatabase {
             return Instance ?: synchronized(this) {
-                Room.databaseBuilder(context, PortfolioDatabase::class.java, "portfolioDatabase")
+                Room.databaseBuilder(context, SimBrokerDatabase::class.java, "portfolioDatabase")
                     .fallbackToDestructiveMigration()
                     .build()
                     .also { Instance = it }

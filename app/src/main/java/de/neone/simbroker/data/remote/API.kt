@@ -52,8 +52,8 @@ interface APIService {
         @Query("tiers") tiers: String = "1",
         @Query("orderBy") orderBy: String = "marketCap",
         @Query("orderDirection") orderDirection: String = "desc",
-        @Query("limit") limit: Int = 50,
-        @Query("offset") offset: Int = 0,
+        @Query("limit") limit: Int,
+        @Query("offset") offset: Int,
         @Query("timePeriod") timePeriod: String = "24h",
     ): CoinsResponse
 
