@@ -9,6 +9,7 @@ package de.neone.simbroker
 */
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -66,6 +67,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun startStartActivity() {
+        Log.d("test", "startStartActivity() aufgerufen")
         val intent = Intent(this, StartActivity::class.java)
         startActivity(intent)
         finish()
