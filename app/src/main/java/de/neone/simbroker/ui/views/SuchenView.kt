@@ -71,8 +71,8 @@ fun SuchenView(viewModel: SimBrokerViewModel) {
         ) {
             Text(
                 text = "RealoadTime: $timer",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             IconButton(onClick = {

@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SimBrokerDAO {
@@ -11,17 +12,20 @@ interface SimBrokerDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPortfolioData(portfolioData: PortfolioData)
 
-    @Query("SELECT * FROM portfolioData")
-    suspend fun getAllPortfolioData(): List<PortfolioData>
-
-    @Query("SELECT * FROM portfolioData WHERE coinUuid = :coinUuid")
-    suspend fun getPortfolioDataByCoinUuid(coinUuid: String): PortfolioData?
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSparklineDataEntity(sparklineDataEntity: SparklineDataEntity)
 
+
+    // Daten als Flow
+
+    @Query("SELECT * FROM portfolioData")
+    fun getAllPortfolioData(): Flow<List<PortfolioData>>
+
+    @Query("SELECT * FROM portfolioData WHERE coinUuid = :coinUuid")
+    fun getPortfolioDataByCoinUuid(coinUuid: String): Flow<PortfolioData?>
+
     @Query("SELECT * FROM portfolioDataSparklines WHERE coinUuid = :coinUuid")
-    suspend fun getCoinSparklines(coinUuid: String): List<SparklineDataEntity>
+    fun getCoinSparklines(coinUuid: String): Flow<List<SparklineDataEntity>>
 
 
 }

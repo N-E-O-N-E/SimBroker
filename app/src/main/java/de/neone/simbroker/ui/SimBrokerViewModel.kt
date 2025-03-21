@@ -11,13 +11,19 @@ import de.neone.simbroker.data.remote.Coin
 import de.neone.simbroker.data.repository.SimBrokerRepositoryInterface
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class SimBrokerViewModel(
     application: Application,
     private val repository: SimBrokerRepositoryInterface,
 ) : AndroidViewModel(application) {
+
+    // Room Database
+    private val simBrokerDatabase =
+        SimBrokerDatabase.getDatabase(application.applicationContext).simBrokerDAO()
 
     // Timer Steuerung
     private var timerStartet = false
@@ -34,7 +40,7 @@ class SimBrokerViewModel(
     init {
         viewModelScope.launch {
             loadMoreCoins()
-            if (!timerStartet) {
+            while(!timerStartet) {
                 startTimer()
                 timerStartet = true
             }
@@ -54,60 +60,42 @@ class SimBrokerViewModel(
         }
     }
 
-
-    // Room Database
-    private val simBrokerDatabase =
-        SimBrokerDatabase.getDatabase(application.applicationContext).simBrokerDAO()
-
-    // Room Datenströme
-    private val _coinsListData = MutableStateFlow<List<PortfolioData>>(emptyList())
-    val coinsListData: StateFlow<List<PortfolioData>> = _coinsListData
-
-    private val _sparklineData = MutableStateFlow<List<SparklineDataEntity>>(emptyList())
-    val sparklineData: StateFlow<List<SparklineDataEntity>> = _sparklineData
-
-    fun loadPortfolioData() {
+    fun insertPortfolioData(portfolioData: PortfolioData) {
         viewModelScope.launch {
-            try {
-                val result = repository.getAllPortfolioData()
-                _coinsListData.value = result
-            } catch (e: Exception) {
-                Log.e("SimBrokerViewModel", "Fehler beim Laden der Coins", e)
-            }
+            simBrokerDatabase.insertPortfolioData(portfolioData)
         }
     }
 
-    fun loadCoinSparklines(coinUuid: String) {
+    fun insertSparklineDataEntity(sparklineDataEntity: SparklineDataEntity) {
         viewModelScope.launch {
-            try {
-                val result = repository.getCoinSparklines(coinUuid)
-                _sparklineData.value = result
-            } catch (e: Exception) {
-                Log.e("SimBrokerViewModel", "Fehler beim Laden der Sparkline", e)
-            }
-
+            simBrokerDatabase.insertSparklineDataEntity(sparklineDataEntity)
         }
     }
 
-    fun savePortfolioData(portfolioData: PortfolioData) {
-        viewModelScope.launch {
-            try {
-                repository.insertPortfolioData(portfolioData)
-            } catch (e: Exception) {
-                Log.e("SimBrokerViewModel", "Fehler beim Speichern der PortfolioData", e)
-            }
-        }
-    }
 
-    fun saveSparklineData(sparklineDataEntity: SparklineDataEntity) {
-        viewModelScope.launch {
-            try {
-                repository.insertSparklineDataEntity(sparklineDataEntity)
-            } catch (e: Exception) {
-                Log.e("SimBrokerViewModel", "Fehler beim Speichern der SparklineData", e)
-            }
-        }
-    }
+    // Room Datenströme Flow
+
+    val portfolioCoins = simBrokerDatabase.getAllPortfolioData()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = emptyList()
+        )
+
+    val portfolioDataCoin = simBrokerDatabase.getPortfolioDataByCoinUuid("coinUuid")
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = null
+        )
+
+    val portfolioDataCoinSparklines = simBrokerDatabase.getCoinSparklines("coinUuid")
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = emptyList()
+        )
+
 
 
     // API Response
@@ -137,7 +125,7 @@ class SimBrokerViewModel(
         viewModelScope.launch {
             try {
                 val refreshedCoins =
-                    repository.getCoins(offset = 0, limit = _coinList.value.size)
+                    repository.getCoins(offset = 0, limit = limit)
                 if (refreshedCoins.isNotEmpty()) {
                     _coinList.value = refreshedCoins
                 }

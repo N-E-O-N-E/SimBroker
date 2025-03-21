@@ -6,6 +6,7 @@ import de.neone.simbroker.data.remote.CoinbaseAPI
 import de.neone.simbroker.data.repository.SimBrokerRepositoryInterface
 import de.neone.simbroker.data.repository.SimBrokerRepositoryMock
 import de.neone.simbroker.ui.SimBrokerViewModel
+import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
@@ -19,7 +20,7 @@ val appModule = module {
     }
 
     single<SimBrokerDatabase> {
-        SimBrokerDatabase.getDatabase(get())
+        SimBrokerDatabase.getDatabase(androidContext())
     }
 
     single {
@@ -27,16 +28,11 @@ val appModule = module {
     }
 
 //    single<SimBrokerRepositoryInterface> {
-//        SimBrokerRepositoryImpl(
-//            apiService = get(),
-//            simBrokerDAO = get()
-//        )
+//        SimBrokerRepositoryImpl(get(), get())
 //    }
 
     single<SimBrokerRepositoryInterface> {
-        SimBrokerRepositoryMock(
-            simBrokerDAO = get()
-        )
+        SimBrokerRepositoryMock(get())
     }
 
 }
