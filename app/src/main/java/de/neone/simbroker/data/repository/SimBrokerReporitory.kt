@@ -10,7 +10,7 @@ interface SimBrokerRepositoryInterface {
 }
 
 class SimBrokerRepositoryImpl(
-    private val apiService: APIService
+    private val apiService: APIService,
 ) : SimBrokerRepositoryInterface {
 
     override suspend fun getCoins(limit: Int, offset: Int): List<Coin> {

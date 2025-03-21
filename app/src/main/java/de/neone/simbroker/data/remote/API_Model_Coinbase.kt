@@ -37,14 +37,8 @@ data class Coin(
     val coinrankingUrl: String,
     @Json(name = "24hVolume")
     val h24Volume: String,
-    val btcPrice: String,
-    val contractAddresses: List<String>? = null,
     val description: String? = null,
-    val numberOfMarkets: Int? = null,
-    val numberOfExchanges: Int? = null,
-    val fullyDilutedMarketCap: String? = null,
     val priceAt: Long? = null,
-    val tags: List<String>? = null,
 )
 
 data class PriceHistoryDto(

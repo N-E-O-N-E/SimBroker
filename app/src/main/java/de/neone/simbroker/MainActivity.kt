@@ -28,6 +28,7 @@ import de.neone.simbroker.ui.theme.topBarColorDark
 import de.neone.simbroker.ui.theme.topBarColorLight
 import kotlinx.serialization.Serializable
 
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,6 +56,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                 ) { innerPadding ->
+
                     NavHostComponent(
                         innerPadding = innerPadding,
                         navController = navController

@@ -23,6 +23,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -68,9 +69,14 @@ fun SuchenView(
                 .height(25.dp)
                 .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f))
                 .padding(horizontal = 10.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("RealoadTime: $timer")
+            Text(
+                text = "RealoadTime: $timer",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+            )
 
             IconButton(onClick = {
                 openSucheSheet = !openSucheSheet

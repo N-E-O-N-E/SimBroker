@@ -27,11 +27,9 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.request.error
 import de.neone.simbroker.R
-import de.neone.simbroker.data.local.PortfolioData
 import de.neone.simbroker.data.remote.Coin
 import de.neone.simbroker.ui.SimBrokerViewModel
 import org.koin.androidx.compose.koinViewModel
-import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -86,17 +84,7 @@ fun CoinDetailSheet(
 
             Button(onClick = {
                 Log.d("simDebug", "Kaufen gedrückt")
-                viewModel.addCoinToPortfolio(
-                    PortfolioData(
-                        coinUuid = selectedCoin.uuid,
-                        amount = 1.0,
-                        averageBuyPrice = selectedCoin.price.toDouble(),
-                        buyTimestamp = Date().time,
-                        symbol = selectedCoin.symbol,
-                        name = selectedCoin.name,
-                        iconUrl = selectedCoin.iconUrl
-                    )
-                )
+
                 onDismiss()
 
             }) {

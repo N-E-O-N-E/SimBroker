@@ -5,23 +5,33 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "portfolioData")
-data class PortfolioData(
+@Entity(tableName = "coinsDto")
+data class CoinEntityDto(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
-    val coinUuid: String,
-    val name: String,
+    val id: Long = 0,
+    val uuid: String,
     val symbol: String,
-    val amount: Double,
-    val averageBuyPrice: Double,
+    val name: String,
+    val color: String?,
     val iconUrl: String,
+    val price: String,
+    val marketCap: String,
+    val listedAt: Long,
+    val tier: Int,
+    val change: String,
+    val rank: Int,
+    val lowVolume: Boolean,
+    val coinrankingUrl: String,
+    val h24Volume: String,
+    val description: String?,
+    val priceAt: Long?
 )
 
 @Entity(
-    tableName = "portfolioDataSparklines",
+    tableName = "sparklinesDto",
     foreignKeys = [
         ForeignKey(
-            entity = PortfolioData::class,
+            entity = CoinEntityDto::class,
             parentColumns = ["id"],
             childColumns = ["coinUuid"],
             onDelete = ForeignKey.CASCADE
@@ -30,11 +40,10 @@ data class PortfolioData(
     indices = [Index("coinUuid")]
 )
 
-data class SparklineDataEntity(
+data class SparklineEntityDto(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val coinUuid: String,
     val value: String,
     val position: Int
 )
-

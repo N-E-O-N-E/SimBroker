@@ -4,15 +4,12 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import de.neone.simbroker.data.local.PortfolioData
 import de.neone.simbroker.data.local.SimBrokerDatabase
 import de.neone.simbroker.data.remote.Coin
 import de.neone.simbroker.data.repository.SimBrokerRepositoryInterface
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class SimBrokerViewModel(
@@ -46,14 +43,15 @@ class SimBrokerViewModel(
 
 
     // Room
-    private val portfolioDao =
-        SimBrokerDatabase.getDatabase(application.applicationContext).portfolioDao()
+    private val simBrokerDAO = SimBrokerDatabase.getDatabase(application.applicationContext).portfolioDao()
 
-    val portfolioCoins = portfolioDao.getAllPortfolioData().stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(),
-        initialValue = emptyList()
-    )
+    // Speichern und Laden der API Daten ins DTO
+
+    // Speichern und Laden von Portfolio Daten
+
+
+
+
 
     // API Response
     private val _coinList = MutableStateFlow<List<Coin>>(emptyList())
@@ -96,12 +94,6 @@ class SimBrokerViewModel(
             } finally {
                 isLoading = false
             }
-        }
-    }
-
-    fun addCoinToPortfolio(portfolioData: PortfolioData) {
-        viewModelScope.launch {
-            portfolioDao.insertPortfolioData(portfolioData)
         }
     }
 }

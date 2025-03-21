@@ -116,13 +116,6 @@ private fun SucheCoinListPreview() {
         "https://coinranking.com/coin/btc",
         "32000000000",
         "1.0",
-        listOf("0xBTC"),
-        "The first and largest cryptocurrency",
-        400,
-        200,
-        "1500000000000",
-        1710676800000L,
-        listOf("store-of-value")
     )
     SucheCoinListItem(testCoin, onListSearchItemSelected = { })
 }
