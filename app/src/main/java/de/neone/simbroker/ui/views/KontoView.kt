@@ -11,13 +11,9 @@ import androidx.compose.ui.Modifier
 import de.neone.simbroker.R
 import de.neone.simbroker.ui.SimBrokerViewModel
 import de.neone.simbroker.ui.components.activites.ViewWallpaperImageBox
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun KontoView(
-    modifier: Modifier = Modifier,
-    viewModel: SimBrokerViewModel = koinViewModel(),
-) {
+fun KontoView(viewModel: SimBrokerViewModel) {
     ViewWallpaperImageBox(
         toMainActivity = { },
         imageLightTheme = R.drawable.simbroker_light_clear,

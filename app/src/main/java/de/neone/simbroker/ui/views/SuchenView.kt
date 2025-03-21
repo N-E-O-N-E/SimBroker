@@ -35,13 +35,9 @@ import de.neone.simbroker.ui.components.sheets.CoinDetailSheet
 import de.neone.simbroker.ui.components.sheets.SucheSheet
 import de.neone.simbroker.ui.components.suche.LoadingIndicator
 import de.neone.simbroker.ui.components.suche.SucheCoinListItem
-import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun SuchenView(
-    modifier: Modifier = Modifier,
-    viewModel: SimBrokerViewModel = koinViewModel(),
-) {
+fun SuchenView(viewModel: SimBrokerViewModel) {
     ViewWallpaperImageBox(
         toMainActivity = { },
         imageLightTheme = R.drawable.simbroker_light_clear,
@@ -59,7 +55,7 @@ fun SuchenView(
     }
 
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize(),
         verticalArrangement = Arrangement.Top
     ) {

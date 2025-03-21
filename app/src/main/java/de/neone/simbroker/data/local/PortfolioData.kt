@@ -26,8 +26,7 @@ data class PortfolioData(
             childColumns = ["coinUuid"],
             onDelete = ForeignKey.CASCADE
         )
-    ],
-    indices = [Index("coinUuid")]
+    ], indices = [Index("coinUuid")]
 )
 
 data class SparklineDataEntity(
@@ -35,6 +34,5 @@ data class SparklineDataEntity(
     val id: Long = 0,
     val coinUuid: String,
     val value: String,
-    val position: Int
 )
 

@@ -1,11 +1,12 @@
 package de.neone.simbroker.ui.views
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Text
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -15,12 +16,10 @@ import androidx.compose.ui.Modifier
 import de.neone.simbroker.R
 import de.neone.simbroker.ui.SimBrokerViewModel
 import de.neone.simbroker.ui.components.activites.ViewWallpaperImageBox
-import org.koin.androidx.compose.koinViewModel
+import de.neone.simbroker.ui.components.portfolio.PortfolioCoinListItem
 
 @Composable
-fun PortfolioView(
-    viewModel: SimBrokerViewModel = koinViewModel(),
-) {
+fun PortfolioView(viewModel: SimBrokerViewModel) {
     ViewWallpaperImageBox(
         toMainActivity = { },
         imageLightTheme = R.drawable.simbroker_light_clear,
@@ -28,11 +27,12 @@ fun PortfolioView(
     )
 
     LaunchedEffect(Unit) {
-        // Portfolio laden und Daten der API Dto für aktuelle CoinListe
+        viewModel.getAllPortfolioData()
     }
 
     val coinList by viewModel.coinList.collectAsState()
-    // Laden ->  val portfolioCoins by viewModel.portfolioCoins.collectAsState()
+    val portfolioCoins by viewModel.coinsListData.collectAsState()
+    val sparklineData by viewModel.sparklineData.collectAsState()
 
     Column(
         modifier = Modifier
@@ -42,11 +42,11 @@ fun PortfolioView(
         verticalArrangement = Arrangement.Top
     ) {
 
-        Text(coinList.size.toString())
         LazyColumn {
-//            items(portfolioCoins) { coin ->
-//                PortfolioCoinListItem(coin = coin)
-//            }
+            items(portfolioCoins) { coin ->
+                PortfolioCoinListItem(coin = coin, coinSparklines = sparklineData.map { it.value }, onLoad = { viewModel.getCoinSparklines(coin.coinUuid) })
+                Log.d("simDebug", "CoinSparklines: ${sparklineData.map { it.value }}")
+            }
         }
     }
 

@@ -59,10 +59,11 @@ class MainActivity : ComponentActivity() {
 
                     NavHostComponent(
                         innerPadding = innerPadding,
-                        navController = navController
-                    ) {
-                        startStartActivity()
-                    }
+                        navController = navController,
+                        action = {
+                            startStartActivity()
+                        }
+                    )
                 }
             }
         }
@@ -77,10 +78,13 @@ class MainActivity : ComponentActivity() {
 
     @Serializable
     object PortfolioRoute
+
     @Serializable
     object SucheRoute
+
     @Serializable
     object KontoRoute
+
     @Serializable
     object LogoutRoute
 }

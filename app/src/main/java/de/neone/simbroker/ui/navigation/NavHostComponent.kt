@@ -11,15 +11,18 @@ import de.neone.simbroker.MainActivity.KontoRoute
 import de.neone.simbroker.MainActivity.LogoutRoute
 import de.neone.simbroker.MainActivity.PortfolioRoute
 import de.neone.simbroker.MainActivity.SucheRoute
+import de.neone.simbroker.ui.SimBrokerViewModel
 import de.neone.simbroker.ui.views.KontoView
 import de.neone.simbroker.ui.views.PortfolioView
 import de.neone.simbroker.ui.views.SuchenView
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun NavHostComponent(
     innerPadding: PaddingValues,
     navController: NavHostController,
     action: () -> Unit,
+    viewModel: SimBrokerViewModel = koinViewModel()
 ) {
     NavHost(
         navController = navController,
@@ -27,13 +30,13 @@ fun NavHostComponent(
         modifier = Modifier.padding(innerPadding)
     ) {
         composable<PortfolioRoute> {
-            PortfolioView()
+            PortfolioView(viewModel)
         }
         composable<SucheRoute> {
-            SuchenView()
+            SuchenView(viewModel)
         }
         composable<KontoRoute> {
-            KontoView()
+            KontoView(viewModel)
         }
         composable<LogoutRoute> {
             action()

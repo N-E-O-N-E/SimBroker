@@ -13,6 +13,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -29,12 +30,18 @@ import de.neone.simbroker.data.local.PortfolioData
 @Composable
 fun PortfolioCoinListItem(
     coin: PortfolioData,
+    coinSparklines: List<String>,
+    onLoad: () -> Unit,
 ) {
     val imageRequest = ImageRequest.Builder(LocalContext.current)
         .data(coin.iconUrl)
         .crossfade(true)
         .error(R.drawable.coinplaceholder)
         .build()
+
+    LaunchedEffect(Unit) {
+        onLoad()
+    }
 
     Card(
         modifier = Modifier.padding(8.dp),
@@ -82,10 +89,11 @@ fun PortfolioCoinListItem(
 
                             Text(text = "Kaufwert: ${coin.amount * coin.averageBuyPrice}")
 
+                            HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
 
-
-
-
+                            coinSparklines.forEach { line ->
+                                Text(text = "Sparkline: $line")
+                            }
 
 
 
@@ -109,5 +117,7 @@ private fun PortfolioCoinListPreview() {
             name = "Bitcoin",
             iconUrl = "https://example.com/btc.png"
         ),
+        coinSparklines = emptyList(),
+        onLoad = { },
     )
 }

@@ -45,5 +45,4 @@ data class SparklineEntityDto(
     val id: Long = 0,
     val coinUuid: String,
     val value: String,
-    val position: Int
 )
