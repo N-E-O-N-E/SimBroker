@@ -4,11 +4,9 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import de.neone.simbroker.data.local.CoinEntityDto
 import de.neone.simbroker.data.local.PortfolioData
 import de.neone.simbroker.data.local.SimBrokerDatabase
 import de.neone.simbroker.data.local.SparklineDataEntity
-import de.neone.simbroker.data.local.SparklineEntityDto
 import de.neone.simbroker.data.remote.Coin
 import de.neone.simbroker.data.repository.SimBrokerRepositoryInterface
 import kotlinx.coroutines.delay
@@ -57,71 +55,57 @@ class SimBrokerViewModel(
     }
 
 
-    // Room
+    // Room Database
     private val simBrokerDatabase =
-        SimBrokerDatabase.getDatabase(application.applicationContext).portfolioDao()
+        SimBrokerDatabase.getDatabase(application.applicationContext).simBrokerDAO()
 
+    // Room Datenströme
     private val _coinsListData = MutableStateFlow<List<PortfolioData>>(emptyList())
     val coinsListData: StateFlow<List<PortfolioData>> = _coinsListData
+
     private val _sparklineData = MutableStateFlow<List<SparklineDataEntity>>(emptyList())
     val sparklineData: StateFlow<List<SparklineDataEntity>> = _sparklineData
 
-    private val _coinsListDto = MutableStateFlow<List<CoinEntityDto>>(emptyList())
-    val coinsListDto: StateFlow<List<CoinEntityDto>> = _coinsListDto
-    private val _sparklineListDto = MutableStateFlow<List<SparklineEntityDto>>(emptyList())
-    val sparklineListDto: StateFlow<List<SparklineEntityDto>> = _sparklineListDto
-
-    // Room - PortfolioDATA
-    fun insertPortfolioData(portfolioData: PortfolioData) {
+    fun loadPortfolioData() {
         viewModelScope.launch {
-            simBrokerDatabase.insertPortfolioData(portfolioData)
+            try {
+                val result = repository.getAllPortfolioData()
+                _coinsListData.value = result
+            } catch (e: Exception) {
+                Log.e("SimBrokerViewModel", "Fehler beim Laden der Coins", e)
+            }
         }
     }
 
-    fun insertSparklineDataEntity(sparklineDataEntity: SparklineDataEntity) {
+    fun loadCoinSparklines(coinUuid: String) {
         viewModelScope.launch {
-            simBrokerDatabase.insertSparklineDataEntity(sparklineDataEntity)
+            try {
+                val result = repository.getCoinSparklines(coinUuid)
+                _sparklineData.value = result
+            } catch (e: Exception) {
+                Log.e("SimBrokerViewModel", "Fehler beim Laden der Sparkline", e)
+            }
+
         }
     }
 
-    fun getAllPortfolioData() {
+    fun savePortfolioData(portfolioData: PortfolioData) {
         viewModelScope.launch {
-            val portfolioData = simBrokerDatabase.getAllPortfolioData()
-            _coinsListData.value = portfolioData
+            try {
+                repository.insertPortfolioData(portfolioData)
+            } catch (e: Exception) {
+                Log.e("SimBrokerViewModel", "Fehler beim Speichern der PortfolioData", e)
+            }
         }
     }
 
-    fun getCoinSparklines(coinUuid: String) {
+    fun saveSparklineData(sparklineDataEntity: SparklineDataEntity) {
         viewModelScope.launch {
-            val sparklineData = simBrokerDatabase.getCoinSparklines(coinUuid)
-            _sparklineData.value = sparklineData
-        }
-    }
-
-    // Room - CoinEntityDto
-    fun insertCoinEntityDto(coinEntityDto: CoinEntityDto) {
-        viewModelScope.launch {
-            simBrokerDatabase.insertCoinEntityDto(coinEntityDto)
-        }
-    }
-
-    fun insertSparklineEntityDto(sparklineEntityDto: SparklineEntityDto) {
-        viewModelScope.launch {
-            simBrokerDatabase.insertSparklineEntityDto(sparklineEntityDto)
-        }
-    }
-
-    fun getAllCoinsDto() {
-        viewModelScope.launch {
-            val coinsDto = simBrokerDatabase.getAllCoinsDto()
-            _coinsListDto.value = coinsDto
-        }
-    }
-
-    fun getCoinSparklinesDto() {
-        viewModelScope.launch {
-            val sparklinesDto = simBrokerDatabase.getCoinSparklinesDto()
-            _sparklineListDto.value = sparklinesDto
+            try {
+                repository.insertSparklineDataEntity(sparklineDataEntity)
+            } catch (e: Exception) {
+                Log.e("SimBrokerViewModel", "Fehler beim Speichern der SparklineData", e)
+            }
         }
     }
 
@@ -152,7 +136,8 @@ class SimBrokerViewModel(
     private fun refreshCoins() {
         viewModelScope.launch {
             try {
-                val refreshedCoins = repository.getCoins(offset = 0, limit = _coinList.value.size)
+                val refreshedCoins =
+                    repository.getCoins(offset = 0, limit = _coinList.value.size)
                 if (refreshedCoins.isNotEmpty()) {
                     _coinList.value = refreshedCoins
                 }

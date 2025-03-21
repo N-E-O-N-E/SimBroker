@@ -46,6 +46,7 @@ fun SuchenView(viewModel: SimBrokerViewModel) {
 
     val coinList by viewModel.coinList.collectAsState()
     var selectedCoin by remember { mutableStateOf<Coin?>(null) }
+
     var openSucheSheet by rememberSaveable { mutableStateOf(false) }
     var openCoinDetailSheet by rememberSaveable { mutableStateOf(false) }
     val timer by viewModel.refreshTimer.collectAsState()
@@ -130,7 +131,7 @@ fun SuchenView(viewModel: SimBrokerViewModel) {
                 selectedCoin = it,
                 onDismiss = {
                     openCoinDetailSheet = false
-                },
+                }
             )
         }
     }

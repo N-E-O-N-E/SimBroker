@@ -15,7 +15,7 @@ val appModule = module {
     viewModelOf(::SimBrokerViewModel)
 
     single<SimBrokerDAO> {
-        get<SimBrokerDatabase>().portfolioDao()
+        get<SimBrokerDatabase>().simBrokerDAO()
     }
 
     single<SimBrokerDatabase> {
@@ -27,11 +27,16 @@ val appModule = module {
     }
 
 //    single<SimBrokerRepositoryInterface> {
-//        SimBrokerRepositoryImpl(get())
+//        SimBrokerRepositoryImpl(
+//            apiService = get(),
+//            simBrokerDAO = get()
+//        )
 //    }
 
     single<SimBrokerRepositoryInterface> {
-        SimBrokerRepositoryMock()
+        SimBrokerRepositoryMock(
+            simBrokerDAO = get()
+        )
     }
 
 }

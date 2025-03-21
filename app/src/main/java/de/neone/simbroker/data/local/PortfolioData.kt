@@ -5,7 +5,7 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "portfolioData")
+@Entity(tableName = "portfolioData", indices = [Index(value = ["coinUuid"], unique = false)])
 data class PortfolioData(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
@@ -26,7 +26,8 @@ data class PortfolioData(
             childColumns = ["coinUuid"],
             onDelete = ForeignKey.CASCADE
         )
-    ], indices = [Index("coinUuid")]
+    ],
+    indices = [Index("coinUuid")]
 )
 
 data class SparklineDataEntity(

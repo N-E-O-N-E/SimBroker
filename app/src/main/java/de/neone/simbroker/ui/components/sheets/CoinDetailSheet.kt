@@ -22,17 +22,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewModelScope
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.request.error
 import de.neone.simbroker.R
-import de.neone.simbroker.data.local.PortfolioData
-import de.neone.simbroker.data.local.SparklineDataEntity
 import de.neone.simbroker.data.remote.Coin
 import de.neone.simbroker.ui.SimBrokerViewModel
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,10 +37,10 @@ fun CoinDetailSheet(
     modifier: Modifier = Modifier,
     viewModel: SimBrokerViewModel = koinViewModel(),
     onDismiss: () -> Unit,
-    selectedCoin: Coin,
+    selectedCoin: Coin
 ) {
 
-    val skipPartiallyExpanded by rememberSaveable { mutableStateOf(false) }
+        val skipPartiallyExpanded by rememberSaveable { mutableStateOf(false) }
     val coinDetailSheetState =
         rememberModalBottomSheetState(skipPartiallyExpanded = skipPartiallyExpanded)
 
@@ -89,26 +85,6 @@ fun CoinDetailSheet(
             Button(onClick = {
                 Log.d("simDebug", "Kaufen gedrückt")
 
-                viewModel.viewModelScope.launch {
-                    viewModel.insertPortfolioData(
-                        portfolioData = PortfolioData(
-                            coinUuid = selectedCoin.uuid,
-                            name = selectedCoin.name,
-                            symbol = selectedCoin.symbol,
-                            amount = 1.0, // Usereingabe später
-                            averageBuyPrice = selectedCoin.price.toDouble(),
-                            iconUrl = selectedCoin.iconUrl
-                        )
-                    )
-                    selectedCoin.sparkline.forEach { value ->
-                        viewModel.insertSparklineDataEntity(
-                            SparklineDataEntity(
-                                coinUuid = selectedCoin.uuid,
-                                value = value
-                            )
-                        )
-                    }
-                }
 
                 onDismiss()
 

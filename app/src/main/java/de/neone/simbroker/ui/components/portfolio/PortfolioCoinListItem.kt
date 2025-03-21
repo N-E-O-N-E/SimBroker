@@ -30,7 +30,6 @@ import de.neone.simbroker.data.local.PortfolioData
 @Composable
 fun PortfolioCoinListItem(
     coin: PortfolioData,
-    coinSparklines: List<String>,
     onLoad: () -> Unit,
 ) {
     val imageRequest = ImageRequest.Builder(LocalContext.current)
@@ -91,9 +90,8 @@ fun PortfolioCoinListItem(
 
                             HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
 
-                            coinSparklines.forEach { line ->
-                                Text(text = "Sparkline: $line")
-                            }
+
+
 
 
 
@@ -117,7 +115,6 @@ private fun PortfolioCoinListPreview() {
             name = "Bitcoin",
             iconUrl = "https://example.com/btc.png"
         ),
-        coinSparklines = emptyList(),
         onLoad = { },
     )
 }
