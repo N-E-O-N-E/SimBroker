@@ -1,8 +1,10 @@
 package de.neone.simbroker.data.repository
 
-import de.neone.simbroker.data.local.PortfolioData
+import de.neone.simbroker.data.local.ClosedTrade
+import de.neone.simbroker.data.local.PortfolioPosition
 import de.neone.simbroker.data.local.SimBrokerDAO
 import de.neone.simbroker.data.local.SparklineDataEntity
+import de.neone.simbroker.data.local.Transaction
 import de.neone.simbroker.data.remote.Coin
 import de.neone.simbroker.data.repository.mockdata.coins_Mockdata
 import kotlinx.coroutines.flow.Flow
@@ -20,25 +22,37 @@ class SimBrokerRepositoryMock(private val simBrokerDAO: SimBrokerDAO) : SimBroke
 
     // ROOM - PortfolioDATA
 
-    override suspend fun insertPortfolioData(portfolioData: PortfolioData) {
-        simBrokerDAO.insertPortfolioData(portfolioData)
+    override suspend fun insertTransaction(transaction: Transaction) {
+        simBrokerDAO.insertTransaction(transaction)
     }
-
+    override suspend fun insertPortfolioPosition(portfolioPosition: PortfolioPosition) {
+        simBrokerDAO.insertPortfolioPosition(portfolioPosition)
+    }
+    override suspend fun insertClosedTrade(closedTrade: ClosedTrade) {
+        simBrokerDAO.insertClosedTrade(closedTrade)
+    }
     override suspend fun insertSparklineDataEntity(sparklineDataEntity: SparklineDataEntity) {
         simBrokerDAO.insertSparklineDataEntity(sparklineDataEntity)
     }
 
-
-    override fun getAllPortfolioData(): Flow<List<PortfolioData>> {
-        return simBrokerDAO.getAllPortfolioData()
+    override fun getAllTransactions(): Flow<List<Transaction>> {
+        return simBrokerDAO.getAllTransactions()
     }
 
-    override fun getPortfolioDataByCoinUuid(coinUuid: String): Flow<PortfolioData?> {
-        return simBrokerDAO.getPortfolioDataByCoinUuid(coinUuid)
+    override fun getAllPortfolioPositions(): Flow<List<PortfolioPosition>> {
+        return simBrokerDAO.getAllPortfolioPositions()
     }
 
-    override fun getCoinSparklines(coinUuid: String): Flow<List<SparklineDataEntity>> {
-        return simBrokerDAO.getCoinSparklines(coinUuid)
+    override fun getAllClosedTrades(): Flow<List<ClosedTrade>> {
+        return simBrokerDAO.getAllClosedTrades()
+    }
+
+    override fun getTransactionsByCoinUuid(coinUuid: String): Flow<List<Transaction>> {
+        return simBrokerDAO.getTransactionsByCoinUuid(coinUuid)
+    }
+
+    override fun getSparklineDataByCoinUuid(coinUuid: String): Flow<List<SparklineDataEntity>> {
+        return simBrokerDAO.getSparklineDataByCoinUuid(coinUuid)
     }
 
 }

@@ -10,7 +10,13 @@ import kotlinx.coroutines.flow.Flow
 interface SimBrokerDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPortfolioData(portfolioData: PortfolioData)
+    suspend fun insertTransaction(transaction: Transaction)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertPortfolioPosition(portfolioPosition: PortfolioPosition)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertClosedTrade(closedTrade: ClosedTrade)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSparklineDataEntity(sparklineDataEntity: SparklineDataEntity)
@@ -18,14 +24,21 @@ interface SimBrokerDAO {
 
     // Daten als Flow
 
-    @Query("SELECT * FROM portfolioData")
-    fun getAllPortfolioData(): Flow<List<PortfolioData>>
+    @Query("SELECT * FROM transactions")
+    fun getAllTransactions(): Flow<List<Transaction>>
 
-    @Query("SELECT * FROM portfolioData WHERE coinUuid = :coinUuid")
-    fun getPortfolioDataByCoinUuid(coinUuid: String): Flow<PortfolioData?>
+    @Query("SELECT * FROM portfolioPositions")
+    fun getAllPortfolioPositions(): Flow<List<PortfolioPosition>>
 
-    @Query("SELECT * FROM portfolioDataSparklines WHERE coinUuid = :coinUuid")
-    fun getCoinSparklines(coinUuid: String): Flow<List<SparklineDataEntity>>
+    @Query("SELECT * FROM closedTrades")
+    fun getAllClosedTrades(): Flow<List<ClosedTrade>>
+
+    @Query("SELECT * FROM transactions WHERE coinUuid = :coinUuid")
+    fun getTransactionsByCoinUuid(coinUuid: String): Flow<List<Transaction>>
+
+    @Query("SELECT * FROM sparklineData WHERE coinUuid = :coinUuid")
+    fun getSparklineDataByCoinUuid(coinUuid: String): Flow<List<SparklineDataEntity>>
+
 
 
 }

@@ -128,6 +128,7 @@ fun SuchenView(viewModel: SimBrokerViewModel) {
     if (openCoinDetailSheet) {
         selectedCoin?.let {
             CoinDetailSheet(
+                viewModel = viewModel,
                 selectedCoin = it,
                 onDismiss = {
                     openCoinDetailSheet = false

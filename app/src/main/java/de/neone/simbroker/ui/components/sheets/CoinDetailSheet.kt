@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -27,20 +28,22 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.request.error
 import de.neone.simbroker.R
+import de.neone.simbroker.data.local.PortfolioPosition
+import de.neone.simbroker.data.local.Transaction
+import de.neone.simbroker.data.local.TransactionType
 import de.neone.simbroker.data.remote.Coin
 import de.neone.simbroker.ui.SimBrokerViewModel
-import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoinDetailSheet(
     modifier: Modifier = Modifier,
-    viewModel: SimBrokerViewModel = koinViewModel(),
+    viewModel: SimBrokerViewModel,
     onDismiss: () -> Unit,
-    selectedCoin: Coin
+    selectedCoin: Coin,
 ) {
 
-        val skipPartiallyExpanded by rememberSaveable { mutableStateOf(false) }
+    val skipPartiallyExpanded by rememberSaveable { mutableStateOf(false) }
     val coinDetailSheetState =
         rememberModalBottomSheetState(skipPartiallyExpanded = skipPartiallyExpanded)
 
@@ -63,6 +66,12 @@ fun CoinDetailSheet(
             verticalArrangement = Arrangement.Top
         ) {
 
+            selectedCoin.sparkline.forEach { sparkline ->
+                Text(sparkline)
+            }
+
+            HorizontalDivider()
+
             Text(text = selectedCoin.uuid, style = MaterialTheme.typography.bodyMedium)
             Text(text = selectedCoin.symbol, style = MaterialTheme.typography.titleMedium)
             Text(text = selectedCoin.name, style = MaterialTheme.typography.bodyMedium)
@@ -82,9 +91,40 @@ fun CoinDetailSheet(
                 clipToBounds = true,
             )
 
+
+
             Button(onClick = {
                 Log.d("simDebug", "Kaufen gedrückt")
 
+                viewModel.insertTransaction(
+                    transaction = Transaction(
+                        coinUuid = selectedCoin.uuid,
+                        name = selectedCoin.name,
+                        symbol = selectedCoin.symbol,
+                        iconUrl = selectedCoin.iconUrl,
+                        type = TransactionType.kauf,
+                        amount = 1.0,
+                        price = selectedCoin.price.toDouble()
+                    )
+                )
+                viewModel.insertPortfolioPosition(
+                    portfolioPosition = PortfolioPosition(
+                        coinUuid = selectedCoin.uuid,
+                        name = selectedCoin.name,
+                        symbol = selectedCoin.symbol,
+                        totalAmount = 1.0,
+                        averageBuyPrice = selectedCoin.price.toDouble(),
+                        currentPrice = selectedCoin.price.toDouble(),
+                        totalInvestment = 0.0,
+                        iconUrl = selectedCoin.iconUrl
+                    )
+                )
+                selectedCoin.sparkline.forEach { value ->
+                    viewModel.insertSparklineDataEntity(
+                        coinUuid = selectedCoin.uuid,
+                        value = value.toDouble()
+                    )
+                }
 
                 onDismiss()
 

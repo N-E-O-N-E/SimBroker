@@ -25,11 +25,12 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.request.error
 import de.neone.simbroker.R
-import de.neone.simbroker.data.local.PortfolioData
+import de.neone.simbroker.data.local.PortfolioPosition
+import de.neone.simbroker.data.repository.mockdata.coins_Mockdata
 
 @Composable
 fun PortfolioCoinListItem(
-    coin: PortfolioData,
+    coin: PortfolioPosition,
     onLoad: () -> Unit,
 ) {
     val imageRequest = ImageRequest.Builder(LocalContext.current)
@@ -74,7 +75,6 @@ fun PortfolioCoinListItem(
                         Column() {
 
                             Row() {
-                                Text(text = "DataID: ${coin.id}   ")
                                 Text(text = "CoinID: ${coin.coinUuid}")
                             }
 
@@ -82,15 +82,9 @@ fun PortfolioCoinListItem(
 
                             Text(text = "Name: ${coin.name}, ${coin.symbol}")
                             Text(text = "Kaufkurs: ${coin.averageBuyPrice}")
-                            Text(text = "Anteile: ${coin.amount}")
+
 
                             HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
-
-                            Text(text = "Kaufwert: ${coin.amount * coin.averageBuyPrice}")
-
-                            HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
-
-
 
 
 
@@ -107,13 +101,15 @@ fun PortfolioCoinListItem(
 @Composable
 private fun PortfolioCoinListPreview() {
     PortfolioCoinListItem(
-        coin = PortfolioData(
-            coinUuid = "1",
-            amount = 1.0,
-            averageBuyPrice = 67000.1321,
-            symbol = "BTC",
-            name = "Bitcoin",
-            iconUrl = "https://example.com/btc.png"
+        coin = PortfolioPosition(
+            coinUuid = coins_Mockdata.first().uuid,
+            name = coins_Mockdata.first().name ,
+            symbol = coins_Mockdata.first().symbol,
+            totalAmount = 1.0,
+            averageBuyPrice = coins_Mockdata.first().price.toDouble(),
+            currentPrice = coins_Mockdata.first().price.toDouble(),
+            totalInvestment = 0.0,
+            iconUrl = coins_Mockdata.first().iconUrl
         ),
         onLoad = { },
     )
