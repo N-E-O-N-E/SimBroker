@@ -76,6 +76,6 @@ data class SparklineDataEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val coinUuid: String,
-    val value: Double,
+    val value: String,
 )
 

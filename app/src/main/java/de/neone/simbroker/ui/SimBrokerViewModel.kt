@@ -24,8 +24,7 @@ class SimBrokerViewModel(
 ) : AndroidViewModel(application) {
 
     // Room Database
-    private val simBrokerDatabase =
-        SimBrokerDatabase.getDatabase(application.applicationContext).simBrokerDAO()
+    private val simBrokerDatabase = SimBrokerDatabase.getDatabase(application.applicationContext).simBrokerDAO()
 
     // Timer Steuerung
     private var timerStartet = false
@@ -80,7 +79,7 @@ class SimBrokerViewModel(
         }
     }
 
-    fun insertSparklineDataEntity(coinUuid: String, value: Double) {
+    fun insertSparklineDataEntity(coinUuid: String, value: String) {
         val sparklineDataEntity = SparklineDataEntity(coinUuid = coinUuid, value = value)
         viewModelScope.launch {
             simBrokerDatabase.insertSparklineDataEntity(sparklineDataEntity)

@@ -1,6 +1,7 @@
 package de.neone.simbroker.data.repository.mockdata
 
 import de.neone.simbroker.data.remote.Coin
+import kotlin.random.Random
 
 val coins_Mockdata = listOf(
     Coin(
@@ -9,7 +10,7 @@ val coins_Mockdata = listOf(
         name = "Bitcoin",
         color = "#f7931a",
         iconUrl = "https://example.com/btc.png",
-        price = "67000.0654899",
+        price = Random.nextDouble(65000.0, 66500.0).toString(),
         marketCap = "1300000000000",
         listedAt = 1234567890L,
         tier = 1,
@@ -28,7 +29,7 @@ val coins_Mockdata = listOf(
         name = "Ethereum",
         color = "#3c3c3d",
         iconUrl = "https://example.com/eth.png",
-        price = "3500",
+        price = Random.nextDouble(3000.0, 3900.0).toString(),
         marketCap = "420000000000",
         listedAt = 1434567890L,
         tier = 1,

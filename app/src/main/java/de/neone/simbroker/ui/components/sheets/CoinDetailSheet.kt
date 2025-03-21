@@ -66,9 +66,6 @@ fun CoinDetailSheet(
             verticalArrangement = Arrangement.Top
         ) {
 
-            selectedCoin.sparkline.forEach { sparkline ->
-                Text(sparkline)
-            }
 
             HorizontalDivider()
 
@@ -119,12 +116,15 @@ fun CoinDetailSheet(
                         iconUrl = selectedCoin.iconUrl
                     )
                 )
-                selectedCoin.sparkline.forEach { value ->
-                    viewModel.insertSparklineDataEntity(
-                        coinUuid = selectedCoin.uuid,
-                        value = value.toDouble()
-                    )
-                }
+
+//                selectedCoin.sparkline.forEach { sparklineItem ->
+//                    sparklineItem.let { value ->
+//                        viewModel.insertSparklineDataEntity(
+//                            coinUuid = selectedCoin.uuid,
+//                            value = value.toString()
+//                        )
+//                    }
+//                }
 
                 onDismiss()
 
