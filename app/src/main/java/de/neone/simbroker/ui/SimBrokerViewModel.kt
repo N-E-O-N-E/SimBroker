@@ -4,11 +4,7 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import de.neone.simbroker.data.local.ClosedTrade
-import de.neone.simbroker.data.local.PortfolioPosition
 import de.neone.simbroker.data.local.SimBrokerDatabase
-import de.neone.simbroker.data.local.SparklineDataEntity
-import de.neone.simbroker.data.local.Transaction
 import de.neone.simbroker.data.remote.Coin
 import de.neone.simbroker.data.repository.SimBrokerRepositoryInterface
 import kotlinx.coroutines.delay
@@ -61,39 +57,9 @@ class SimBrokerViewModel(
         }
     }
 
-    fun insertTransaction(transaction: Transaction) {
-        viewModelScope.launch {
-            simBrokerDatabase.insertTransaction(transaction)
-        }
-    }
 
-    fun insertPortfolioPosition(portfolioPosition: PortfolioPosition) {
-        viewModelScope.launch {
-            simBrokerDatabase.insertPortfolioPosition(portfolioPosition)
-        }
-    }
-
-    fun insertClosedTrade(closedTrade: ClosedTrade) {
-        viewModelScope.launch {
-            simBrokerDatabase.insertClosedTrade(closedTrade)
-        }
-    }
-
-    fun insertSparklineDataEntity(coinUuid: String, value: String) {
-        val sparklineDataEntity = SparklineDataEntity(coinUuid = coinUuid, value = value)
-        viewModelScope.launch {
-            simBrokerDatabase.insertSparklineDataEntity(sparklineDataEntity)
-        }
-    }
 
     // Room Datenströme Flow
-
-    val allTransactions = simBrokerDatabase.getAllTransactions()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = emptyList()
-        )
 
     val allPortfolioPositions = simBrokerDatabase.getAllPortfolioPositions()
         .stateIn(
@@ -101,22 +67,6 @@ class SimBrokerViewModel(
             started = SharingStarted.WhileSubscribed(),
             initialValue = emptyList()
         )
-
-    val allClosedTrades = simBrokerDatabase.getAllClosedTrades()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = emptyList()
-        )
-
-    val transactionsByCoinUuid = { coinUuid: String ->
-        simBrokerDatabase.getTransactionsByCoinUuid(coinUuid)
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(),
-                initialValue = emptyList()
-            )
-    }
 
     val sparklineDataByCoinUuid = { coinUuid: String ->
         simBrokerDatabase.getSparklineDataByCoinUuid(coinUuid)

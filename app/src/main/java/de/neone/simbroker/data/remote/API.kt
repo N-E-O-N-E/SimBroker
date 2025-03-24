@@ -57,6 +57,9 @@ interface APIService {
         @Query("timePeriod") timePeriod: String = "24h",
     ): CoinsResponse
 
+    @GET("coin/{uuid}/price")
+    suspend fun getCoinPrice(@Path("uuid") uuid: String): Double
+
     @GET("coin/{uuid}")
     suspend fun getCoin1h(@Path("uuid") uuid: String, @Query("referenceCurrencyUuid") referenceCurrencyUuid: String = "5k-_VTxqtCEI",
         @Query("timePeriod") timePeriod: String = "1h"): CoinResponse

@@ -6,10 +6,10 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 // speichert jeden Kauf/Verkauf
-@Entity(tableName = "transactions", indices = [Index("coinUuid")])
+@Entity(tableName = "transactions")
 data class Transaction(
     @PrimaryKey(autoGenerate = true)
-    val id: Long = 0,
+    val id: Int = 0,
     val coinUuid: String,
     val name: String,
     val symbol: String,
@@ -22,11 +22,11 @@ data class Transaction(
 )
 
 enum class TransactionType {
-    kauf, verkauf
+    BUY, SELL
 }
 
 // Positionen im Portfolio
-@Entity(tableName = "portfolioPositions", indices = [Index(value = ["coinUuid"], unique = true)])
+@Entity(tableName = "portfolioPositions")
 data class PortfolioPosition(
     @PrimaryKey
     val coinUuid: String,
@@ -44,7 +44,7 @@ data class PortfolioPosition(
 @Entity(tableName = "closedTrades")
 data class ClosedTrade(
     @PrimaryKey(autoGenerate = true)
-    val id: Long = 0,
+    val id: Int = 0,
     val coinUuid: String,
     val name: String,
     val symbol: String,
@@ -72,9 +72,10 @@ data class ClosedTrade(
     ],
     indices = [Index("coinUuid")]
 )
+
 data class SparklineDataEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Long = 0,
+    val id: Int = 0,
     val coinUuid: String,
     val value: String,
 )

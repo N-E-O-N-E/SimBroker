@@ -28,9 +28,6 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.request.error
 import de.neone.simbroker.R
-import de.neone.simbroker.data.local.PortfolioPosition
-import de.neone.simbroker.data.local.Transaction
-import de.neone.simbroker.data.local.TransactionType
 import de.neone.simbroker.data.remote.Coin
 import de.neone.simbroker.ui.SimBrokerViewModel
 
@@ -66,7 +63,6 @@ fun CoinDetailSheet(
             verticalArrangement = Arrangement.Top
         ) {
 
-
             HorizontalDivider()
 
             Text(text = selectedCoin.uuid, style = MaterialTheme.typography.bodyMedium)
@@ -89,48 +85,26 @@ fun CoinDetailSheet(
             )
 
 
-
             Button(onClick = {
-                Log.d("simDebug", "Kaufen gedrückt")
 
-                viewModel.insertTransaction(
-                    transaction = Transaction(
-                        coinUuid = selectedCoin.uuid,
-                        name = selectedCoin.name,
-                        symbol = selectedCoin.symbol,
-                        iconUrl = selectedCoin.iconUrl,
-                        type = TransactionType.kauf,
-                        amount = 1.0,
-                        price = selectedCoin.price.toDouble()
-                    )
-                )
-                viewModel.insertPortfolioPosition(
-                    portfolioPosition = PortfolioPosition(
-                        coinUuid = selectedCoin.uuid,
-                        name = selectedCoin.name,
-                        symbol = selectedCoin.symbol,
-                        totalAmount = 1.0,
-                        averageBuyPrice = selectedCoin.price.toDouble(),
-                        currentPrice = selectedCoin.price.toDouble(),
-                        totalInvestment = 0.0,
-                        iconUrl = selectedCoin.iconUrl
-                    )
-                )
-
-//                selectedCoin.sparkline.forEach { sparklineItem ->
-//                    sparklineItem.let { value ->
-//                        viewModel.insertSparklineDataEntity(
-//                            coinUuid = selectedCoin.uuid,
-//                            value = value.toString()
-//                        )
-//                    }
-//                }
 
                 onDismiss()
 
             }) {
                 Text(text = "Kaufen")
             }
+
+            Button(onClick = {
+                Log.d("simDebug", "Verkaufen gedrückt")
+
+
+                onDismiss()
+
+            }) {
+                Text(text = "Verkaufen")
+            }
+
+
         }
     }
 }
