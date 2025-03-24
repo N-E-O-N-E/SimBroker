@@ -1,4 +1,4 @@
-package de.neone.simbroker.ui.components.suche
+package de.neone.simbroker.ui.views.suche.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.clickable

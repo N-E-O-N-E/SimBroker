@@ -1,4 +1,4 @@
-package de.neone.simbroker.ui.components.activites
+package de.neone.simbroker.ui.navigation
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme

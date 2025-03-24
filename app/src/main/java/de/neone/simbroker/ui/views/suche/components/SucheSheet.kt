@@ -1,4 +1,4 @@
-package de.neone.simbroker.ui.components.sheets
+package de.neone.simbroker.ui.views.suche.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,7 +27,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import de.neone.simbroker.R
 import de.neone.simbroker.data.remote.Coin
-import de.neone.simbroker.ui.components.suche.SucheCoinListItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

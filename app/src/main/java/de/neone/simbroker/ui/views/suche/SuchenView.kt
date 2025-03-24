@@ -1,4 +1,4 @@
-package de.neone.simbroker.ui.views
+package de.neone.simbroker.ui.views.suche
 
 import android.util.Log
 import androidx.compose.foundation.background
@@ -30,11 +30,11 @@ import androidx.compose.ui.unit.dp
 import de.neone.simbroker.R
 import de.neone.simbroker.data.remote.Coin
 import de.neone.simbroker.ui.SimBrokerViewModel
-import de.neone.simbroker.ui.components.activites.ViewWallpaperImageBox
-import de.neone.simbroker.ui.components.sheets.CoinDetailSheet
-import de.neone.simbroker.ui.components.sheets.SucheSheet
-import de.neone.simbroker.ui.components.suche.LoadingIndicator
-import de.neone.simbroker.ui.components.suche.SucheCoinListItem
+import de.neone.simbroker.ui.navigation.ViewWallpaperImageBox
+import de.neone.simbroker.ui.views.detailView.CoinDetailSheet
+import de.neone.simbroker.ui.views.suche.components.LoadingIndicator
+import de.neone.simbroker.ui.views.suche.components.SucheCoinListItem
+import de.neone.simbroker.ui.views.suche.components.SucheSheet
 
 @Composable
 fun SuchenView(viewModel: SimBrokerViewModel) {

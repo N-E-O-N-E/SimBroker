@@ -12,9 +12,9 @@ import de.neone.simbroker.MainActivity.LogoutRoute
 import de.neone.simbroker.MainActivity.PortfolioRoute
 import de.neone.simbroker.MainActivity.SucheRoute
 import de.neone.simbroker.ui.SimBrokerViewModel
-import de.neone.simbroker.ui.views.KontoView
-import de.neone.simbroker.ui.views.PortfolioView
-import de.neone.simbroker.ui.views.SuchenView
+import de.neone.simbroker.ui.views.account.KontoView
+import de.neone.simbroker.ui.views.portfolio.PortfolioView
+import de.neone.simbroker.ui.views.suche.SuchenView
 import org.koin.androidx.compose.koinViewModel
 
 @Composable

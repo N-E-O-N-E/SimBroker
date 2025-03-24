@@ -1,4 +1,4 @@
-package de.neone.simbroker.ui.components.portfolio
+package de.neone.simbroker.ui.views.portfolio.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

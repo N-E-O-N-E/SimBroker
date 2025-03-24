@@ -1,4 +1,4 @@
-package de.neone.simbroker.ui.components.sheets
+package de.neone.simbroker.ui.views.detailView
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
