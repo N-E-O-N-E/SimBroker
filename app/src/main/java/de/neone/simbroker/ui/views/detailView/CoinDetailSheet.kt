@@ -12,12 +12,14 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -57,12 +59,15 @@ fun CoinDetailSheet(
         scrimColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
         shape = MaterialTheme.shapes.large,
     ) {
+
+        var amountTextField by rememberSaveable { mutableStateOf("1.0") }
+        var priceTextField by rememberSaveable { mutableStateOf(selectedCoin.price) }
+
         Column(
             modifier = modifier
                 .fillMaxSize(),
             verticalArrangement = Arrangement.Top
         ) {
-
             HorizontalDivider()
 
             Text(text = selectedCoin.uuid, style = MaterialTheme.typography.bodyMedium)
@@ -84,26 +89,40 @@ fun CoinDetailSheet(
                 clipToBounds = true,
             )
 
+            OutlinedTextField(
+                value = amountTextField,
+                onValueChange = { amountTextField = it },
+                label = {
+                    Text(text = "Amount")
+                },
+            )
 
+            OutlinedTextField(
+                value = priceTextField,
+                onValueChange = { priceTextField = it },
+                label = {
+                    Text(text = "Invest €")
+                },
+            )
             Button(onClick = {
+                viewModel.buyCoin(selectedCoin, amountTextField.toDouble(), priceTextField.toDouble())
+
 
 
                 onDismiss()
-
             }) {
                 Text(text = "Kaufen")
             }
 
             Button(onClick = {
-                Log.d("simDebug", "Verkaufen gedrückt")
+
+
 
 
                 onDismiss()
-
             }) {
                 Text(text = "Verkaufen")
             }
-
 
         }
     }

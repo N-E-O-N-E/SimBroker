@@ -14,11 +14,17 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import de.neone.simbroker.ui.SimBrokerViewModel
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * Ui der StartActivity welche ein Wallpaper beinhaltet
@@ -38,8 +44,12 @@ fun StartActivityImageBox(
     toMainActivity: () -> Unit,
     buttonText: String,
     imageLightTheme: Int,
-    imageDarkTheme: Int
+    imageDarkTheme: Int,
+    viewModel: SimBrokerViewModel = koinViewModel()
 ) {
+
+    var checked by remember { mutableStateOf(false) }
+
     Box {
         if (!isSystemInDarkTheme()) {
             Image(

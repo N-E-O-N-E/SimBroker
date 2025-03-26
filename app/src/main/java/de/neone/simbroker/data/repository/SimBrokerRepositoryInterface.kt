@@ -13,6 +13,9 @@ interface SimBrokerRepositoryInterface {
     suspend fun getCoin(uuid: String, timePeriod: String): Coin
     suspend fun getCoinPrice(uuid: String): Double
 
+    suspend fun buyCoin(coin: Coin, amount: Double, price: Double)
+    suspend fun sellCoin(coin: Coin, amount: Double, price: Double)
+
     suspend fun insertTransaction(transaction: Transaction)
     suspend fun getTransactionByCoinUuid(coinUuid: String): List<Transaction>
     suspend fun updateTransaction(transactionId: Int, isClosed: Boolean)
@@ -28,7 +31,7 @@ interface SimBrokerRepositoryInterface {
 
     fun getAllPortfolioPositions(): Flow<List<PortfolioPosition>>
 
-    fun getPortfolioPositionByCoinUuid(coinUuid: String): Flow<PortfolioPosition?>
+    fun getPortfolioPositionByCoinUuid(coinUuid: String): PortfolioPosition?
 
     fun getAllClosedTrades(): Flow<List<ClosedTrade>>
 

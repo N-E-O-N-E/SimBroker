@@ -1,5 +1,6 @@
 package de.neone.simbroker.data.repository
 
+import android.util.Log
 import de.neone.simbroker.data.local.ClosedTrade
 import de.neone.simbroker.data.local.PortfolioPosition
 import de.neone.simbroker.data.local.SimBrokerDAO
@@ -59,7 +60,7 @@ class SimBrokerRepositoryMock(
         simBrokerDAO.insertSparklineDataEntity(sparklineDataEntity)
     }
 
-    override fun getPortfolioPositionByCoinUuid(coinUuid: String): Flow<PortfolioPosition?> {
+    override fun getPortfolioPositionByCoinUuid(coinUuid: String): PortfolioPosition? {
         return simBrokerDAO.getPortfolioPositionByCoinUuid(coinUuid)
     }
 
@@ -81,56 +82,26 @@ class SimBrokerRepositoryMock(
 
 
 
-    suspend fun buyCoin(coin: Coin, amount: Double, price: Double) {
+    override suspend fun buyCoin(coin: Coin, amount: Double, price: Double) {
         // Kaufen
-        val transaction = Transaction(
-            coinUuid = coin.uuid,
-            name = coin.name,
-            symbol = coin.symbol,
-            iconUrl = coin.iconUrl,
-            type = TransactionType.BUY,
-            amount = amount,
-            price = price
-        )
-        insertTransaction(transaction)
-        updatePortfolioPosition(coin.uuid)
-    }
 
-    suspend fun sellCoin(coinUuid: String, amount: Double, price: Double) {
-        // Verkaufen
-        // Prüfe die Bestände
-
-        val position = getPortfolioPositionByCoinUuid(coinUuid).first()
-            ?: throw Exception("Keine Positionen vorhanden")
-
-        if (position.totalAmount < amount) {
-            throw Exception("Nicht genügend Coins oder PortfolioPositionen zum Verkaufen")
-        }
-
-        // Speichern der Transaktion
-        val transaction = Transaction(
-            coinUuid = position.coinUuid,
-            name = position.name,
-            symbol = position.symbol,
-            iconUrl = position.iconUrl,
-            type = TransactionType.SELL,
-            amount = amount,
-            price = price
-        )
-        insertTransaction(transaction)
-        updatePortfolioPosition(coinUuid)
-
-        // wenn verkauft, dann schließen
-        if (position.totalAmount - amount <= 0 ) {
-            closeTrade(coinUuid)
-        }
+            val transaction = Transaction(
+                coinUuid = coin.uuid,
+                name = coin.name,
+                symbol = coin.symbol,
+                iconUrl = coin.iconUrl,
+                type = TransactionType.BUY,
+                amount = amount,
+                price = price
+            )
+            insertTransaction(transaction)
+            updatePortfolioPosition(coin)
 
     }
 
-    private suspend fun updatePortfolioPosition(coinUuid: String) {
-        // Portfolio aktualisieren
-        val sparks = getSparklineDataByCoinUuid(coinUuid)
-        val transaction = getTransactionByCoinUuid(coinUuid)
+    private suspend fun updatePortfolioPosition(coin: Coin) {
+        val transaction = getTransactionByCoinUuid(coin.uuid)
+
         val buys = transaction.filter { it.type == TransactionType.BUY }
         val sells = transaction.filter { it.type == TransactionType.SELL }
 
@@ -147,10 +118,10 @@ class SimBrokerRepositoryMock(
                 0.0
             }
 
-            val currentPrice = getCoinPrice(coinUuid)
+            val currentPrice = getCoinPrice(coin.uuid)
 
             val newPortfolio = PortfolioPosition(
-                coinUuid = coinUuid,
+                coinUuid = coin.uuid,
                 name = buys.first().name,
                 symbol = buys.first().symbol,
                 totalAmount = remainingAmount,
@@ -161,20 +132,22 @@ class SimBrokerRepositoryMock(
             )
 
             insertOrUpdatePortfolioPosition(newPortfolio)
-            val sparklinesForCoin = sparks.first()
 
-            insertSparklineDataEntity(
-                sparklineDataEntity = SparklineDataEntity(
-                    coinUuid = coinUuid,
-                    value = sparklinesForCoin.toString()
+            val sparklinesForCoin = coin.sparkline
+            Log.d("Sparklines", sparklinesForCoin.toString())
+
+            sparklinesForCoin.forEach { match ->
+                val sparklineDataEntity = SparklineDataEntity(
+                    coinUuid = coin.uuid ,
+                    value = match.toString()
                 )
-            )
-
+                insertSparklineDataEntity(sparklineDataEntity)
+            }
 
         } else {
             val currentPortfolio = getAllPortfolioPositions()
                 .first()
-                .find { it.coinUuid == coinUuid }
+                .find { it.coinUuid == coin.uuid }
                 .let {
                     it ?: return
                 }
@@ -182,35 +155,59 @@ class SimBrokerRepositoryMock(
         }
     }
 
-    private suspend fun closeTrade(coinUuid: String) {
-        // Trade schließen
-        val transaction = getTransactionByCoinUuid(coinUuid)
-        val buys = transaction.filter { it.type == TransactionType.BUY }
-        val sells = transaction.filter { it.type == TransactionType.SELL }
 
-        val totalBuyAmount = buys.sumOf { it.amount }
-        val totalBuyValue = buys.sumOf { it.amount * it.price }
-        val totalAverageBuyPrice = totalBuyValue / totalBuyAmount
+    override suspend fun sellCoin(coin: Coin, amount: Double, price: Double) {
 
-        val totalSellAmount = sells.sumOf { it.amount }
-        val totalSellValue = sells.sumOf { it.amount * it.price }
-        val totalAverageSellPrice = totalSellValue - totalBuyValue
+        val position = getPortfolioPositionByCoinUuid(coin.uuid)
+        if (position == null || position.totalAmount < amount) {
+            throw Exception("Not enough coins in portfolio")
+        }
 
-        val profit = totalSellValue - totalBuyValue
-        val profitPercentage = (totalSellValue / totalBuyValue - 1) * 100
+        val transaction = Transaction(
+            coinUuid = coin.uuid,
+            name = position.name,
+            symbol = position.symbol,
+            iconUrl = position.iconUrl,
+            type = TransactionType.SELL,
+            amount = amount,
+            price = price
+        )
+        insertTransaction(transaction)
+        updatePortfolioPosition(coin)
 
-        val firstBuy = buys.minByOrNull { it.timestamp }!!
-        val lastSell = sells.maxByOrNull { it.timestamp }!!
+        val updatedPosition = getPortfolioPositionByCoinUuid(coin.uuid)
+        if (updatedPosition == null || updatedPosition.totalAmount == 0.0) {
+            createClosedTrade(coin)
+        }
+
+    }
+
+    private suspend fun createClosedTrade(coin: Coin) {
+        val transactions = getTransactionByCoinUuid(coin.uuid)
+
+        val buyTransactions = transactions.filter { it.type == TransactionType.BUY }
+        val sellTransactions = transactions.filter { it.type == TransactionType.SELL }
+
+        val totalBought = buyTransactions.sumOf { it.amount }
+        val totalSpent = buyTransactions.sumOf { it.amount * it.price }
+        val totalSold = sellTransactions.sumOf { it.amount }
+        val totalReceived = sellTransactions.sumOf { it.amount * it.price }
+
+        val profit = totalReceived - totalSpent
+        val profitPercentage = (totalReceived / totalSpent - 1) * 100
+
+        val firstBuy = buyTransactions.minByOrNull { it.timestamp }!!
+        val lastSell = sellTransactions.maxByOrNull { it.timestamp }!!
 
         val closedTrade = ClosedTrade(
-            coinUuid = coinUuid,
+            coinUuid = coin.uuid,
             name = firstBuy.name,
             symbol = firstBuy.symbol,
-            buyAmount = totalBuyAmount,
-            buyPrice = totalAverageBuyPrice,
+            buyAmount = totalBought,
+            buyPrice = totalSpent / totalBought,  // Durchschnittskaufpreis
             buyTimestamp = firstBuy.timestamp,
-            sellAmount = totalSellAmount,
-            sellPrice = totalAverageSellPrice,
+            sellAmount = totalSold,
+            sellPrice = totalReceived / totalSold,  // Durchschnittsverkaufspreis
             sellTimestamp = lastSell.timestamp,
             profit = profit,
             profitPercentage = profitPercentage,
@@ -219,12 +216,9 @@ class SimBrokerRepositoryMock(
 
         insertClosedTrade(closedTrade)
 
-        // Transaction abgeschlossen markieren
-        transaction.forEach {
-            updateTransaction(it.id, true)
+        transactions.forEach { transaction ->
+            updateTransaction(transaction.id, true)
         }
-
-
     }
 
 }

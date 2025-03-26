@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import de.neone.simbroker.data.local.SimBrokerDatabase
 import de.neone.simbroker.data.remote.Coin
 import de.neone.simbroker.data.repository.SimBrokerRepositoryInterface
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -20,10 +21,8 @@ class SimBrokerViewModel(
 ) : AndroidViewModel(application) {
 
     // Room Database
-    private val simBrokerDatabase = SimBrokerDatabase.getDatabase(application.applicationContext).simBrokerDAO()
-
-    // Timer Steuerung
-    private var timerStartet = false
+    private val simBrokerDatabase =
+        SimBrokerDatabase.getDatabase(application.applicationContext).simBrokerDAO()
 
     // Pagination
     private var isLoading = false
@@ -37,10 +36,7 @@ class SimBrokerViewModel(
     init {
         viewModelScope.launch {
             loadMoreCoins()
-            while (!timerStartet) {
                 startTimer()
-                timerStartet = true
-            }
         }
     }
 
@@ -57,11 +53,37 @@ class SimBrokerViewModel(
         }
     }
 
+    fun buyCoin(coin: Coin, amount: Double, price: Double) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                repository.buyCoin(
+                    coin = coin,
+                    amount = amount,
+                    price = price
+                )
+            } catch (e: Exception) {
+                Log.e("SimBrokerViewModel", "Fehler beim Kauf", e)
+            }
+        }
+    }
 
+    fun sellCoin(coin: Coin, amount: Double, price: Double) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                repository.sellCoin(
+                    coin = coin,
+                    amount = amount,
+                    price = price
+                )
+            } catch (e: Exception) {
+                Log.e("SimBrokerViewModel", "Fehler beim Verkaufen", e)
+            }
+        }
+    }
 
     // Room Datenströme Flow
 
-    val allPortfolioPositions = simBrokerDatabase.getAllPortfolioPositions()
+    val allPortfolioPositions = repository.getAllPortfolioPositions()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
@@ -69,7 +91,7 @@ class SimBrokerViewModel(
         )
 
     val sparklineDataByCoinUuid = { coinUuid: String ->
-        simBrokerDatabase.getSparklineDataByCoinUuid(coinUuid)
+        repository.getSparklineDataByCoinUuid(coinUuid)
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(),
@@ -86,7 +108,7 @@ class SimBrokerViewModel(
         if (isLoading || !hasMoreData) return
 
         isLoading = true
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 val newCoins = repository.getCoins(offset = offset, limit = limit)
                 _coinList.value += newCoins
@@ -102,7 +124,7 @@ class SimBrokerViewModel(
     }
 
     private fun refreshCoins() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 val refreshedCoins =
                     repository.getCoins(offset = 0, limit = limit)

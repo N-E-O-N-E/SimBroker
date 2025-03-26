@@ -46,7 +46,7 @@ interface SimBrokerDAO {
     fun getAllPortfolioPositions(): Flow<List<PortfolioPosition>>
 
     @Query("SELECT * FROM portfolioPositions WHERE coinUuid = :coinUuid")
-    fun getPortfolioPositionByCoinUuid(coinUuid: String): Flow<PortfolioPosition?>
+    fun getPortfolioPositionByCoinUuid(coinUuid: String): PortfolioPosition?
 
 
 
