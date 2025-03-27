@@ -25,12 +25,12 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.request.error
 import de.neone.simbroker.R
-import de.neone.simbroker.data.local.Portfolio
+import de.neone.simbroker.data.local.Portfolio_Positions
 import de.neone.simbroker.data.repository.mockdata.coins_Mockdata
 
 @Composable
 fun PortfolioCoinListItem(
-    coin: Portfolio,
+    coin: Portfolio_Positions,
     onLoad: () -> Unit,
 ) {
     val imageRequest = ImageRequest.Builder(LocalContext.current)
@@ -102,7 +102,7 @@ fun PortfolioCoinListItem(
 @Composable
 private fun PortfolioCoinListPreview() {
     PortfolioCoinListItem(
-        coin = Portfolio(
+        coin = Portfolio_Positions(
             coinUuid = coins_Mockdata.first().uuid,
             symbol = coins_Mockdata.first().symbol,
             iconUrl = coins_Mockdata.first().iconUrl,

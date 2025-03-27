@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import de.neone.simbroker.data.local.SimBrokerDatabase
+import de.neone.simbroker.data.local.Transaction_Positions
 import de.neone.simbroker.data.remote.Coin
 import de.neone.simbroker.data.repository.SimBrokerRepositoryInterface
 import kotlinx.coroutines.Dispatchers
@@ -19,8 +20,7 @@ class SimBrokerViewModel(
 ) : AndroidViewModel(application) {
 
     // Room Database
-    private val simBrokerDatabase =
-        SimBrokerDatabase.getDatabase(application.applicationContext).simBrokerDAO()
+    private val simBrokerDatabase = SimBrokerDatabase.getDatabase(application.applicationContext).simBrokerDAO()
 
     // Pagination
     private var isLoading = false
@@ -88,4 +88,16 @@ class SimBrokerViewModel(
             }
         }
     }
+
+    fun addTransaction(transaction: Transaction_Positions) {
+        Log.d("simDebug", "buyCoin over ViewModel started")
+        viewModelScope.launch {
+            repository.insertTransaction(transaction)
+        }
+    }
+
+
+
+
+
 }

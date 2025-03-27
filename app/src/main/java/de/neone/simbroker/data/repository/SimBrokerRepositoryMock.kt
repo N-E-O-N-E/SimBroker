@@ -1,6 +1,7 @@
 package de.neone.simbroker.data.repository
 
 import de.neone.simbroker.data.local.SimBrokerDAO
+import de.neone.simbroker.data.local.Transaction_Positions
 import de.neone.simbroker.data.remote.Coin
 import de.neone.simbroker.data.repository.mockdata.coins_Mockdata
 
@@ -20,6 +21,10 @@ class SimBrokerRepositoryMock(
     override suspend fun getCoin(uuid: String, timePeriod: String): Coin {
         val result = coins_Mockdata.first { it.uuid == uuid }
         return result
+    }
+
+    override suspend fun insertTransaction(transaction: Transaction_Positions) {
+        simBrokerDAO.insertTransaction(transaction)
     }
 
 }

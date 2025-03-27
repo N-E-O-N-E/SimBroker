@@ -2,6 +2,7 @@ package de.neone.simbroker.data.repository
 
 import android.util.Log
 import de.neone.simbroker.data.local.SimBrokerDAO
+import de.neone.simbroker.data.local.Transaction_Positions
 import de.neone.simbroker.data.remote.APIService
 import de.neone.simbroker.data.remote.Coin
 
@@ -43,6 +44,10 @@ class SimBrokerRepositoryImpl(
         }
     }
 
+
+    override suspend fun insertTransaction(transaction: Transaction_Positions) {
+        simBrokerDAO.insertTransaction(transaction)
+    }
 
 }
 

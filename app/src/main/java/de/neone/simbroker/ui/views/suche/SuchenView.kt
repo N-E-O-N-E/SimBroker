@@ -31,12 +31,15 @@ import de.neone.simbroker.data.remote.Coin
 import de.neone.simbroker.ui.SimBrokerViewModel
 import de.neone.simbroker.ui.navigation.ViewWallpaperImageBox
 import de.neone.simbroker.ui.views.detailView.CoinDetailSheet
+import de.neone.simbroker.ui.views.suche.components.AlertDialog
 import de.neone.simbroker.ui.views.suche.components.LoadingIndicator
 import de.neone.simbroker.ui.views.suche.components.SucheCoinListItem
 import de.neone.simbroker.ui.views.suche.components.SucheSheet
 
 @Composable
-fun SuchenView(viewModel: SimBrokerViewModel) {
+fun SuchenView(
+    viewModel: SimBrokerViewModel,
+) {
     ViewWallpaperImageBox(
         toMainActivity = { },
         imageLightTheme = R.drawable.simbroker_light_clear,
@@ -46,19 +49,26 @@ fun SuchenView(viewModel: SimBrokerViewModel) {
     val coinList by viewModel.coinList.collectAsState()
     var selectedCoin by remember { mutableStateOf<Coin?>(null) }
 
+    var showAlertDialog by rememberSaveable { mutableStateOf(false) }
     var openSucheSheet by rememberSaveable { mutableStateOf(false) }
     var openCoinDetailSheet by rememberSaveable { mutableStateOf(false) }
+
     val timer by viewModel.refreshTimer.collectAsState()
+
 
     LaunchedEffect(Unit) {
         viewModel.loadMoreCoins()
     }
+
+
 
     Column(
         modifier = Modifier
             .fillMaxSize(),
         verticalArrangement = Arrangement.Top
     ) {
+
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -83,6 +93,8 @@ fun SuchenView(viewModel: SimBrokerViewModel) {
             }
         }
 
+
+
         LazyColumn() {
             items(coinList) { coin ->
                 SucheCoinListItem(
@@ -105,7 +117,10 @@ fun SuchenView(viewModel: SimBrokerViewModel) {
                 }
             }
         }
+
+
     }
+
 
     if (openSucheSheet) {
         SucheSheet(
@@ -124,15 +139,33 @@ fun SuchenView(viewModel: SimBrokerViewModel) {
 
 
     if (openCoinDetailSheet) {
-        selectedCoin?.let {
+        selectedCoin?.let { it ->
             CoinDetailSheet(
                 selectedCoin = it,
                 onDismiss = {
                     openCoinDetailSheet = false
+                },
+                onBuyClicked = { data ->
+                    viewModel.addTransaction(data)
+
+                },
+                onSellClicked = {
+
+                },
+                alertDialog = {
+                    showAlertDialog = true
                 }
             )
         }
     }
-}
 
+    if (showAlertDialog) {
+        AlertDialog(
+            message = "Das Eingabefeld darf nicht leer sein!"
+        ) {
+            showAlertDialog = false
+        }
+    }
+
+}
 

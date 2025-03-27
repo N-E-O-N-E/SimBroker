@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [Transaction::class, Portfolio::class, ClosedTrade::class], version = 1, exportSchema = false)
+@Database(entities = [Transaction_Positions::class, Portfolio_Positions::class, ClosedTrade_Positions::class], version = 1, exportSchema = false)
 abstract class SimBrokerDatabase : RoomDatabase() {
     abstract fun simBrokerDAO(): SimBrokerDAO
 

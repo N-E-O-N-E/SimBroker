@@ -22,8 +22,9 @@ fun NavHostComponent(
     innerPadding: PaddingValues,
     navController: NavHostController,
     action: () -> Unit,
-    viewModel: SimBrokerViewModel = koinViewModel()
-) {
+    viewModel: SimBrokerViewModel = koinViewModel(),
+    ) {
+
     NavHost(
         navController = navController,
         startDestination = SucheRoute,

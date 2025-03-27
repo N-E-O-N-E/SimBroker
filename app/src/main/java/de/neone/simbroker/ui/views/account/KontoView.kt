@@ -13,7 +13,9 @@ import de.neone.simbroker.ui.SimBrokerViewModel
 import de.neone.simbroker.ui.navigation.ViewWallpaperImageBox
 
 @Composable
-fun KontoView(viewModel: SimBrokerViewModel) {
+fun KontoView(
+    viewModel: SimBrokerViewModel
+    ) {
     ViewWallpaperImageBox(
         toMainActivity = { },
         imageLightTheme = R.drawable.simbroker_light_clear,

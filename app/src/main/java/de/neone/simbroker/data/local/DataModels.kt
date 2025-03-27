@@ -4,20 +4,21 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "transaction")
-data class Transaction(
+data class Transaction_Positions(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
+    val timestamp: Long = System.currentTimeMillis(),
+
+    val fee: Double, // Standard Transaktionsgebühren
     val coinUuid: String,
     val symbol: String,
     val iconUrl: String,
-    val timestamp: Long = System.currentTimeMillis(),
     val name: String,
     val price: Double, // Preis pro Coin
     val amount: Double, // Menge der Coins, die gekauft/verkauft wurden
     val isClosed: Boolean = false, // Abgeschlossen
     val type: TransactionType, // BUY oder SELL
     val totalValue: Double, // Gesamtwert der Transaktion
-    val fee: Double, // Transaktionsgebühren
 )
 
 enum class TransactionType {
@@ -25,7 +26,7 @@ enum class TransactionType {
 }
 
 @Entity(tableName = "portfolio")
-data class Portfolio(
+data class Portfolio_Positions(
     @PrimaryKey
     val id: Int = 0,
     val coinUuid: String,
@@ -40,7 +41,7 @@ data class Portfolio(
 )
 
 @Entity(tableName = "closedTrades")
-data class ClosedTrade(
+data class ClosedTrade_Positions(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val coinUuid: String,

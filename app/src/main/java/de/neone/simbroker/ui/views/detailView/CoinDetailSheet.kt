@@ -39,6 +39,8 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.request.error
 import de.neone.simbroker.R
+import de.neone.simbroker.data.local.TransactionType
+import de.neone.simbroker.data.local.Transaction_Positions
 import de.neone.simbroker.data.remote.Coin
 import de.neone.simbroker.ui.theme.buy
 import de.neone.simbroker.ui.theme.colorDown
@@ -50,6 +52,9 @@ import de.neone.simbroker.ui.theme.sell
 fun CoinDetailSheet(
     modifier: Modifier = Modifier,
     onDismiss: () -> Unit,
+    alertDialog: () -> Unit,
+    onBuyClicked: (Transaction_Positions) -> Unit,
+    onSellClicked: () -> Unit,
     selectedCoin: Coin,
 ) {
 
@@ -68,6 +73,8 @@ fun CoinDetailSheet(
         scrimColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
         shape = MaterialTheme.shapes.large,
     ) {
+
+
 
         var selectedOption by remember { mutableStateOf("amount") } // "amount" oder "price"
         var inputValue by remember { mutableStateOf("") }
@@ -110,7 +117,10 @@ fun CoinDetailSheet(
                 }
                 Column {
                     Text(text = selectedCoin.symbol, style = MaterialTheme.typography.titleLarge)
-                    Text(text = selectedCoin.name.take(23), style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        text = selectedCoin.name.take(23),
+                        style = MaterialTheme.typography.titleMedium
+                    )
                 }
 
                 Spacer(modifier = Modifier.weight(1f))
@@ -147,7 +157,7 @@ fun CoinDetailSheet(
                 RadioButton(
                     selected = selectedOption == "price",
                     onClick = { selectedOption = "price"; inputValue = "" })
-                Text("Betrag (€)")
+                Text("Betrag (EUR)")
             }
 
             Column(
@@ -163,10 +173,10 @@ fun CoinDetailSheet(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     value = inputValue,
                     onValueChange = { inputValue = it },
-                    label = { Text(if (selectedOption == "amount") "Menge in BTC" else "Betrag in €") })
+                    label = { Text(if (selectedOption == "amount") "Menge in BTC" else "Betrag in EUR") })
 
                 Text(
-                    text = if (selectedOption == "amount") "Gesamtkosten: %.2f €".format(
+                    text = if (selectedOption == "amount") "Kaufpreis: %.2f €".format(
                         calculatedValue
                     )
                     else "Menge: %.6f BTC".format(calculatedValue),
@@ -191,6 +201,24 @@ fun CoinDetailSheet(
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                     ), modifier = Modifier.weight(0.5f), onClick = {
 
+                        if (inputValue.isEmpty()) {
+                            alertDialog()
+                            return@Button
+                        }
+
+                        onBuyClicked(
+                            Transaction_Positions(
+                                fee = 1.5,
+                                coinUuid = selectedCoin.uuid,
+                                symbol = selectedCoin.symbol,
+                                iconUrl = selectedCoin.iconUrl,
+                                name = selectedCoin.name,
+                                price = selectedCoin.price.toDouble(),
+                                amount = if (selectedOption == "amount") inputValue.toDouble() else inputValue.toDouble() / selectedCoin.price.toDouble(),
+                                type = TransactionType.BUY,
+                                totalValue = if (selectedOption == "amount") inputValue.toDouble() * selectedCoin.price.toDouble() else inputValue.toDouble()
+                            )
+                        )
                         onDismiss()
                     }) {
                     Text(text = "Kaufen")
@@ -203,7 +231,7 @@ fun CoinDetailSheet(
                         containerColor = sell,
                         contentColor = MaterialTheme.colorScheme.onErrorContainer
                     ), modifier = Modifier.weight(0.5f), onClick = {
-
+                        onSellClicked()
                         onDismiss()
                     }) {
                     Text(text = "Verkaufen")
@@ -211,6 +239,7 @@ fun CoinDetailSheet(
             }
         }
     }
+
 }
 
 

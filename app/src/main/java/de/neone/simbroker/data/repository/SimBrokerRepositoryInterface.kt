@@ -1,5 +1,6 @@
 package de.neone.simbroker.data.repository
 
+import de.neone.simbroker.data.local.Transaction_Positions
 import de.neone.simbroker.data.remote.Coin
 
 interface SimBrokerRepositoryInterface {
@@ -7,5 +8,8 @@ interface SimBrokerRepositoryInterface {
     suspend fun getCoinPrice(uuid: String): Double
     suspend fun getCoins(limit: Int, offset: Int): List<Coin>
     suspend fun getCoin(uuid: String, timePeriod: String): Coin
+
+    suspend fun insertTransaction(transaction: Transaction_Positions)
+
 
 }
