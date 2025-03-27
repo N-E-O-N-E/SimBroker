@@ -46,6 +46,9 @@ object CoinbaseAPI {
 }
 
 interface APIService {
+    @GET("coin/{uuid}/price")
+    suspend fun getCoinPrice(@Path("uuid") uuid: String): Double
+
     @GET("coins")
     suspend fun getCoins(
         @Query("referenceCurrencyUuid") referenceCurrencyUuid: String = "5k-_VTxqtCEI",
@@ -57,35 +60,48 @@ interface APIService {
         @Query("timePeriod") timePeriod: String = "24h",
     ): CoinsResponse
 
-    @GET("coin/{uuid}/price")
-    suspend fun getCoinPrice(@Path("uuid") uuid: String): Double
+    @GET("coin/{uuid}")
+    suspend fun getCoin1h(
+        @Path("uuid") uuid: String,
+        @Query("referenceCurrencyUuid") referenceCurrencyUuid: String = "5k-_VTxqtCEI",
+        @Query("timePeriod") timePeriod: String = "1h",
+    ): CoinResponse
 
     @GET("coin/{uuid}")
-    suspend fun getCoin1h(@Path("uuid") uuid: String, @Query("referenceCurrencyUuid") referenceCurrencyUuid: String = "5k-_VTxqtCEI",
-        @Query("timePeriod") timePeriod: String = "1h"): CoinResponse
+    suspend fun getCoin3h(
+        @Path("uuid") uuid: String,
+        @Query("referenceCurrencyUuid") referenceCurrencyUuid: String = "5k-_VTxqtCEI",
+        @Query("timePeriod") timePeriod: String = "3h",
+    ): CoinResponse
 
     @GET("coin/{uuid}")
-    suspend fun getCoin3h(@Path("uuid") uuid: String, @Query("referenceCurrencyUuid") referenceCurrencyUuid: String = "5k-_VTxqtCEI",
-                        @Query("timePeriod") timePeriod: String = "3h"): CoinResponse
+    suspend fun getCoin24h(
+        @Path("uuid") uuid: String,
+        @Query("referenceCurrencyUuid") referenceCurrencyUuid: String = "5k-_VTxqtCEI",
+        @Query("timePeriod") timePeriod: String = "24h",
+    ): CoinResponse
 
     @GET("coin/{uuid}")
-    suspend fun getCoin24h(@Path("uuid") uuid: String, @Query("referenceCurrencyUuid") referenceCurrencyUuid: String = "5k-_VTxqtCEI",
-                        @Query("timePeriod") timePeriod: String = "24h"): CoinResponse
+    suspend fun getCoin7d(
+        @Path("uuid") uuid: String,
+        @Query("referenceCurrencyUuid") referenceCurrencyUuid: String = "5k-_VTxqtCEI",
+        @Query("timePeriod") timePeriod: String = "7d",
+    ): CoinResponse
 
     @GET("coin/{uuid}")
-    suspend fun getCoin7d(@Path("uuid") uuid: String, @Query("referenceCurrencyUuid") referenceCurrencyUuid: String = "5k-_VTxqtCEI",
-                        @Query("timePeriod") timePeriod: String = "7d"): CoinResponse
+    suspend fun getCoin30d(
+        @Path("uuid") uuid: String,
+        @Query("referenceCurrencyUuid") referenceCurrencyUuid: String = "5k-_VTxqtCEI",
+        @Query("timePeriod") timePeriod: String = "30d",
+    ): CoinResponse
 
     @GET("coin/{uuid}")
-    suspend fun getCoin30d(@Path("uuid") uuid: String, @Query("referenceCurrencyUuid") referenceCurrencyUuid: String = "5k-_VTxqtCEI",
-                          @Query("timePeriod") timePeriod: String = "30d"): CoinResponse
-
-    @GET("coin/{uuid}")
-    suspend fun getCoin3m(@Path("uuid") uuid: String, @Query("referenceCurrencyUuid") referenceCurrencyUuid: String = "5k-_VTxqtCEI",
-                          @Query("timePeriod") timePeriod: String = "3m"): CoinResponse
-
+    suspend fun getCoin3m(
+        @Path("uuid") uuid: String,
+        @Query("referenceCurrencyUuid") referenceCurrencyUuid: String = "5k-_VTxqtCEI",
+        @Query("timePeriod") timePeriod: String = "3m",
+    ): CoinResponse
 }
-
 
 
 fun main() = runBlocking {

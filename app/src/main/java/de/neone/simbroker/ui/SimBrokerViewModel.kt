@@ -10,9 +10,7 @@ import de.neone.simbroker.data.repository.SimBrokerRepositoryInterface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class SimBrokerViewModel(
@@ -52,53 +50,6 @@ class SimBrokerViewModel(
             }
         }
     }
-
-    fun buyCoin(coin: Coin, amount: Double, price: Double) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                repository.buyCoin(
-                    coin = coin,
-                    amount = amount,
-                    price = price
-                )
-            } catch (e: Exception) {
-                Log.e("SimBrokerViewModel", "Fehler beim Kauf", e)
-            }
-        }
-    }
-
-    fun sellCoin(coin: Coin, amount: Double, price: Double) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                repository.sellCoin(
-                    coin = coin,
-                    amount = amount,
-                    price = price
-                )
-            } catch (e: Exception) {
-                Log.e("SimBrokerViewModel", "Fehler beim Verkaufen", e)
-            }
-        }
-    }
-
-    // Room Datenströme Flow
-
-    val allPortfolioPositions = repository.getAllPortfolioPositions()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = emptyList()
-        )
-
-    val sparklineDataByCoinUuid = { coinUuid: String ->
-        repository.getSparklineDataByCoinUuid(coinUuid)
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(),
-                initialValue = emptyList()
-            )
-    }
-
 
     // API Response
     private val _coinList = MutableStateFlow<List<Coin>>(emptyList())

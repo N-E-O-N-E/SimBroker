@@ -105,9 +105,6 @@ fun CoinDetailSheet(
                 },
             )
             Button(onClick = {
-                viewModel.buyCoin(selectedCoin, amountTextField.toDouble(), priceTextField.toDouble())
-
-
 
                 onDismiss()
             }) {
@@ -115,9 +112,6 @@ fun CoinDetailSheet(
             }
 
             Button(onClick = {
-
-
-
 
                 onDismiss()
             }) {

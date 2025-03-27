@@ -1,82 +1,57 @@
 package de.neone.simbroker.data.local
 
 import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.Index
 import androidx.room.PrimaryKey
 
-// speichert jeden Kauf/Verkauf
-@Entity(tableName = "transactions")
+@Entity(tableName = "transaction")
 data class Transaction(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val coinUuid: String,
-    val name: String,
     val symbol: String,
     val iconUrl: String,
-    val type: TransactionType,
-    val amount: Double,
-    val price: Double,
     val timestamp: Long = System.currentTimeMillis(),
-    val isClosed: Boolean = false
+    val name: String,
+    val price: Double, // Preis pro Coin
+    val amount: Double, // Menge der Coins, die gekauft/verkauft wurden
+    val isClosed: Boolean = false, // Abgeschlossen
+    val type: TransactionType, // BUY oder SELL
+    val totalValue: Double, // Gesamtwert der Transaktion
+    val fee: Double, // Transaktionsgebühren
 )
 
 enum class TransactionType {
     BUY, SELL
 }
 
-// Positionen im Portfolio
-@Entity(tableName = "portfolioPositions")
-data class PortfolioPosition(
+@Entity(tableName = "portfolio")
+data class Portfolio(
     @PrimaryKey
+    val id: Int = 0,
     val coinUuid: String,
-    val name: String,
     val symbol: String,
-    val totalAmount: Double,           // Gesamtmenge
-    val averageBuyPrice: Double,       // Durchschnittskaufpreis
-    val currentPrice: Double,          // Aktueller Preis (wird aktualisiert)
-    val totalInvestment: Double,       // Gesamtinvestition
     val iconUrl: String,
-    val lastUpdated: Long = System.currentTimeMillis()
+    val timestamp: Long = System.currentTimeMillis(),
+    val name: String,
+    val amountBought: Double, // Ursprünglich gekaufte Menge
+    val amountRemaining: Double, // Verbleibende Menge nach Verkäufen
+    val pricePerUnit: Double, // Preis pro Coin zum Zeitpunkt des Kaufs
+    val totalValue: Double, // 	Gesamtwert der Position zum Kaufzeitpunkt"
 )
 
-// Abgeschlossene Trades
 @Entity(tableName = "closedTrades")
 data class ClosedTrade(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val coinUuid: String,
-    val name: String,
     val symbol: String,
-    val buyAmount: Double,             // Gekaufte Menge
-    val buyPrice: Double,              // Kaufpreis
-    val buyTimestamp: Long,            // Kaufzeitpunkt
-    val sellAmount: Double,            // Verkaufte Menge
-    val sellPrice: Double,             // Verkaufspreis
-    val sellTimestamp: Long,           // Verkauft
-    val profit: Double,                // Gewinn/Verlust
-    val profitPercentage: Double,      // Gewinn/Verlust in Prozent
-    val iconUrl: String
+    val iconUrl: String,
+    val name: String,
+    val amountSold: Double, // Menge der verkauften Coins
+    val totalProceeds: Double, // 	Gesamterlös (verkaufte Menge × Verkaufspreis)"
+    val totalCost: Double, // Gesamtkosten (Anschaffungskosten nach FIFO)
+    val totalFee: Double, // Summe der Gebühren (Kauf- & Verkaufsgebühren)
+    val profitLoss: Double, // Gewinn (+) oder Verlust (-) des Trades
+    val profitLossPercent: Double, // Gewinn/Verlust in Prozent
+    val closedAt: Long, // Zeitpunkt des Verkaufs/Trade-Abschlusses
 )
-
-// Sparkline
-@Entity(
-    tableName = "sparklineData",
-    foreignKeys = [
-        ForeignKey(
-            entity = PortfolioPosition::class,
-            parentColumns = ["coinUuid"],
-            childColumns = ["coinUuid"],
-            onDelete = ForeignKey.CASCADE
-        )
-    ],
-    indices = [Index("coinUuid")]
-)
-
-data class SparklineDataEntity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
-    val coinUuid: String,
-    val value: String,
-)
-
