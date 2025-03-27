@@ -3,21 +3,28 @@ package de.neone.simbroker.ui.views.portfolio.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -25,24 +32,28 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.request.error
 import de.neone.simbroker.R
-import de.neone.simbroker.data.local.Portfolio_Positions
+import de.neone.simbroker.data.helper.Helper
+import de.neone.simbroker.data.local.PortfolioPositions
+import de.neone.simbroker.data.local.TransactionPositions
 import de.neone.simbroker.data.repository.mockdata.coins_Mockdata
+import de.neone.simbroker.ui.theme.colorDown
+import de.neone.simbroker.ui.theme.colorUp
 
 @Composable
 fun PortfolioCoinListItem(
-    coin: Portfolio_Positions,
-    onLoad: () -> Unit,
+    coin: PortfolioPositions,
+    coinTransactions: List<TransactionPositions>,
+    currentPrice: Double,
+    profit: Double
 ) {
+    val slideInChart by remember { mutableStateOf(false) }
+    var showTransactionsForCoinState by remember { mutableStateOf(false) }
+
     val imageRequest = ImageRequest.Builder(LocalContext.current)
         .data(coin.iconUrl)
         .crossfade(true)
         .error(R.drawable.coinplaceholder)
         .build()
-
-
-    LaunchedEffect(Unit) {
-        onLoad()
-    }
 
     Card(
         modifier = Modifier.padding(8.dp),
@@ -51,8 +62,16 @@ fun PortfolioCoinListItem(
         )
     ) {
 
-        // Diagramm mit Sparklines
-
+        if (slideInChart) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .padding(10.dp),
+            ) {
+                // Sparkline Chart
+            }
+        }
 
         Column(
             modifier = Modifier
@@ -64,32 +83,92 @@ fun PortfolioCoinListItem(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
-                    Row() {
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
                         AsyncImage(
                             modifier = Modifier
-                                .padding(end = 15.dp)
-                                .width(50.dp)
-                                .height(50.dp)
+                                .padding(start = 5.dp)
+                                .padding(end = 13.dp)
+                                .width(70.dp)
+                                .height(70.dp)
                                 .clip(shape = MaterialTheme.shapes.extraLarge),
                             model = imageRequest,
                             contentDescription = coin.name,
                             contentScale = ContentScale.Fit,
                             clipToBounds = false
                         )
-                        Column() {
 
-                            Row() {
-                                Text(text = "CoinID: ${coin.coinUuid}")
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.Start
+                        ) {
+                            Text(text = coin.symbol, style = MaterialTheme.typography.titleMedium)
+                            Row {
+                                Text(
+                                    text = "${coin.name.take(25)}  ",
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
                             }
+                            Text(
+                                text = "Aktueller Kurs: %.2f".format(currentPrice),
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
 
-                            HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
-
-                            Text(text = "Name: ${coin.name}, ${coin.symbol}")
-                            Text(text = "Kaufkurs: ${coin.pricePerUnit}")
-
-
-                            HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
-
+                        Column(
+                            modifier = Modifier.fillMaxWidth(0.4f),
+                            horizontalAlignment = Alignment.End
+                        ) {
+                            Text(
+                                text = "Gewinn/Verlust",
+                                style = MaterialTheme.typography.labelLarge,
+                            )
+                            Text(
+                                text = "%.2f".format(profit),
+                                style = MaterialTheme.typography.titleLarge,
+                                color = if (coin.totalValue.toString()
+                                        .contains("-")
+                                ) colorDown else colorUp
+                            )
+                            IconButton(
+                                onClick = {
+                                    showTransactionsForCoinState = !showTransactionsForCoinState
+                                }
+                            ) {
+                                Icon(
+                                    painterResource(id = if (showTransactionsForCoinState) R.drawable.baseline_arrow_drop_up_24 else R.drawable.baseline_arrow_drop_down_48),
+                                    contentDescription = null
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+            if (showTransactionsForCoinState) {
+                coinTransactions.forEach {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(5.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.5f))
+                    ) {
+                        Column(modifier = Modifier.padding(15.dp)) {
+                            Row() {
+                                Text(text ="Kaufdatum: ${Helper.timestampToString(it.timestamp)}  ", style = MaterialTheme.typography.labelLarge)
+                                Spacer(modifier = Modifier.weight(1f))
+                                Text(text ="Anteil(e): %.6f Stk. ".format(it.amount), style = MaterialTheme.typography.labelLarge)
+                            }
+                            Row() {
+                                Text(text ="Kaufpreis: %.2f €  ".format(it.price), style = MaterialTheme.typography.labelLarge)
+                                Spacer(modifier = Modifier.weight(1f))
+                                Text(text ="Anteilspreis: %.2f €  ".format(it.price * it.amount), style = MaterialTheme.typography.labelLarge)
+                            }
                         }
                     }
                 }
@@ -102,16 +181,19 @@ fun PortfolioCoinListItem(
 @Composable
 private fun PortfolioCoinListPreview() {
     PortfolioCoinListItem(
-        coin = Portfolio_Positions(
-            coinUuid = coins_Mockdata.first().uuid,
-            symbol = coins_Mockdata.first().symbol,
-            iconUrl = coins_Mockdata.first().iconUrl,
-            name = coins_Mockdata.first().name,
+        coin = PortfolioPositions(
+            coinUuid = coins_Mockdata[2].uuid,
+            symbol = coins_Mockdata[2].symbol,
+            iconUrl = coins_Mockdata[2].iconUrl,
+            name = coins_Mockdata[2].name,
             amountBought = 2.0,
             amountRemaining = 0.0,
             pricePerUnit = 3500.0,
             totalValue = 7000.0
-        ) ,
-        onLoad = {}
+        ),
+        currentPrice = 3680.0,
+        coinTransactions = emptyList(),
+        profit = 1200.0
     )
+
 }

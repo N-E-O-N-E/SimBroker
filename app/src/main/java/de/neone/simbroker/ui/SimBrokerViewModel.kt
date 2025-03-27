@@ -4,8 +4,9 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import de.neone.simbroker.data.local.PortfolioPositions
 import de.neone.simbroker.data.local.SimBrokerDatabase
-import de.neone.simbroker.data.local.Transaction_Positions
+import de.neone.simbroker.data.local.TransactionPositions
 import de.neone.simbroker.data.remote.Coin
 import de.neone.simbroker.data.repository.SimBrokerRepositoryInterface
 import kotlinx.coroutines.Dispatchers
@@ -62,7 +63,7 @@ class SimBrokerViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val newCoins = repository.getCoins(offset = offset, limit = limit)
-                _coinList.value += newCoins
+                _coinList.value = _coinList.value + newCoins // nicht mit += da sich die Referenz nicht mitändert!
                 offset += limit
                 hasMoreData = newCoins.isNotEmpty()
             } catch (e: Exception) {
@@ -89,13 +90,38 @@ class SimBrokerViewModel(
         }
     }
 
-    fun addTransaction(transaction: Transaction_Positions) {
-        Log.d("simDebug", "buyCoin over ViewModel started")
+
+    fun addTransaction(transaction: TransactionPositions) {
+        Log.d("simDebug", "addTransaction over ViewModel started")
         viewModelScope.launch {
             repository.insertTransaction(transaction)
         }
     }
 
+    fun addPortfolio(portfolio: PortfolioPositions) {
+        Log.d("simDebug", "addPosition over ViewModel started")
+        viewModelScope.launch {
+            repository.insertPortfolio(portfolio)
+        }
+    }
+
+    private val _allPortfolioPositions = MutableStateFlow<List<PortfolioPositions>>(emptyList())
+    val allPortfolioPositions: StateFlow<List<PortfolioPositions>> = _allPortfolioPositions
+
+    fun getAllPortfolioPositions() {
+        viewModelScope.launch {
+            _allPortfolioPositions.value = repository.getAllPortfolioPositions()
+        }
+    }
+
+    private val _allTransactionPositions = MutableStateFlow<List<TransactionPositions>>(emptyList())
+    val allTransactionPositions: StateFlow<List<TransactionPositions>> = _allTransactionPositions
+
+    fun getAllTransactionPositions() {
+        viewModelScope.launch {
+            _allTransactionPositions.value = repository.getAllTransactionPositions()
+        }
+    }
 
 
 

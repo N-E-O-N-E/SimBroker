@@ -24,6 +24,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import de.neone.simbroker.R
@@ -79,7 +80,7 @@ fun SuchenView(
         ) {
             Text(
                 text = "RealoadTime: $timer",
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface
             )
 
@@ -87,6 +88,7 @@ fun SuchenView(
                 openSucheSheet = !openSucheSheet
             }) {
                 Icon(
+                    modifier = Modifier.scale(1.3f),
                     painter = painterResource(id = R.drawable.baseline_manage_search_24),
                     contentDescription = null
                 )
@@ -145,9 +147,9 @@ fun SuchenView(
                 onDismiss = {
                     openCoinDetailSheet = false
                 },
-                onBuyClicked = { data ->
-                    viewModel.addTransaction(data)
-
+                onBuyClicked = { transaction, portfolio ->
+                    viewModel.addTransaction(transaction)
+                    viewModel.addPortfolio(portfolio)
                 },
                 onSellClicked = {
 

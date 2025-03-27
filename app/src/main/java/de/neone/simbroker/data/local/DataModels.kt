@@ -3,8 +3,8 @@ package de.neone.simbroker.data.local
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "transaction")
-data class Transaction_Positions(
+@Entity(tableName = "tbl_transaction")
+data class TransactionPositions(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val timestamp: Long = System.currentTimeMillis(),
@@ -25,14 +25,15 @@ enum class TransactionType {
     BUY, SELL
 }
 
-@Entity(tableName = "portfolio")
-data class Portfolio_Positions(
-    @PrimaryKey
+@Entity(tableName = "tbl_portfolio")
+data class PortfolioPositions(
+    @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
+    val timestamp: Long = System.currentTimeMillis(),
+
     val coinUuid: String,
     val symbol: String,
     val iconUrl: String,
-    val timestamp: Long = System.currentTimeMillis(),
     val name: String,
     val amountBought: Double, // Ursprünglich gekaufte Menge
     val amountRemaining: Double, // Verbleibende Menge nach Verkäufen
@@ -40,8 +41,8 @@ data class Portfolio_Positions(
     val totalValue: Double, // 	Gesamtwert der Position zum Kaufzeitpunkt"
 )
 
-@Entity(tableName = "closedTrades")
-data class ClosedTrade_Positions(
+@Entity(tableName = "tbl_closedTrades")
+data class ClosedTradePositions(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val coinUuid: String,

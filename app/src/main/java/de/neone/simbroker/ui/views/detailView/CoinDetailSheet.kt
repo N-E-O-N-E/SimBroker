@@ -39,8 +39,9 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.request.error
 import de.neone.simbroker.R
+import de.neone.simbroker.data.local.PortfolioPositions
+import de.neone.simbroker.data.local.TransactionPositions
 import de.neone.simbroker.data.local.TransactionType
-import de.neone.simbroker.data.local.Transaction_Positions
 import de.neone.simbroker.data.remote.Coin
 import de.neone.simbroker.ui.theme.buy
 import de.neone.simbroker.ui.theme.colorDown
@@ -53,10 +54,12 @@ fun CoinDetailSheet(
     modifier: Modifier = Modifier,
     onDismiss: () -> Unit,
     alertDialog: () -> Unit,
-    onBuyClicked: (Transaction_Positions) -> Unit,
+    onBuyClicked: (TransactionPositions, PortfolioPositions) -> Unit,
     onSellClicked: () -> Unit,
     selectedCoin: Coin,
 ) {
+
+    val feeValue = 1.5
 
     val skipPartiallyExpanded by rememberSaveable { mutableStateOf(false) }
     val coinDetailSheetState =
@@ -135,6 +138,10 @@ fun CoinDetailSheet(
                         text = "%.2f €".format(selectedCoin.price.toDouble()),
                         style = MaterialTheme.typography.titleLarge
                     )
+                    Text(
+                        text = "%.2f tax".format(feeValue),
+                        style = MaterialTheme.typography.titleLarge
+                    )
                 }
 
             }
@@ -176,10 +183,10 @@ fun CoinDetailSheet(
                     label = { Text(if (selectedOption == "amount") "Menge in BTC" else "Betrag in EUR") })
 
                 Text(
-                    text = if (selectedOption == "amount") "Kaufpreis: %.2f €".format(
-                        calculatedValue
+                    text = if (selectedOption == "amount") "Kosten: %.2f €".format(
+                        calculatedValue + feeValue
                     )
-                    else "Menge: %.6f BTC".format(calculatedValue),
+                    else "Anteile: %.6f BTC".format(calculatedValue),
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(top = 8.dp)
                 )
@@ -207,8 +214,8 @@ fun CoinDetailSheet(
                         }
 
                         onBuyClicked(
-                            Transaction_Positions(
-                                fee = 1.5,
+                            TransactionPositions(
+                                fee = feeValue,
                                 coinUuid = selectedCoin.uuid,
                                 symbol = selectedCoin.symbol,
                                 iconUrl = selectedCoin.iconUrl,
@@ -216,7 +223,17 @@ fun CoinDetailSheet(
                                 price = selectedCoin.price.toDouble(),
                                 amount = if (selectedOption == "amount") inputValue.toDouble() else inputValue.toDouble() / selectedCoin.price.toDouble(),
                                 type = TransactionType.BUY,
-                                totalValue = if (selectedOption == "amount") inputValue.toDouble() * selectedCoin.price.toDouble() else inputValue.toDouble()
+                                totalValue = if (selectedOption == "amount") inputValue.toDouble() * selectedCoin.price.toDouble() + feeValue else inputValue.toDouble() + feeValue
+                            ),
+                            PortfolioPositions(
+                                coinUuid = selectedCoin.uuid,
+                                symbol = selectedCoin.symbol,
+                                iconUrl = selectedCoin.iconUrl,
+                                name = selectedCoin.name,
+                                amountBought = if (selectedOption == "amount") inputValue.toDouble() else inputValue.toDouble() / selectedCoin.price.toDouble(),
+                                amountRemaining = if (selectedOption == "amount") inputValue.toDouble() else inputValue.toDouble() / selectedCoin.price.toDouble(),
+                                pricePerUnit = selectedCoin.price.toDouble(),
+                                totalValue = if (selectedOption == "amount") inputValue.toDouble() * selectedCoin.price.toDouble() + feeValue else inputValue.toDouble() + feeValue
                             )
                         )
                         onDismiss()

@@ -1,7 +1,8 @@
 package de.neone.simbroker.data.repository
 
+import de.neone.simbroker.data.local.PortfolioPositions
 import de.neone.simbroker.data.local.SimBrokerDAO
-import de.neone.simbroker.data.local.Transaction_Positions
+import de.neone.simbroker.data.local.TransactionPositions
 import de.neone.simbroker.data.remote.Coin
 import de.neone.simbroker.data.repository.mockdata.coins_Mockdata
 
@@ -9,6 +10,7 @@ class SimBrokerRepositoryMock(
     private val simBrokerDAO: SimBrokerDAO,
 ) : SimBrokerRepositoryInterface {
 
+    // API --------------------------------------------------------------------------------
     override suspend fun getCoinPrice(uuid: String): Double {
         val coinPrice = coins_Mockdata.first { it.uuid == uuid }.price
         return coinPrice.toDouble()
@@ -23,8 +25,25 @@ class SimBrokerRepositoryMock(
         return result
     }
 
-    override suspend fun insertTransaction(transaction: Transaction_Positions) {
+    // Room --------------------------------------------------------------------------------
+
+    override suspend fun insertTransaction(transaction: TransactionPositions) {
         simBrokerDAO.insertTransaction(transaction)
     }
+
+    override suspend fun insertPortfolio(portfolio: PortfolioPositions) {
+        simBrokerDAO.insertPortfolio(portfolio)
+    }
+
+    override suspend fun getAllPortfolioPositions(): List<PortfolioPositions> {
+        return simBrokerDAO.getAllPortfolioPositions()
+    }
+    override suspend fun getAllTransactionPositions(): List<TransactionPositions> {
+        return simBrokerDAO.getAllTransactionPositions()
+    }
+
+
+
+
 
 }

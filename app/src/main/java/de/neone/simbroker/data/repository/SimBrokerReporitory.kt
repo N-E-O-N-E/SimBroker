@@ -1,8 +1,9 @@
 package de.neone.simbroker.data.repository
 
 import android.util.Log
+import de.neone.simbroker.data.local.PortfolioPositions
 import de.neone.simbroker.data.local.SimBrokerDAO
-import de.neone.simbroker.data.local.Transaction_Positions
+import de.neone.simbroker.data.local.TransactionPositions
 import de.neone.simbroker.data.remote.APIService
 import de.neone.simbroker.data.remote.Coin
 
@@ -10,6 +11,8 @@ class SimBrokerRepositoryImpl(
     private val apiService: APIService,
     private val simBrokerDAO: SimBrokerDAO,
 ) : SimBrokerRepositoryInterface {
+
+    // API --------------------------------------------------------------------------------
 
     override suspend fun getCoinPrice(uuid: String): Double {
         return try {
@@ -20,7 +23,6 @@ class SimBrokerRepositoryImpl(
         }
     }
 
-    // API
     override suspend fun getCoins(limit: Int, offset: Int): List<Coin> {
         return try {
             apiService.getCoins(limit = limit, offset = offset).data.coins
@@ -44,10 +46,25 @@ class SimBrokerRepositoryImpl(
         }
     }
 
+    // Room --------------------------------------------------------------------------------
 
-    override suspend fun insertTransaction(transaction: Transaction_Positions) {
+    override suspend fun insertTransaction(transaction: TransactionPositions) {
         simBrokerDAO.insertTransaction(transaction)
     }
+
+    override suspend fun insertPortfolio(portfolio: PortfolioPositions) {
+        simBrokerDAO.insertPortfolio(portfolio)
+    }
+
+    override suspend fun getAllPortfolioPositions(): List<PortfolioPositions> {
+        return simBrokerDAO.getAllPortfolioPositions()
+    }
+
+    override suspend fun getAllTransactionPositions(): List<TransactionPositions> {
+        return simBrokerDAO.getAllTransactionPositions()
+    }
+
+
 
 }
 
