@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -63,7 +62,6 @@ fun SuchenView(viewModel: SimBrokerViewModel) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(25.dp)
                 .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f))
                 .padding(horizontal = 10.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -71,7 +69,7 @@ fun SuchenView(viewModel: SimBrokerViewModel) {
         ) {
             Text(
                 text = "RealoadTime: $timer",
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )
 
@@ -128,7 +126,6 @@ fun SuchenView(viewModel: SimBrokerViewModel) {
     if (openCoinDetailSheet) {
         selectedCoin?.let {
             CoinDetailSheet(
-                viewModel = viewModel,
                 selectedCoin = it,
                 onDismiss = {
                     openCoinDetailSheet = false

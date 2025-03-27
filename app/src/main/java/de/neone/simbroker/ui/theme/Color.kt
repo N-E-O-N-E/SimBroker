@@ -8,7 +8,10 @@ val topBarColorDark = Color(0xFF4779A0)
 val bottomBarColorDark = Color(0xFF13365E)
 
 val colorUp = Color(0xFF4ABB36)
-val colorDown = Color(0xFFFF2020)
+val colorDown = Color(0xFFF31D1D)
+
+val buy = Color(0xFF1B8614)
+val sell = Color(0xFF831313)
 
 
 val primaryLightMediumContrast = Color(0xFF205B93)

@@ -14,6 +14,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -50,19 +51,23 @@ fun SucheCoinListItem(
     ) {
         Column(
             modifier = Modifier
-                .padding(10.dp)
-                .fillMaxWidth()
+                .padding(8.dp)
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
             ) {
 
                 AsyncImage(
                     modifier = Modifier
-                        .padding(end = 15.dp)
-                        .width(50.dp)
-                        .height(50.dp)
+                        .padding(start = 5.dp)
+                        .padding(end = 13.dp)
+                        .width(70.dp)
+                        .height(70.dp)
                         .clip(shape = MaterialTheme.shapes.extraLarge),
                     model = imageRequest,
                     contentDescription = coin.name,
@@ -70,23 +75,34 @@ fun SucheCoinListItem(
                     clipToBounds = false
                 )
 
-                Column(modifier = Modifier.weight(1f)) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Text(text = coin.symbol, style = MaterialTheme.typography.titleMedium)
                     Row {
                         Text(
-                            text = "${coin.name.take(22)}  ",
-                            style = MaterialTheme.typography.bodyLarge
+                            text = "${coin.name.take(25)}  ",
+                            style = MaterialTheme.typography.bodyMedium
                         )
-                        Text(text = coin.symbol, style = MaterialTheme.typography.titleSmall)
                     }
-                    Text(text = "${coin.price} EUR", style = MaterialTheme.typography.bodySmall)
-                    Text(text = "UUID: ${coin.uuid}", style = MaterialTheme.typography.bodySmall)
                 }
 
-                Text(
-                    text = "${coin.change} %",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = if (coin.change.contains("-")) colorDown else colorUp
-                )
+                Column(
+                    modifier = Modifier.fillMaxWidth(0.4f),
+                    horizontalAlignment = Alignment.End
+                ) {
+                    Text(
+                        text = "${coin.change} %",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = if (coin.change.contains("-")) colorDown else colorUp
+                    )
+                    Text(
+                        text = "%.2f €".format(coin.price.toDouble()),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
             }
         }
     }

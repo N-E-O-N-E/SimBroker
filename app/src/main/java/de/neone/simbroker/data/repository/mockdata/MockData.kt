@@ -45,7 +45,7 @@ val coins_Mockdata = listOf(
     Coin(
         uuid = "3",
         symbol = "ADA",
-        name = "Cardano",
+        name = "Cardano with a long Coinname for testing",
         color = "#0033ad",
         iconUrl = "https://example.com/ada.png",
         price = "0.52",
