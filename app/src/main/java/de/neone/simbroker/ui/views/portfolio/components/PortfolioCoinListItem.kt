@@ -44,10 +44,11 @@ fun PortfolioCoinListItem(
     coin: PortfolioPositions,
     coinTransactions: List<TransactionPositions>,
     currentPrice: Double,
-    profit: Double
+    profit: Double,
 ) {
-    val slideInChart by remember { mutableStateOf(false) }
+    var slideInChart by remember { mutableStateOf(false) }
     var showTransactionsForCoinState by remember { mutableStateOf(false) }
+
 
     val imageRequest = ImageRequest.Builder(LocalContext.current)
         .data(coin.iconUrl)
@@ -82,7 +83,20 @@ fun PortfolioCoinListItem(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Column {
+                Column(horizontalAlignment = Alignment.Start) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        IconButton(
+                            onClick = {
+                                slideInChart = !slideInChart
+                            }
+                        ) {
+                            Icon(
+                                painterResource(id = if (slideInChart) R.drawable.baseline_show_chart_24 else R.drawable.baseline_show_chart_24),
+                                contentDescription = null
+                            )
+                        }
+                        Text("Chart View", style = MaterialTheme.typography.labelSmall)
+                    }
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -132,19 +146,20 @@ fun PortfolioCoinListItem(
                             Text(
                                 text = "%.2f".format(profit),
                                 style = MaterialTheme.typography.titleLarge,
-                                color = if (coin.totalValue.toString()
-                                        .contains("-")
-                                ) colorDown else colorUp
+                                color = if (profit.toString().contains("-")) colorDown else colorUp
                             )
-                            IconButton(
-                                onClick = {
-                                    showTransactionsForCoinState = !showTransactionsForCoinState
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text("History", style = MaterialTheme.typography.labelSmall)
+                                IconButton(
+                                    onClick = {
+                                        showTransactionsForCoinState = !showTransactionsForCoinState
+                                    }
+                                ) {
+                                    Icon(
+                                        painterResource(id = if (showTransactionsForCoinState) R.drawable.baseline_arrow_drop_up_24 else R.drawable.baseline_arrow_drop_down_48),
+                                        contentDescription = null
+                                    )
                                 }
-                            ) {
-                                Icon(
-                                    painterResource(id = if (showTransactionsForCoinState) R.drawable.baseline_arrow_drop_up_24 else R.drawable.baseline_arrow_drop_down_48),
-                                    contentDescription = null
-                                )
                             }
                         }
                     }
@@ -156,18 +171,34 @@ fun PortfolioCoinListItem(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(5.dp),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.5f))
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainerLow.copy(
+                                alpha = 0.5f
+                            )
+                        )
                     ) {
                         Column(modifier = Modifier.padding(15.dp)) {
                             Row() {
-                                Text(text ="Kaufdatum: ${Helper.timestampToString(it.timestamp)}  ", style = MaterialTheme.typography.labelLarge)
+                                Text(
+                                    text = "Kaufdatum: ${Helper.timestampToString(it.timestamp)}  ",
+                                    style = MaterialTheme.typography.labelLarge
+                                )
                                 Spacer(modifier = Modifier.weight(1f))
-                                Text(text ="Anteil(e): %.6f Stk. ".format(it.amount), style = MaterialTheme.typography.labelLarge)
+                                Text(
+                                    text = "Anteil(e): %.6f Stk. ".format(it.amount),
+                                    style = MaterialTheme.typography.labelLarge
+                                )
                             }
                             Row() {
-                                Text(text ="Kaufpreis: %.2f €  ".format(it.price), style = MaterialTheme.typography.labelLarge)
+                                Text(
+                                    text = "Kaufpreis: %.2f €  ".format(it.price),
+                                    style = MaterialTheme.typography.labelLarge
+                                )
                                 Spacer(modifier = Modifier.weight(1f))
-                                Text(text ="Anteilspreis: %.2f €  ".format(it.price * it.amount), style = MaterialTheme.typography.labelLarge)
+                                Text(
+                                    text = "Anteilspreis: %.2f €  ".format(it.price * it.amount),
+                                    style = MaterialTheme.typography.labelLarge
+                                )
                             }
                         }
                     }

@@ -31,7 +31,7 @@ import de.neone.simbroker.R
 import de.neone.simbroker.data.remote.Coin
 import de.neone.simbroker.ui.SimBrokerViewModel
 import de.neone.simbroker.ui.navigation.ViewWallpaperImageBox
-import de.neone.simbroker.ui.views.detailView.CoinDetailSheet
+import de.neone.simbroker.ui.views.detailView.CoinSheet
 import de.neone.simbroker.ui.views.suche.components.AlertDialog
 import de.neone.simbroker.ui.views.suche.components.LoadingIndicator
 import de.neone.simbroker.ui.views.suche.components.SucheCoinListItem
@@ -142,7 +142,7 @@ fun SuchenView(
 
     if (openCoinDetailSheet) {
         selectedCoin?.let { it ->
-            CoinDetailSheet(
+            CoinSheet(
                 selectedCoin = it,
                 onDismiss = {
                     openCoinDetailSheet = false

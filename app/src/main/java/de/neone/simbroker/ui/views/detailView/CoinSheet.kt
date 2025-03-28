@@ -47,16 +47,17 @@ import de.neone.simbroker.ui.theme.buy
 import de.neone.simbroker.ui.theme.colorDown
 import de.neone.simbroker.ui.theme.colorUp
 import de.neone.simbroker.ui.theme.sell
+import de.neone.simbroker.ui.views.detailView.components.ChartPlotter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CoinDetailSheet(
+fun CoinSheet(
     modifier: Modifier = Modifier,
     onDismiss: () -> Unit,
     alertDialog: () -> Unit,
     onBuyClicked: (TransactionPositions, PortfolioPositions) -> Unit,
     onSellClicked: () -> Unit,
-    selectedCoin: Coin,
+    selectedCoin: Coin
 ) {
 
     val feeValue = 1.5
@@ -78,7 +79,6 @@ fun CoinDetailSheet(
     ) {
 
 
-
         var selectedOption by remember { mutableStateOf("amount") } // "amount" oder "price"
         var inputValue by remember { mutableStateOf("") }
         val currentCoinPrice = selectedCoin.price.toDouble() // Aktueller aus API
@@ -92,11 +92,16 @@ fun CoinDetailSheet(
         } ?: 0.0
 
 
+        ChartPlotter(
+            coinSparklineData = selectedCoin.sparkline
+        )
+        
         Column(
             modifier = modifier
                 .fillMaxSize(1f)
                 .padding(horizontal = 15.dp)
         ) {
+            
             Row(
                 modifier = Modifier
                     .fillMaxWidth(1f)
@@ -244,6 +249,7 @@ fun CoinDetailSheet(
                 Spacer(modifier = Modifier.weight(0.1f))
 
                 Button(
+                    enabled = false,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = sell,
                         contentColor = MaterialTheme.colorScheme.onErrorContainer

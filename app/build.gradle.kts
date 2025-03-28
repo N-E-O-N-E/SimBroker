@@ -77,6 +77,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation(libs.androidx.compose.material)
 
     implementation(libs.androidx.navigation.compose)    // Navigation in Compose
     implementation(libs.kotlinx.serialization)          // Kotlin Serialization
@@ -106,8 +107,12 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
 
+    // --- Coil (Image Loading) ---
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
 
-    implementation(libs.androidx.compose.material)
+    // --- JetChart (Charting) ---
+    implementation(libs.jetchart)
+
+
 }

@@ -78,10 +78,9 @@ class SimBrokerViewModel(
     private fun refreshCoins() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val refreshedCoins =
-                    repository.getCoins(offset = 0, limit = limit)
+                val refreshedCoins = repository.getCoins(offset = 0, limit = limit)
                 if (refreshedCoins.isNotEmpty()) {
-                    _coinList.value = refreshedCoins
+                    _coinList.value = _coinList.value + refreshedCoins // nicht mit += da sich die Referenz nicht mitändert!
                 }
                 Log.d("simDebug", "Coins aktualisiert: ${refreshedCoins.size}")
             } catch (e: Exception) {
