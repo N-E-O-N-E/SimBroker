@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import de.neone.simbroker.data.local.PortfolioPositions
-import de.neone.simbroker.data.local.SimBrokerDatabase
 import de.neone.simbroker.data.local.TransactionPositions
 import de.neone.simbroker.data.remote.Coin
 import de.neone.simbroker.data.repository.SimBrokerRepositoryInterface
@@ -19,9 +18,6 @@ class SimBrokerViewModel(
     application: Application,
     private val repository: SimBrokerRepositoryInterface,
 ) : AndroidViewModel(application) {
-
-    // Room Database
-    private val simBrokerDatabase = SimBrokerDatabase.getDatabase(application.applicationContext).simBrokerDAO()
 
     // Pagination
     private var isLoading = false

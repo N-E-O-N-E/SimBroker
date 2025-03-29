@@ -15,8 +15,6 @@ val appModule = module {
 
     viewModelOf(::SimBrokerViewModel)
 
-
-
     single {
         CoinbaseAPI.retrofitService
     }
@@ -28,7 +26,6 @@ val appModule = module {
     single<SimBrokerDAO> {
         get<SimBrokerDatabase>().simBrokerDAO()
     }
-
 
 //    single<SimBrokerRepositoryInterface> {
 //        SimBrokerRepositoryImpl(get(), get())

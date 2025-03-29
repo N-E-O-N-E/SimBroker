@@ -45,6 +45,7 @@ fun PortfolioCoinListItem(
     coinTransactions: List<TransactionPositions>,
     currentPrice: Double,
     profit: Double,
+    sparks: List<String> = emptyList()
 ) {
     var slideInChart by remember { mutableStateOf(false) }
     var showTransactionsForCoinState by remember { mutableStateOf(false) }
@@ -69,8 +70,12 @@ fun PortfolioCoinListItem(
                     .fillMaxWidth()
                     .height(200.dp)
                     .padding(10.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.6f),
+                )
             ) {
                 // Sparkline Chart
+                PortfolioChartPlotter(coinSparklineData = sparks)
             }
         }
 

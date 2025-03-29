@@ -1,4 +1,4 @@
-package de.neone.simbroker.ui.views.detailView.components
+package de.neone.simbroker.ui.views.portfolio.components
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,7 +24,7 @@ import dev.anirban.charts.linear.plots.GradientPlotStrategy
 
 
 @Composable
-fun ChartPlotter(
+fun PortfolioChartPlotter(
     modifier: Modifier = Modifier,
     coinSparklineData: List<String> = emptyList(),
 ) {
@@ -83,7 +83,7 @@ fun ChartPlotter(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun ChartPlotterPreview() {
-    ChartPlotter(
+    PortfolioChartPlotter(
         coinSparklineData = coins_Mockdata.first().sparkline
     )
 }

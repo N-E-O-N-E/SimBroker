@@ -57,49 +57,28 @@ interface APIService {
         @Query("orderDirection") orderDirection: String = "desc",
         @Query("limit") limit: Int,
         @Query("offset") offset: Int,
-        @Query("timePeriod") timePeriod: String = "24h",
+        @Query("timePeriod") timePeriod: String = "30d",
     ): CoinsResponse
 
     @GET("coin/{uuid}")
     suspend fun getCoin1h(
         @Path("uuid") uuid: String,
         @Query("referenceCurrencyUuid") referenceCurrencyUuid: String = "5k-_VTxqtCEI",
-        @Query("timePeriod") timePeriod: String = "1h",
-    ): CoinResponse
-
-    @GET("coin/{uuid}")
-    suspend fun getCoin3h(
-        @Path("uuid") uuid: String,
-        @Query("referenceCurrencyUuid") referenceCurrencyUuid: String = "5k-_VTxqtCEI",
-        @Query("timePeriod") timePeriod: String = "3h",
+        @Query("timePeriod") timePeriod: String = "1h", // 12 Sparklines
     ): CoinResponse
 
     @GET("coin/{uuid}")
     suspend fun getCoin24h(
         @Path("uuid") uuid: String,
         @Query("referenceCurrencyUuid") referenceCurrencyUuid: String = "5k-_VTxqtCEI",
-        @Query("timePeriod") timePeriod: String = "24h",
-    ): CoinResponse
-
-    @GET("coin/{uuid}")
-    suspend fun getCoin7d(
-        @Path("uuid") uuid: String,
-        @Query("referenceCurrencyUuid") referenceCurrencyUuid: String = "5k-_VTxqtCEI",
-        @Query("timePeriod") timePeriod: String = "7d",
+        @Query("timePeriod") timePeriod: String = "24h", // 24 Sparklines
     ): CoinResponse
 
     @GET("coin/{uuid}")
     suspend fun getCoin30d(
         @Path("uuid") uuid: String,
         @Query("referenceCurrencyUuid") referenceCurrencyUuid: String = "5k-_VTxqtCEI",
-        @Query("timePeriod") timePeriod: String = "30d",
-    ): CoinResponse
-
-    @GET("coin/{uuid}")
-    suspend fun getCoin3m(
-        @Path("uuid") uuid: String,
-        @Query("referenceCurrencyUuid") referenceCurrencyUuid: String = "5k-_VTxqtCEI",
-        @Query("timePeriod") timePeriod: String = "3m",
+        @Query("timePeriod") timePeriod: String = "30d", // 30 Sparklines
     ): CoinResponse
 }
 

@@ -13,6 +13,9 @@ val colorDown = Color(0xFFF31D1D)
 val buy = Color(0xFF1B8614)
 val sell = Color(0xFF831313)
 
+val chartLight = Color(0xFF0090FF)
+val chartDark = Color(0xFFF700FF)
+
 
 val primaryLightMediumContrast = Color(0xFF205B93)
 val onPrimaryLightMediumContrast = Color(0xFFFFFFFF)

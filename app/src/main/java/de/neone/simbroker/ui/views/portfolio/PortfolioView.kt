@@ -52,12 +52,15 @@ fun PortfolioView(
                 val averagePrice = if (totalAmount > 0) totalInvested / totalAmount else 0.0
                 val profit = (currentPrice - averagePrice) * totalAmount
 
+                val sparksForPosition = coinList.find { it.uuid == coinUuid }?.sparkline.orEmpty()
+
 
                 PortfolioCoinListItem(
                     coin = positions.first(),
                     currentPrice = currentPrice,
                     coinTransactions = coinTransactions,
-                    profit = profit
+                    profit = profit,
+                    sparks = sparksForPosition
                 )
 
             }

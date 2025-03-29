@@ -57,20 +57,22 @@ fun CoinSheet(
     alertDialog: () -> Unit,
     onBuyClicked: (TransactionPositions, PortfolioPositions) -> Unit,
     onSellClicked: () -> Unit,
-    selectedCoin: Coin
+    selectedCoin: Coin,
 ) {
 
     val feeValue = 1.5
 
     val skipPartiallyExpanded by rememberSaveable { mutableStateOf(false) }
     val coinDetailSheetState =
-        rememberModalBottomSheetState(skipPartiallyExpanded = skipPartiallyExpanded)
+        rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val imageRequest =
         ImageRequest.Builder(LocalContext.current).data(selectedCoin.iconUrl).crossfade(true)
             .error(R.drawable.coinplaceholder).build()
 
+
     ModalBottomSheet(
+        modifier = Modifier,
         onDismissRequest = { onDismiss() },
         sheetState = coinDetailSheetState,
         tonalElevation = 3.dp,
@@ -92,16 +94,15 @@ fun CoinSheet(
         } ?: 0.0
 
 
-        ChartPlotter(
-            coinSparklineData = selectedCoin.sparkline
-        )
-        
+
+
         Column(
             modifier = modifier
                 .fillMaxSize(1f)
                 .padding(horizontal = 15.dp)
         ) {
-            
+            ChartPlotter(coinSparklineData = selectedCoin.sparkline)
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth(1f)
@@ -124,7 +125,10 @@ fun CoinSheet(
                     )
                 }
                 Column {
-                    Text(text = selectedCoin.symbol, style = MaterialTheme.typography.titleLarge)
+                    Text(
+                        text = selectedCoin.symbol,
+                        style = MaterialTheme.typography.titleLarge
+                    )
                     Text(
                         text = selectedCoin.name.take(23),
                         style = MaterialTheme.typography.titleMedium
@@ -262,7 +266,6 @@ fun CoinSheet(
             }
         }
     }
-
 }
 
 

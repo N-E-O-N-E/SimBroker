@@ -56,8 +56,13 @@ fun SucheCoinListItem(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
+            MiniChartPlotter(
+                coinSparklineData = coin.sparkline
+            )
+            
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier,
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically
             ) {
