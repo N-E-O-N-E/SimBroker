@@ -38,7 +38,7 @@ import de.neone.simbroker.ui.views.search.components.SearchSheet
 import de.neone.simbroker.ui.views.search.components.SearchViewLoadIndicator
 
 @Composable
-fun SuchenView(
+fun SearchView(
     viewModel: SimBrokerViewModel,
 ) {
     ViewWallpaperImageBox(

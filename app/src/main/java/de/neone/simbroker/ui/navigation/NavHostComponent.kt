@@ -7,15 +7,13 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import de.neone.simbroker.MainActivity.KontoRoute
-import de.neone.simbroker.MainActivity.LogoutRoute
-import de.neone.simbroker.MainActivity.PortfolioRoute
-import de.neone.simbroker.MainActivity.SucheRoute
+import de.neone.simbroker.MainActivity
 import de.neone.simbroker.ui.SimBrokerViewModel
-import de.neone.simbroker.ui.views.account.KontoView
+import de.neone.simbroker.ui.views.account.AccountView
 import de.neone.simbroker.ui.views.portfolio.PortfolioView
-import de.neone.simbroker.ui.views.search.SuchenView
+import de.neone.simbroker.ui.views.search.SearchView
 import org.koin.androidx.compose.koinViewModel
+
 
 @Composable
 fun NavHostComponent(
@@ -27,19 +25,19 @@ fun NavHostComponent(
 
     NavHost(
         navController = navController,
-        startDestination = SucheRoute,
+        startDestination = MainActivity.SearchRoute,
         modifier = Modifier.padding(innerPadding)
     ) {
-        composable<PortfolioRoute> {
+        composable<MainActivity.PortfolioRoute> {
             PortfolioView(viewModel)
         }
-        composable<SucheRoute> {
-            SuchenView(viewModel)
+        composable<MainActivity.SearchRoute> {
+            SearchView(viewModel)
         }
-        composable<KontoRoute> {
-            KontoView(viewModel)
+        composable<MainActivity.AccountRoute> {
+            AccountView(viewModel)
         }
-        composable<LogoutRoute> {
+        composable<MainActivity.LogoutRoute> {
             action()
         }
     }

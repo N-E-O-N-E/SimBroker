@@ -13,7 +13,7 @@ import de.neone.simbroker.ui.SimBrokerViewModel
 import de.neone.simbroker.ui.theme.activity.ViewWallpaperImageBox
 
 @Composable
-fun KontoView(
+fun AccountView(
     viewModel: SimBrokerViewModel
     ) {
     ViewWallpaperImageBox(

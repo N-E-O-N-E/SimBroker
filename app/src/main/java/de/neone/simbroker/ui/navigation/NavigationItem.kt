@@ -14,15 +14,15 @@ enum class NavigationItem(
         route = MainActivity.PortfolioRoute
     ),
     Suche(
-        label = "Suche",
+        label = "Search",
         icon = R.drawable.baseline_search_48,
-        route = MainActivity.SucheRoute
+        route = MainActivity.SearchRoute
 
     ),
     Konto(
-        label = "Konto",
+        label = "Account",
         icon = R.drawable.baseline_account_circle_48,
-        route = MainActivity.KontoRoute
+        route = MainActivity.AccountRoute
     ),
     Logout(
         label = "Logout",

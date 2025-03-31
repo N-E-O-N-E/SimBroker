@@ -38,6 +38,7 @@ fun PortfolioView(
     val allPortfolioPositionsGrouped = allPortfolioPositions.groupBy { it.coinUuid }
     val allPortfolioGroupedList = allPortfolioPositionsGrouped.values.toList()
     val allTransactionPositions by viewModel.allTransactionPositions.collectAsState()
+
     var showCoinSheet by remember { mutableStateOf(false) }
 
     Column(

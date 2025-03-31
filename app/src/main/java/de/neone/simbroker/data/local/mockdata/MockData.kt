@@ -10,7 +10,7 @@ val coins_Mockdata: List<Coin> = listOf(
         name = "Testcoin",
         color = "#f7931a",
         iconUrl = "https://example.com/btc.png",
-        price = "10.0",
+        price = "14.0",
         marketCap = "1.0",
         listedAt = 1234567890L,
         tier = 1,
@@ -25,7 +25,7 @@ val coins_Mockdata: List<Coin> = listOf(
         lowVolume = false,
         coinrankingUrl = "https://coinranking.com/coin/btc",
         h24Volume = "1.0",
-        description = "The first and largest cryptocurrency",
+        description = "The first and largest cryptocurrency. The first and largest cryptocurrency. The first and largest cryptocurrency. ",
         priceAt = 1710676800000L
     ),
     Coin(
@@ -50,7 +50,7 @@ val coins_Mockdata: List<Coin> = listOf(
         lowVolume = false,
         coinrankingUrl = "https://coinranking.com/coin/btc",
         h24Volume = "32000000000",
-        description = "The first and largest cryptocurrency",
+        description = "The first and largest cryptocurrency. The first and largest cryptocurrency. The first and largest cryptocurrency. ",
         priceAt = 1710676800000L
     ),
     Coin(
@@ -72,7 +72,7 @@ val coins_Mockdata: List<Coin> = listOf(
         lowVolume = false,
         coinrankingUrl = "https://coinranking.com/coin/eth",
         h24Volume = "25000000000",
-        description = "Decentralized smart contract platform",
+        description = "Decentralized smart contract platform. Decentralized smart contract platform. Decentralized smart contract platform. Decentralized smart contract platform",
         priceAt = 1710676800000L
     ),
     Coin(
@@ -91,7 +91,7 @@ val coins_Mockdata: List<Coin> = listOf(
         lowVolume = false,
         coinrankingUrl = "https://coinranking.com/coin/ada",
         h24Volume = "1000000000",
-        description = "Third-generation blockchain platform",
+        description = "Third-generation blockchain platform. Third-generation blockchain platform. Third-generation blockchain platform",
         priceAt = 1710676800000L,
     ),
     Coin(

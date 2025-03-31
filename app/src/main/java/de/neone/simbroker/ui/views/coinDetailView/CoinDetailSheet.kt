@@ -124,7 +124,7 @@ fun CoinDetailSheet(
                 Column {
                     Text(
                         text = selectedCoin.symbol,
-                        style = MaterialTheme.typography.titleLarge
+                        style = MaterialTheme.typography.headlineSmall
                     )
                     Text(
                         text = selectedCoin.name.take(23),
@@ -137,27 +137,37 @@ fun CoinDetailSheet(
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
                         text = "${selectedCoin.change} %",
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleMedium,
                         color = if (selectedCoin.change.contains("-")) colorDown else colorUp
                     )
                     Text(
                         text = "%.2f €".format(selectedCoin.price.toDouble()),
-                        style = MaterialTheme.typography.titleLarge
+                        style = MaterialTheme.typography.titleMedium
                     )
                     Text(
-                        text = "%.2f tax".format(feeValue),
-                        style = MaterialTheme.typography.titleLarge
+                        text = "Fee %.2f €".format(feeValue),
+                        style = MaterialTheme.typography.titleSmall
                     )
                 }
 
             }
 
-            HorizontalDivider()
+            HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp))
+
+            Text(
+                text = "Description:",
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Text(
+                text = "${selectedCoin.description}",
+                style = MaterialTheme.typography.titleSmall
+            )
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp))
 
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 5.dp),
+                    .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -165,12 +175,12 @@ fun CoinDetailSheet(
                 RadioButton(
                     selected = selectedOption == "amount",
                     onClick = { selectedOption = "amount"; inputValue = "" })
-                Text("Menge (BTC)")
+                Text("Amount (Coin)")
 
                 RadioButton(
                     selected = selectedOption == "price",
                     onClick = { selectedOption = "price"; inputValue = "" })
-                Text("Betrag (EUR)")
+                Text("Price (EUR)")
             }
 
             Column(
@@ -186,13 +196,13 @@ fun CoinDetailSheet(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     value = inputValue,
                     onValueChange = { inputValue = it },
-                    label = { Text(if (selectedOption == "amount") "Menge in BTC" else "Betrag in EUR") })
+                    label = { Text(if (selectedOption == "amount") "Amount in Coin" else "Price in EUR") })
 
                 Text(
-                    text = if (selectedOption == "amount") "Kosten: %.2f €".format(
+                    text = if (selectedOption == "amount") "Invest incl. Fee : %.2f €".format(
                         calculatedValue + feeValue
                     )
-                    else "Anteile: %.6f BTC".format(calculatedValue),
+                    else "Coin shares: %.6f Coins".format(calculatedValue),
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(top = 8.dp)
                 )
@@ -244,13 +254,13 @@ fun CoinDetailSheet(
                         )
                         onDismiss()
                     }) {
-                    Text(text = "Kaufen")
+                    Text(text = "BUY")
                 }
 
                 Spacer(modifier = Modifier.weight(0.1f))
 
                 Button(
-                    enabled = false,
+                    enabled = true,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = sell,
                         contentColor = MaterialTheme.colorScheme.onErrorContainer
@@ -258,7 +268,7 @@ fun CoinDetailSheet(
                         onSellClicked()
                         onDismiss()
                     }) {
-                    Text(text = "Verkaufen")
+                    Text(text = "SELL")
                 }
             }
         }

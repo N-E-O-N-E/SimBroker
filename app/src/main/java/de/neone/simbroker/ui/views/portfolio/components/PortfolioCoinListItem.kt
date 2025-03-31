@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -45,11 +46,12 @@ fun PortfolioCoinListItem(
     coinTransactions: List<TransactionPositions>,
     currentPrice: Double,
     profit: Double,
-    sparks: List<String> = emptyList()
+    sparks: List<String> = emptyList(),
+    totalFee: Double = 0.0,
+    totalInvested: Double = 0.0
 ) {
     var slideInChart by remember { mutableStateOf(false) }
     var showTransactionsForCoinState by remember { mutableStateOf(false) }
-
 
     val imageRequest = ImageRequest.Builder(LocalContext.current)
         .data(coin.iconUrl)
@@ -63,21 +65,6 @@ fun PortfolioCoinListItem(
             containerColor = MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.5f),
         )
     ) {
-
-        if (slideInChart) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .padding(10.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.6f),
-                )
-            ) {
-                // Sparkline Chart
-                PortfolioCoinChartPlotter(coinSparklineData = sparks)
-            }
-        }
 
         Column(
             modifier = Modifier
@@ -100,7 +87,22 @@ fun PortfolioCoinListItem(
                                 contentDescription = null
                             )
                         }
-                        Text("Chart View", style = MaterialTheme.typography.labelSmall)
+                        Text("Chart", style = MaterialTheme.typography.labelSmall)
+                    }
+
+                    if (slideInChart) {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(220.dp)
+                                .padding(5.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.6f),
+                            )
+                        ) {
+                            // Sparkline Chart
+                            PortfolioCoinChartPlotter(coinSparklineData = sparks)
+                        }
                     }
 
                     Row(
@@ -123,20 +125,29 @@ fun PortfolioCoinListItem(
                         )
 
                         Column(
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier.weight(1f).padding(vertical = 5.dp),
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.Start
                         ) {
-                            Text(text = coin.symbol, style = MaterialTheme.typography.titleMedium)
-                            Row {
+                            Text(text = coin.symbol, style = MaterialTheme.typography.headlineSmall)
+                            Row() {
                                 Text(
                                     text = "${coin.name.take(25)}  ",
-                                    style = MaterialTheme.typography.bodyMedium
+                                    style = MaterialTheme.typography.bodyLarge
                                 )
                             }
+
                             Text(
-                                text = "Aktueller Kurs: %.2f".format(currentPrice),
-                                style = MaterialTheme.typography.bodyMedium
+                                text = "Current price: %.2f".format(currentPrice),
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                            Text(
+                                text = "Invested: %.2f".format(totalInvested),
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                            Text(
+                                text = "Fees: %.2f".format(totalFee),
+                                style = MaterialTheme.typography.labelSmall
                             )
                         }
 
@@ -145,8 +156,8 @@ fun PortfolioCoinListItem(
                             horizontalAlignment = Alignment.End
                         ) {
                             Text(
-                                text = "Gewinn/Verlust",
-                                style = MaterialTheme.typography.labelLarge,
+                                text = "Profit/Loss",
+                                style = MaterialTheme.typography.labelMedium,
                             )
                             Text(
                                 text = "%.2f".format(profit),
@@ -187,38 +198,73 @@ fun PortfolioCoinListItem(
                                 )
                             ) {
                                 Column(modifier = Modifier.padding(15.dp)) {
+
                                     Row() {
                                         Text(
-                                            text = "Kaufdatum: ${SBHelper.timestampToString(it.timestamp)}  ",
-                                            style = MaterialTheme.typography.labelLarge
+                                            text = "Purchase Date",
+                                            style = MaterialTheme.typography.labelMedium
                                         )
                                         Spacer(modifier = Modifier.weight(1f))
                                         Text(
-                                            text = "Anteil(e): %.6f Stk.".format(it.amount),
-                                            style = MaterialTheme.typography.labelLarge
+                                            text = SBHelper.timestampToString(it.timestamp),
+                                            style = MaterialTheme.typography.labelMedium
                                         )
+                                    }
+
+                                    Row() {
+                                        Text(
+                                            text = "Amount purchased",
+                                            style = MaterialTheme.typography.labelMedium
+                                        )
+                                        Spacer(modifier = Modifier.weight(1f))
+                                        Text(
+                                            text = "%.6f".format(it.amount),
+                                            style = MaterialTheme.typography.labelMedium
+                                        )
+
                                     }
                                     Row() {
                                         Text(
-                                            text = "Kaufpreis: %.2f €  ".format(it.price),
-                                            style = MaterialTheme.typography.labelLarge
+                                            text = "Purchase price",
+                                            style = MaterialTheme.typography.labelMedium
                                         )
                                         Spacer(modifier = Modifier.weight(1f))
                                         Text(
-                                            text = "Anteilspreis: %.2f €".format(anteilEUR),
-                                            style = MaterialTheme.typography.labelLarge
+                                            text = "%.2f €".format(anteilEUR),
+                                            style = MaterialTheme.typography.labelMedium
                                         )
+
                                     }
+
                                     Row() {
                                         Text(
-                                            text = "G/V: %.2f €     ".format(gewVer),
-                                            style = MaterialTheme.typography.labelLarge
+                                            text = "Fee",
+                                            style = MaterialTheme.typography.labelMedium
                                         )
                                         Spacer(modifier = Modifier.weight(1f))
                                         Text(
-                                            text = "G/V %% %.2f".format(gvProzent),
-                                            style = MaterialTheme.typography.labelLarge
+                                            text = "%.2f €".format(coinTransactions.first().fee),
+                                            style = MaterialTheme.typography.labelMedium
                                         )
+
+                                    }
+
+                                    HorizontalDivider(color = MaterialTheme.colorScheme.onSurface)
+                                    Row() {
+                                        Text(
+                                            text = "Profit/Loss",
+                                            style = MaterialTheme.typography.labelMedium
+                                        )
+                                        Spacer(modifier = Modifier.weight(1f))
+
+                                            Text(
+                                                text = "%.2f €  ".format(gewVer),
+                                                style = MaterialTheme.typography.labelMedium
+                                            )
+                                            Text(
+                                                text = "(%.2f %%)".format(gvProzent),
+                                                style = MaterialTheme.typography.labelMedium
+                                            )
 
                                     }
                                 }
