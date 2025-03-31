@@ -2,22 +2,83 @@ package de.neone.simbroker.ui
 
 import android.app.Application
 import android.util.Log
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.doublePreferencesKey
+import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import de.neone.simbroker.data.local.models.PortfolioPositions
 import de.neone.simbroker.data.local.models.TransactionPositions
 import de.neone.simbroker.data.remote.models.Coin
 import de.neone.simbroker.data.repository.SimBrokerRepositoryInterface
+import de.neone.simbroker.dataStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+
+private val DATASTORE_MOCKDATA = booleanPreferencesKey("mockData")
+private val DATASTORE_ACCOUNTVALUE = doublePreferencesKey("accountValue")
 
 class SimBrokerViewModel(
     application: Application,
     private val repository: SimBrokerRepositoryInterface,
 ) : AndroidViewModel(application) {
+
+    // DataStore
+    private val dataStore = application.dataStore
+
+    private val mockDataFlow = dataStore.data
+        .map {
+            it[DATASTORE_MOCKDATA] ?: false
+        }
+
+    private val accountValueFlow = dataStore.data
+        .map {
+            it[DATASTORE_ACCOUNTVALUE] ?: 0.0
+        }
+
+    private val mockDataState: StateFlow<Boolean> = mockDataFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = false
+        )
+
+    val accountValueState: StateFlow<Double> = accountValueFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = 0.0
+        )
+
+    fun setMockData(value: Boolean) {
+        viewModelScope.launch {
+            dataStore.edit {
+                it[DATASTORE_MOCKDATA] = value
+            }
+            Log.d("simDebug", "DataStore Mockdata value updated: $value")
+        }
+    }
+
+    fun setAccountValue() {
+        val accountValueStateNow = accountValueState.value
+        if (accountValueState.value <= 200) {
+            viewModelScope.launch {
+                dataStore.edit {
+                    it[DATASTORE_ACCOUNTVALUE] = accountValueStateNow + 50
+                }
+                Log.d("simDebug", "DataStore Account Credit updated")
+            }
+        } else {
+            Log.d("simDebug", "Account Credit cannot be higher than 200")
+        }
+    }
+
 
     // Pagination
     private var isLoading = false
@@ -33,6 +94,7 @@ class SimBrokerViewModel(
             loadMoreCoins()
             startTimer()
         }
+
     }
 
     private fun startTimer() {
@@ -135,6 +197,5 @@ class SimBrokerViewModel(
             _allTransactionPositions.value = repository.getAllTransactionPositions()
         }
     }
-
 
 }
