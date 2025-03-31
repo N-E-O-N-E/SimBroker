@@ -22,7 +22,7 @@ class SimBrokerViewModel(
     // Pagination
     private var isLoading = false
     private var offset = 0
-    private val limit = 50
+    private val limit = 5
     private var hasMoreData = true
 
     private val _refreshTimer = MutableStateFlow(0)
@@ -31,15 +31,15 @@ class SimBrokerViewModel(
     init {
         viewModelScope.launch {
             loadMoreCoins()
-                startTimer()
+            startTimer()
         }
     }
 
     private fun startTimer() {
         viewModelScope.launch {
             while (true) {
-                _refreshTimer.value = 60
-                for (i in 60 downTo 1) {
+                _refreshTimer.value = 90
+                for (i in _refreshTimer.value downTo 1) {
                     _refreshTimer.value = i
                     delay(1000)
                 }
@@ -52,6 +52,9 @@ class SimBrokerViewModel(
     private val _coinList = MutableStateFlow<List<Coin>>(emptyList())
     val coinList: StateFlow<List<Coin>> = _coinList
 
+    private val _coinDetails: MutableStateFlow<Coin?> = MutableStateFlow(null)
+    val coinDetails: StateFlow<Coin?> = _coinDetails
+
     fun loadMoreCoins() {
         if (isLoading || !hasMoreData) return
 
@@ -59,8 +62,9 @@ class SimBrokerViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val newCoins = repository.getCoins(offset = offset, limit = limit)
-                _coinList.value = _coinList.value + newCoins // nicht mit += da sich die Referenz nicht mitändert!
-                offset += limit
+                _coinList.value =
+                    _coinList.value + newCoins // nicht mit += da sich die Referenz nicht mitändert!
+                offset = offset + limit
                 hasMoreData = newCoins.isNotEmpty()
             } catch (e: Exception) {
                 Log.e("SimBrokerViewModel", "Fehler beim Laden der Coins", e)
@@ -71,12 +75,24 @@ class SimBrokerViewModel(
         }
     }
 
+    fun getCoinDetails(uuid: String, timePeriod: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val coinDetails = repository.getCoin(uuid, timePeriod)
+                _coinDetails.value = coinDetails
+            } catch (e: Exception) {
+                Log.e("SimBrokerViewModel", "Fehler beim Laden der CoinDetails", e)
+            }
+        }
+    }
+
     private fun refreshCoins() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val refreshedCoins = repository.getCoins(offset = 0, limit = limit)
                 if (refreshedCoins.isNotEmpty()) {
-                    _coinList.value = _coinList.value + refreshedCoins // nicht mit += da sich die Referenz nicht mitändert!
+                    _coinList.value = refreshedCoins
+                    offset = refreshedCoins.size
                 }
                 Log.d("simDebug", "Coins aktualisiert: ${refreshedCoins.size}")
             } catch (e: Exception) {
@@ -109,16 +125,16 @@ class SimBrokerViewModel(
         }
     }
 
-    private val _allTransactionPositions = MutableStateFlow<List<TransactionPositions>>(emptyList())
-    val allTransactionPositions: StateFlow<List<TransactionPositions>> = _allTransactionPositions
+    private val _allTransactionPositions =
+        MutableStateFlow<List<TransactionPositions>>(emptyList())
+    val allTransactionPositions: StateFlow<List<TransactionPositions>> =
+        _allTransactionPositions
 
     fun getAllTransactionPositions() {
         viewModelScope.launch {
             _allTransactionPositions.value = repository.getAllTransactionPositions()
         }
     }
-
-
 
 
 }

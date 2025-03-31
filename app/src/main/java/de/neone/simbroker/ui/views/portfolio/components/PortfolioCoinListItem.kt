@@ -201,7 +201,7 @@ fun PortfolioCoinListItem(
 
                                     Row() {
                                         Text(
-                                            text = "Purchase Date",
+                                            text = "Date",
                                             style = MaterialTheme.typography.labelMedium
                                         )
                                         Spacer(modifier = Modifier.weight(1f))
@@ -213,7 +213,7 @@ fun PortfolioCoinListItem(
 
                                     Row() {
                                         Text(
-                                            text = "Amount purchased",
+                                            text = "Amount",
                                             style = MaterialTheme.typography.labelMedium
                                         )
                                         Spacer(modifier = Modifier.weight(1f))
@@ -225,7 +225,20 @@ fun PortfolioCoinListItem(
                                     }
                                     Row() {
                                         Text(
-                                            text = "Purchase price",
+                                            text = "Price p. Coin",
+                                            style = MaterialTheme.typography.labelMedium
+                                        )
+                                        Spacer(modifier = Modifier.weight(1f))
+                                        Text(
+                                            text = "%.2f".format(it.price),
+                                            style = MaterialTheme.typography.labelMedium
+                                        )
+
+                                    }
+
+                                    Row() {
+                                        Text(
+                                            text = "Invested",
                                             style = MaterialTheme.typography.labelMedium
                                         )
                                         Spacer(modifier = Modifier.weight(1f))

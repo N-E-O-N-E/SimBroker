@@ -35,6 +35,7 @@ data class Coin(
     val sparkline: List<String>,
     val lowVolume: Boolean,
     val coinrankingUrl: String,
+    val websiteUrl: String?,
     @Json(name = "24hVolume")
     val h24Volume: String,
     val description: String? = null,

@@ -34,11 +34,11 @@ class SimBrokerRepositoryImpl(
 
     override suspend fun getCoin(uuid: String, timePeriod: String): Coin {
         return when (timePeriod) {
-            "1h" -> apiService.getCoin1h(uuid).data.coin
+            "3h" -> apiService.getCoin3h(uuid).data.coin
             "24h" -> apiService.getCoin24h(uuid).data.coin
             "30d" -> apiService.getCoin30d(uuid).data.coin
             else -> {
-                apiService.getCoin1h(uuid).data.coin
+                apiService.getCoin3h(uuid).data.coin
             }
         }
     }

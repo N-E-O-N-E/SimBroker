@@ -10,7 +10,7 @@ val coins_Mockdata: List<Coin> = listOf(
         name = "Testcoin",
         color = "#f7931a",
         iconUrl = "https://example.com/btc.png",
-        price = "14.0",
+        price = Random.nextDouble(1.0, 5.0).toString(),
         marketCap = "1.0",
         listedAt = 1234567890L,
         tier = 1,
@@ -26,7 +26,8 @@ val coins_Mockdata: List<Coin> = listOf(
         coinrankingUrl = "https://coinranking.com/coin/btc",
         h24Volume = "1.0",
         description = "The first and largest cryptocurrency. The first and largest cryptocurrency. The first and largest cryptocurrency. ",
-        priceAt = 1710676800000L
+        priceAt = 1710676800000L,
+        websiteUrl = "https://coinranking.com/coin/btc",
     ),
     Coin(
         uuid = "1",
@@ -51,7 +52,8 @@ val coins_Mockdata: List<Coin> = listOf(
         coinrankingUrl = "https://coinranking.com/coin/btc",
         h24Volume = "32000000000",
         description = "The first and largest cryptocurrency. The first and largest cryptocurrency. The first and largest cryptocurrency. ",
-        priceAt = 1710676800000L
+        priceAt = 1710676800000L,
+        websiteUrl = "https://coinranking.com/coin/btc",
     ),
     Coin(
         uuid = "2",
@@ -73,7 +75,8 @@ val coins_Mockdata: List<Coin> = listOf(
         coinrankingUrl = "https://coinranking.com/coin/eth",
         h24Volume = "25000000000",
         description = "Decentralized smart contract platform. Decentralized smart contract platform. Decentralized smart contract platform. Decentralized smart contract platform",
-        priceAt = 1710676800000L
+        priceAt = 1710676800000L,
+        websiteUrl = "https://coinranking.com/coin/eth",
     ),
     Coin(
         uuid = "3",
@@ -93,6 +96,7 @@ val coins_Mockdata: List<Coin> = listOf(
         h24Volume = "1000000000",
         description = "Third-generation blockchain platform. Third-generation blockchain platform. Third-generation blockchain platform",
         priceAt = 1710676800000L,
+        websiteUrl = "https://coinranking.com/coin/ada",
     ),
     Coin(
         uuid = "4",
@@ -112,6 +116,7 @@ val coins_Mockdata: List<Coin> = listOf(
         h24Volume = "3200000000",
         description = "High-performance blockchain",
         priceAt = 1710676800000L,
+        websiteUrl = "https://coinranking.com/coin/sol",
     ),
     Coin(
         uuid = "5",
@@ -131,6 +136,7 @@ val coins_Mockdata: List<Coin> = listOf(
         h24Volume = "500000000",
         description = "Digital payment protocol",
         priceAt = 1710676800000L,
+        websiteUrl = "https://coinranking.com/coin/xrp",
     ),
     Coin(
         uuid = "6",
@@ -150,6 +156,7 @@ val coins_Mockdata: List<Coin> = listOf(
         h24Volume = "1200000000",
         description = "Interoperable blockchain network",
         priceAt = 1710676800000L,
+        websiteUrl = "https://coinranking.com/coin/dot",
     ),
     Coin(
         uuid = "7",
@@ -169,6 +176,7 @@ val coins_Mockdata: List<Coin> = listOf(
         h24Volume = "700000000",
         description = "Meme coin",
         priceAt = 1710676800000L,
+        websiteUrl = "https://coinranking.com/coin/doge",
     ),
     Coin(
         uuid = "8",
@@ -188,6 +196,7 @@ val coins_Mockdata: List<Coin> = listOf(
         h24Volume = "900000000",
         description = "Ethereum scaling solution",
         priceAt = 1710676800000L,
+        websiteUrl = "https://coinranking.com/coin/matic",
     ),
     Coin(
         uuid = "9",
@@ -207,6 +216,7 @@ val coins_Mockdata: List<Coin> = listOf(
         h24Volume = "600000000",
         description = "Faster Bitcoin alternative",
         priceAt = 1710676800000L,
+        websiteUrl = "https://coinranking.com/coin/ltc",
     ),
 
 )

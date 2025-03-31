@@ -48,6 +48,7 @@ fun SearchView(
     )
 
     val coinList by viewModel.coinList.collectAsState()
+    val selectedCoinDetails by viewModel.coinDetails.collectAsState()
     var selectedCoin by remember { mutableStateOf<Coin?>(null) }
 
     var showAlertDialog by rememberSaveable { mutableStateOf(false) }
@@ -60,8 +61,6 @@ fun SearchView(
     LaunchedEffect(Unit) {
         viewModel.loadMoreCoins()
     }
-
-
 
     Column(
         modifier = Modifier
@@ -142,22 +141,26 @@ fun SearchView(
 
     if (openCoinDetailSheet) {
         selectedCoin?.let { it ->
-            CoinDetailSheet(
-                selectedCoin = it,
-                onDismiss = {
-                    openCoinDetailSheet = false
-                },
-                onBuyClicked = { transaction, portfolio ->
-                    viewModel.addTransaction(transaction)
-                    viewModel.addPortfolio(portfolio)
-                },
-                onSellClicked = {
+            viewModel.getCoinDetails(it.uuid, "3h")
+            selectedCoinDetails?.let { coinDetails ->
+                CoinDetailSheet(
+                    selectedCoin = it,
+                    coinDetails = coinDetails,
+                    onDismiss = {
+                        openCoinDetailSheet = false
+                    },
+                    onBuyClicked = { transaction, portfolio ->
+                        viewModel.addTransaction(transaction)
+                        viewModel.addPortfolio(portfolio)
+                    },
+                    onSellClicked = {
 
-                },
-                alertDialog = {
-                    showAlertDialog = true
-                }
-            )
+                    },
+                    alertDialog = {
+                        showAlertDialog = true
+                    }
+                )
+            }
         }
     }
 

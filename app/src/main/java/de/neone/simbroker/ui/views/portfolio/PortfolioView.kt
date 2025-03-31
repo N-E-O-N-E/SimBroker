@@ -40,21 +40,25 @@ fun PortfolioView(
     val allTransactionPositions by viewModel.allTransactionPositions.collectAsState()
 
     var showCoinSheet by remember { mutableStateOf(false) }
+    val timer = viewModel.refreshTimer.collectAsState()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(),
-        horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.Top
-    ) {
 
-        LazyColumn(modifier = Modifier.clickable {
-            showCoinSheet = !showCoinSheet
-        }) {
-            itemsIndexed(allPortfolioGroupedList) { _, position ->
-                PortfolioCoinListPositionObject(coinList, allTransactionPositions, position)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(),
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.Top
+        ) {
+
+
+            LazyColumn(modifier = Modifier.clickable {
+                showCoinSheet = !showCoinSheet
+            }) {
+                itemsIndexed(allPortfolioGroupedList) { _, position ->
+                    PortfolioCoinListPositionObject(coinList, allTransactionPositions, position)
+                }
             }
         }
     }
-}
+

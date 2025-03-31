@@ -59,14 +59,14 @@ interface APIService {
         @Query("orderDirection") orderDirection: String = "desc",
         @Query("limit") limit: Int,
         @Query("offset") offset: Int,
-        @Query("timePeriod") timePeriod: String = "30d",
+        @Query("timePeriod") timePeriod: String = "3h",
     ): CoinsResponse
 
     @GET("coin/{uuid}")
-    suspend fun getCoin1h(
+    suspend fun getCoin3h(
         @Path("uuid") uuid: String,
         @Query("referenceCurrencyUuid") referenceCurrencyUuid: String = "5k-_VTxqtCEI",
-        @Query("timePeriod") timePeriod: String = "1h", // 12 Sparklines
+        @Query("timePeriod") timePeriod: String = "3h", // 12 Sparklines
     ): CoinResponse
 
     @GET("coin/{uuid}")
@@ -88,10 +88,10 @@ interface APIService {
 fun main() = runBlocking {
     val api = CoinbaseAPI.retrofitService
     try {
-        val response = api.getCoin1h(
+        val response = api.getCoin3h(
             uuid = "Qwsogvtv82FCd",
             referenceCurrencyUuid = "5k-_VTxqtCEI",
-            timePeriod = "1h"
+            timePeriod = "3h"
         )
         println("API Response: $response")
     } catch (e: Exception) {
