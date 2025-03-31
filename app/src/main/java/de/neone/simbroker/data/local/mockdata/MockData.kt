@@ -5,6 +5,30 @@ import kotlin.random.Random
 
 val coins_Mockdata: List<Coin> = listOf(
     Coin(
+        uuid = "10",
+        symbol = "ABC",
+        name = "Testcoin",
+        color = "#f7931a",
+        iconUrl = "https://example.com/btc.png",
+        price = "10.0",
+        marketCap = "1.0",
+        listedAt = 1234567890L,
+        tier = 1,
+        change = "0.0",
+        rank = 1,
+        sparkline = listOf(
+            "1.0", "1.0", "1.0", "1.0", "1.0", "1.0", "1.0", "1.0", "1.0", "1.0",
+            "1.0", "1.0", "1.0", "1.0", "1.0", "1.0", "1.0", "1.0", "1.0", "1.0",
+            "1.0", "1.0", "1.0", "1.0", "1.0", "1.0", "1.0", "1.0", "1.0", "1.0",
+            "1.0", "1.0", "1.0",
+        ),
+        lowVolume = false,
+        coinrankingUrl = "https://coinranking.com/coin/btc",
+        h24Volume = "1.0",
+        description = "The first and largest cryptocurrency",
+        priceAt = 1710676800000L
+    ),
+    Coin(
         uuid = "1",
         symbol = "BTC",
         name = "Bitcoin",

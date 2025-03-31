@@ -171,43 +171,59 @@ fun PortfolioCoinListItem(
                 }
             }
             if (showTransactionsForCoinState) {
-                coinTransactions.forEach {
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(5.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainerLow.copy(
-                                alpha = 0.5f
-                            )
-                        )
-                    ) {
-                        Column(modifier = Modifier.padding(15.dp)) {
-                            Row() {
-                                Text(
-                                    text = "Kaufdatum: ${SBHelper.timestampToString(it.timestamp)}  ",
-                                    style = MaterialTheme.typography.labelLarge
+                        coinTransactions.forEach {
+                            val anteilEUR = it.price * it.amount
+                            val gewVer = (currentPrice - it.price) * it.amount
+                            val gvProzent = (((currentPrice / it.price) -1) * 100)
+
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(5.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow.copy(
+                                        alpha = 0.5f
+                                    )
                                 )
-                                Spacer(modifier = Modifier.weight(1f))
-                                Text(
-                                    text = "Anteil(e): %.6f Stk. ".format(it.amount),
-                                    style = MaterialTheme.typography.labelLarge
-                                )
-                            }
-                            Row() {
-                                Text(
-                                    text = "Kaufpreis: %.2f €  ".format(it.price),
-                                    style = MaterialTheme.typography.labelLarge
-                                )
-                                Spacer(modifier = Modifier.weight(1f))
-                                Text(
-                                    text = "Anteilspreis: %.2f €  ".format(it.price * it.amount),
-                                    style = MaterialTheme.typography.labelLarge
-                                )
+                            ) {
+                                Column(modifier = Modifier.padding(15.dp)) {
+                                    Row() {
+                                        Text(
+                                            text = "Kaufdatum: ${SBHelper.timestampToString(it.timestamp)}  ",
+                                            style = MaterialTheme.typography.labelLarge
+                                        )
+                                        Spacer(modifier = Modifier.weight(1f))
+                                        Text(
+                                            text = "Anteil(e): %.6f Stk.".format(it.amount),
+                                            style = MaterialTheme.typography.labelLarge
+                                        )
+                                    }
+                                    Row() {
+                                        Text(
+                                            text = "Kaufpreis: %.2f €  ".format(it.price),
+                                            style = MaterialTheme.typography.labelLarge
+                                        )
+                                        Spacer(modifier = Modifier.weight(1f))
+                                        Text(
+                                            text = "Anteilspreis: %.2f €".format(anteilEUR),
+                                            style = MaterialTheme.typography.labelLarge
+                                        )
+                                    }
+                                    Row() {
+                                        Text(
+                                            text = "G/V: %.2f €     ".format(gewVer),
+                                            style = MaterialTheme.typography.labelLarge
+                                        )
+                                        Spacer(modifier = Modifier.weight(1f))
+                                        Text(
+                                            text = "G/V %% %.2f".format(gvProzent),
+                                            style = MaterialTheme.typography.labelLarge
+                                        )
+
+                                    }
+                                }
                             }
                         }
-                    }
-                }
             }
         }
     }
