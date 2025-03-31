@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
-object Helper {
+object SBHelper {
 
     @SuppressLint("SimpleDateFormat")
     fun timestampToString(timestamp: Long): String {

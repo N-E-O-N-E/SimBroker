@@ -16,8 +16,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Scaffold
-import de.neone.simbroker.ui.navigation.StartActivityImageBox
 import de.neone.simbroker.ui.theme.SimBrokerTheme
+import de.neone.simbroker.ui.theme.activity.StartActivityImageBox
 
 class StartActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

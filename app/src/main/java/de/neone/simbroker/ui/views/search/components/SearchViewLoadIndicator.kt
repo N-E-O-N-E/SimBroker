@@ -1,4 +1,4 @@
-package de.neone.simbroker.ui.views.suche.components
+package de.neone.simbroker.ui.views.search.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun LoadingIndicator() {
+fun SearchViewLoadIndicator() {
     Box(
         modifier = Modifier
             .fillMaxWidth()

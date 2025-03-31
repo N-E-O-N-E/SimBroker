@@ -1,8 +1,8 @@
 package de.neone.simbroker.data.repository
 
-import de.neone.simbroker.data.local.PortfolioPositions
-import de.neone.simbroker.data.local.TransactionPositions
-import de.neone.simbroker.data.remote.Coin
+import de.neone.simbroker.data.local.models.PortfolioPositions
+import de.neone.simbroker.data.local.models.TransactionPositions
+import de.neone.simbroker.data.remote.models.Coin
 
 interface SimBrokerRepositoryInterface {
 

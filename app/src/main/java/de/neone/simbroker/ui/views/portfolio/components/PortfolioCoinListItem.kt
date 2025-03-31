@@ -32,10 +32,10 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.request.error
 import de.neone.simbroker.R
-import de.neone.simbroker.data.helper.Helper
-import de.neone.simbroker.data.local.PortfolioPositions
-import de.neone.simbroker.data.local.TransactionPositions
-import de.neone.simbroker.data.repository.mockdata.coins_Mockdata
+import de.neone.simbroker.data.helper.SBHelper
+import de.neone.simbroker.data.local.mockdata.coins_Mockdata
+import de.neone.simbroker.data.local.models.PortfolioPositions
+import de.neone.simbroker.data.local.models.TransactionPositions
 import de.neone.simbroker.ui.theme.colorDown
 import de.neone.simbroker.ui.theme.colorUp
 
@@ -75,7 +75,7 @@ fun PortfolioCoinListItem(
                 )
             ) {
                 // Sparkline Chart
-                PortfolioChartPlotter(coinSparklineData = sparks)
+                PortfolioCoinChartPlotter(coinSparklineData = sparks)
             }
         }
 
@@ -96,7 +96,7 @@ fun PortfolioCoinListItem(
                             }
                         ) {
                             Icon(
-                                painterResource(id = if (slideInChart) R.drawable.baseline_show_chart_24 else R.drawable.baseline_show_chart_24),
+                                painterResource(id = if (slideInChart) R.drawable.baseline_arrow_drop_down_48 else R.drawable.baseline_arrow_drop_up_24),
                                 contentDescription = null
                             )
                         }
@@ -185,7 +185,7 @@ fun PortfolioCoinListItem(
                         Column(modifier = Modifier.padding(15.dp)) {
                             Row() {
                                 Text(
-                                    text = "Kaufdatum: ${Helper.timestampToString(it.timestamp)}  ",
+                                    text = "Kaufdatum: ${SBHelper.timestampToString(it.timestamp)}  ",
                                     style = MaterialTheme.typography.labelLarge
                                 )
                                 Spacer(modifier = Modifier.weight(1f))

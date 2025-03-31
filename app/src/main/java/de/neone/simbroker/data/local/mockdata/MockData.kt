@@ -1,6 +1,6 @@
-package de.neone.simbroker.data.repository.mockdata
+package de.neone.simbroker.data.local.mockdata
 
-import de.neone.simbroker.data.remote.Coin
+import de.neone.simbroker.data.remote.models.Coin
 import kotlin.random.Random
 
 val coins_Mockdata: List<Coin> = listOf(

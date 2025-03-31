@@ -1,17 +1,17 @@
-package de.neone.simbroker.ui.views.portfolio.components
+package de.neone.simbroker.ui.views.coinDetailView.components
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import de.neone.simbroker.data.helper.Helper
-import de.neone.simbroker.data.helper.Helper.roundTo
-import de.neone.simbroker.data.repository.mockdata.coins_Mockdata
+import de.neone.simbroker.data.helper.SBHelper
+import de.neone.simbroker.data.helper.SBHelper.roundTo
+import de.neone.simbroker.data.local.mockdata.coins_Mockdata
 import de.neone.simbroker.ui.theme.chartDark
 import de.neone.simbroker.ui.theme.chartLight
 import dev.anirban.charts.linear.BasicLinearStrategy
@@ -24,7 +24,7 @@ import dev.anirban.charts.linear.plots.GradientPlotStrategy
 
 
 @Composable
-fun PortfolioChartPlotter(
+fun CoinDetailChartPlotter(
     modifier: Modifier = Modifier,
     coinSparklineData: List<String> = emptyList(),
 ) {
@@ -52,7 +52,7 @@ fun PortfolioChartPlotter(
         Coordinate(sparkRangeMax),
     )
 
-    val normalizedData = Helper.normalizeValues(coinDataFloat, 5f)
+    val normalizedData = SBHelper.normalizeValues(coinDataFloat, 5f)
     val linearDataSet: List<LinearDataSet> = listOf(
         LinearDataSet(
             title = "Chart",
@@ -61,7 +61,7 @@ fun PortfolioChartPlotter(
     )
 
     BasicLinearStrategy.GradientPlot(
-        modifier = Modifier.fillMaxWidth().height(450.dp).padding(15.dp),
+        modifier = Modifier.fillMaxWidth().fillMaxHeight(0.30f).padding(5.dp),
         plot = GradientPlotStrategy(
             lineStroke = 6.0f,
             circleRadius = 0.0f
@@ -83,7 +83,5 @@ fun PortfolioChartPlotter(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun ChartPlotterPreview() {
-    PortfolioChartPlotter(
-        coinSparklineData = coins_Mockdata.first().sparkline
-    )
+    CoinDetailChartPlotter(coinSparklineData = coins_Mockdata.first().sparkline)
 }

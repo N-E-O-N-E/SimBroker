@@ -14,7 +14,7 @@ import de.neone.simbroker.MainActivity.SucheRoute
 import de.neone.simbroker.ui.SimBrokerViewModel
 import de.neone.simbroker.ui.views.account.KontoView
 import de.neone.simbroker.ui.views.portfolio.PortfolioView
-import de.neone.simbroker.ui.views.suche.SuchenView
+import de.neone.simbroker.ui.views.search.SuchenView
 import org.koin.androidx.compose.koinViewModel
 
 @Composable

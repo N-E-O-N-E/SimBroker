@@ -1,4 +1,4 @@
-package de.neone.simbroker.ui.views.detailView
+package de.neone.simbroker.ui.views.coinDetailView
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
@@ -39,19 +39,19 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.request.error
 import de.neone.simbroker.R
-import de.neone.simbroker.data.local.PortfolioPositions
-import de.neone.simbroker.data.local.TransactionPositions
-import de.neone.simbroker.data.local.TransactionType
-import de.neone.simbroker.data.remote.Coin
+import de.neone.simbroker.data.local.models.PortfolioPositions
+import de.neone.simbroker.data.local.models.TransactionPositions
+import de.neone.simbroker.data.local.models.TransactionType
+import de.neone.simbroker.data.remote.models.Coin
 import de.neone.simbroker.ui.theme.buy
 import de.neone.simbroker.ui.theme.colorDown
 import de.neone.simbroker.ui.theme.colorUp
 import de.neone.simbroker.ui.theme.sell
-import de.neone.simbroker.ui.views.detailView.components.ChartPlotter
+import de.neone.simbroker.ui.views.coinDetailView.components.CoinDetailChartPlotter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CoinSheet(
+fun CoinDetailSheet(
     modifier: Modifier = Modifier,
     onDismiss: () -> Unit,
     alertDialog: () -> Unit,
@@ -72,7 +72,6 @@ fun CoinSheet(
 
 
     ModalBottomSheet(
-        modifier = Modifier,
         onDismissRequest = { onDismiss() },
         sheetState = coinDetailSheetState,
         tonalElevation = 3.dp,
@@ -94,14 +93,12 @@ fun CoinSheet(
         } ?: 0.0
 
 
-
-
         Column(
             modifier = modifier
                 .fillMaxSize(1f)
                 .padding(horizontal = 15.dp)
         ) {
-            ChartPlotter(coinSparklineData = selectedCoin.sparkline)
+            CoinDetailChartPlotter(coinSparklineData = selectedCoin.sparkline)
 
             Row(
                 modifier = Modifier

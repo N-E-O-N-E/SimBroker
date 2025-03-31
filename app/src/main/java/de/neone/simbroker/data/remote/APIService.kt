@@ -3,6 +3,8 @@ package de.neone.simbroker.data.remote
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import de.neone.simbroker.BuildConfig
+import de.neone.simbroker.data.remote.models.CoinResponse
+import de.neone.simbroker.data.remote.models.CoinsResponse
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor

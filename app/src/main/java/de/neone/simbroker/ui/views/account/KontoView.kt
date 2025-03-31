@@ -10,7 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import de.neone.simbroker.R
 import de.neone.simbroker.ui.SimBrokerViewModel
-import de.neone.simbroker.ui.navigation.ViewWallpaperImageBox
+import de.neone.simbroker.ui.theme.activity.ViewWallpaperImageBox
 
 @Composable
 fun KontoView(

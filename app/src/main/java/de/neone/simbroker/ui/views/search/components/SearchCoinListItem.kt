@@ -1,4 +1,4 @@
-package de.neone.simbroker.ui.views.suche.components
+package de.neone.simbroker.ui.views.search.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.clickable
@@ -26,12 +26,12 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.request.error
 import de.neone.simbroker.R
-import de.neone.simbroker.data.remote.Coin
+import de.neone.simbroker.data.remote.models.Coin
 import de.neone.simbroker.ui.theme.colorDown
 import de.neone.simbroker.ui.theme.colorUp
 
 @Composable
-fun SucheCoinListItem(
+fun SearchCoinListItem(
     coin: Coin,
     onListSearchItemSelected: () -> Unit,
 ) {
@@ -57,7 +57,7 @@ fun SucheCoinListItem(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            MiniChartPlotter(
+            SearchCoinChartPlotter(
                 coinSparklineData = coin.sparkline
             )
             
@@ -138,5 +138,5 @@ private fun SucheCoinListPreview() {
         "32000000000",
         "1.0",
     )
-    SucheCoinListItem(testCoin, onListSearchItemSelected = { })
+    SearchCoinListItem(testCoin, onListSearchItemSelected = { })
 }

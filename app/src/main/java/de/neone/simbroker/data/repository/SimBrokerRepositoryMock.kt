@@ -1,10 +1,10 @@
 package de.neone.simbroker.data.repository
 
-import de.neone.simbroker.data.local.PortfolioPositions
 import de.neone.simbroker.data.local.SimBrokerDAO
-import de.neone.simbroker.data.local.TransactionPositions
-import de.neone.simbroker.data.remote.Coin
-import de.neone.simbroker.data.repository.mockdata.coins_Mockdata
+import de.neone.simbroker.data.local.mockdata.coins_Mockdata
+import de.neone.simbroker.data.local.models.PortfolioPositions
+import de.neone.simbroker.data.local.models.TransactionPositions
+import de.neone.simbroker.data.remote.models.Coin
 
 class SimBrokerRepositoryMock(
     private val simBrokerDAO: SimBrokerDAO,

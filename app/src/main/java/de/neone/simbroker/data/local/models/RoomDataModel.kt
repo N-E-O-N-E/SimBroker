@@ -1,4 +1,4 @@
-package de.neone.simbroker.data.local
+package de.neone.simbroker.data.local.models
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

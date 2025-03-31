@@ -4,9 +4,9 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import de.neone.simbroker.data.local.PortfolioPositions
-import de.neone.simbroker.data.local.TransactionPositions
-import de.neone.simbroker.data.remote.Coin
+import de.neone.simbroker.data.local.models.PortfolioPositions
+import de.neone.simbroker.data.local.models.TransactionPositions
+import de.neone.simbroker.data.remote.models.Coin
 import de.neone.simbroker.data.repository.SimBrokerRepositoryInterface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

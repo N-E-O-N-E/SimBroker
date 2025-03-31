@@ -1,4 +1,4 @@
-package de.neone.simbroker.data.remote
+package de.neone.simbroker.data.remote.models
 
 import com.squareup.moshi.Json
 

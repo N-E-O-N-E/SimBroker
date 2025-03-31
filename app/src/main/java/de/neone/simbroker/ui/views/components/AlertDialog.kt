@@ -1,4 +1,4 @@
-package de.neone.simbroker.ui.views.suche.components
+package de.neone.simbroker.ui.views.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer

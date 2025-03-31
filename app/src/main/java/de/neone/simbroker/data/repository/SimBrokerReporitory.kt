@@ -1,11 +1,11 @@
 package de.neone.simbroker.data.repository
 
 import android.util.Log
-import de.neone.simbroker.data.local.PortfolioPositions
 import de.neone.simbroker.data.local.SimBrokerDAO
-import de.neone.simbroker.data.local.TransactionPositions
+import de.neone.simbroker.data.local.models.PortfolioPositions
+import de.neone.simbroker.data.local.models.TransactionPositions
 import de.neone.simbroker.data.remote.APIService
-import de.neone.simbroker.data.remote.Coin
+import de.neone.simbroker.data.remote.models.Coin
 
 class SimBrokerRepositoryImpl(
     private val apiService: APIService,

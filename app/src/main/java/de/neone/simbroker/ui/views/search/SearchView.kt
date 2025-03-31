@@ -1,4 +1,4 @@
-package de.neone.simbroker.ui.views.suche
+package de.neone.simbroker.ui.views.search
 
 import android.util.Log
 import androidx.compose.foundation.background
@@ -28,14 +28,14 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import de.neone.simbroker.R
-import de.neone.simbroker.data.remote.Coin
+import de.neone.simbroker.data.remote.models.Coin
 import de.neone.simbroker.ui.SimBrokerViewModel
-import de.neone.simbroker.ui.navigation.ViewWallpaperImageBox
-import de.neone.simbroker.ui.views.detailView.CoinSheet
-import de.neone.simbroker.ui.views.suche.components.AlertDialog
-import de.neone.simbroker.ui.views.suche.components.LoadingIndicator
-import de.neone.simbroker.ui.views.suche.components.SucheCoinListItem
-import de.neone.simbroker.ui.views.suche.components.SucheSheet
+import de.neone.simbroker.ui.theme.activity.ViewWallpaperImageBox
+import de.neone.simbroker.ui.views.coinDetailView.CoinDetailSheet
+import de.neone.simbroker.ui.views.components.AlertDialog
+import de.neone.simbroker.ui.views.search.components.SearchCoinListItem
+import de.neone.simbroker.ui.views.search.components.SearchSheet
+import de.neone.simbroker.ui.views.search.components.SearchViewLoadIndicator
 
 @Composable
 fun SuchenView(
@@ -99,7 +99,7 @@ fun SuchenView(
 
         LazyColumn() {
             items(coinList) { coin ->
-                SucheCoinListItem(
+                SearchCoinListItem(
                     coin = coin,
                     onListSearchItemSelected = {
                         selectedCoin = coin
@@ -112,7 +112,7 @@ fun SuchenView(
 
             item {
                 if (coinList.isNotEmpty()) {
-                    LoadingIndicator()
+                    SearchViewLoadIndicator()
                     LaunchedEffect(Unit) {
                         viewModel.loadMoreCoins()
                     }
@@ -125,7 +125,7 @@ fun SuchenView(
 
 
     if (openSucheSheet) {
-        SucheSheet(
+        SearchSheet(
             coinList = coinList,
             onDismiss = {
                 openSucheSheet = false
@@ -142,7 +142,7 @@ fun SuchenView(
 
     if (openCoinDetailSheet) {
         selectedCoin?.let { it ->
-            CoinSheet(
+            CoinDetailSheet(
                 selectedCoin = it,
                 onDismiss = {
                     openCoinDetailSheet = false
