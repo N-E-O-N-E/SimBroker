@@ -23,13 +23,26 @@ import kotlinx.coroutines.launch
 
 private val DATASTORE_MOCKDATA = booleanPreferencesKey("mockData")
 private val DATASTORE_ACCOUNTVALUE = doublePreferencesKey("accountValue")
+private val DATASTORE_TOTALINVESTVALUE = doublePreferencesKey("totalInvested")
 
 class SimBrokerViewModel(
     application: Application,
     private val repository: SimBrokerRepositoryInterface,
 ) : AndroidViewModel(application) {
+    // Fee
+    val fee = 1.5
 
-    // DataStore
+    // Dialog States
+    private var _showAccountMaxValueDialog = MutableStateFlow(false)
+    var showAccountMaxValueDialog: StateFlow<Boolean> = _showAccountMaxValueDialog
+
+    fun setShowAccountMaxValueDialog(value: Boolean) {
+        _showAccountMaxValueDialog.value = value
+    }
+
+
+    // DataStore -----------------------------------------------------------------------------
+
     private val dataStore = application.dataStore
 
     private val mockDataFlow = dataStore.data
@@ -37,23 +50,11 @@ class SimBrokerViewModel(
             it[DATASTORE_MOCKDATA] ?: false
         }
 
-    private val accountValueFlow = dataStore.data
-        .map {
-            it[DATASTORE_ACCOUNTVALUE] ?: 0.0
-        }
-
-    private val mockDataState: StateFlow<Boolean> = mockDataFlow
+    val mockDataState: StateFlow<Boolean> = mockDataFlow
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
+            started = SharingStarted.WhileSubscribed(),
             initialValue = false
-        )
-
-    val accountValueState: StateFlow<Double> = accountValueFlow
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = 0.0
         )
 
     fun setMockData(value: Boolean) {
@@ -65,22 +66,56 @@ class SimBrokerViewModel(
         }
     }
 
-    fun setAccountValue() {
-        val accountValueStateNow = accountValueState.value
-        if (accountValueState.value <= 200) {
+    private val accountValueFlow = dataStore.data
+        .map {
+            it[DATASTORE_ACCOUNTVALUE] ?: 0.0
+        }
+
+    val accountValueState: StateFlow<Double> = accountValueFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = 0.0
+        )
+
+    fun setAccountValue(accountValue: Double) {
+        val newAccountValue = accountValueState.value + accountValue
+        if (accountValueState.value >= 0.0 && accountValueState.value < 500.0) {
             viewModelScope.launch {
                 dataStore.edit {
-                    it[DATASTORE_ACCOUNTVALUE] = accountValueStateNow + 50
+                    it[DATASTORE_ACCOUNTVALUE] = newAccountValue
                 }
                 Log.d("simDebug", "DataStore Account Credit updated")
             }
+            _showAccountMaxValueDialog.value = false
         } else {
-            Log.d("simDebug", "Account Credit cannot be higher than 200")
+            _showAccountMaxValueDialog.value = true
+        }
+    }
+
+    private val investedValueFlow = dataStore.data
+        .map {
+            it[DATASTORE_TOTALINVESTVALUE] ?: 0.0
+        }
+
+    val investedValueState: StateFlow<Double> = investedValueFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = 0.0
+        )
+
+    fun setInvestedValue(newInvestedValue: Double) {
+        viewModelScope.launch {
+            dataStore.edit {
+                it[DATASTORE_TOTALINVESTVALUE] = newInvestedValue
+            }
+            Log.d("simDebug", "DataStore Account Credit updated")
         }
     }
 
 
-    // Pagination
+    // Pagination ------------------------------------------------------------------------------
     private var isLoading = false
     private var offset = 0
     private val limit = 5
@@ -110,7 +145,8 @@ class SimBrokerViewModel(
         }
     }
 
-    // API Response
+    // API Response -------------------------------------------------------------------------------
+
     private val _coinList = MutableStateFlow<List<Coin>>(emptyList())
     val coinList: StateFlow<List<Coin>> = _coinList
 
@@ -163,6 +199,7 @@ class SimBrokerViewModel(
         }
     }
 
+    // Room Database -----------------------------------------------------------------------------
 
     fun addTransaction(transaction: TransactionPositions) {
         Log.d("simDebug", "addTransaction over ViewModel started")
@@ -178,24 +215,21 @@ class SimBrokerViewModel(
         }
     }
 
-    private val _allPortfolioPositions = MutableStateFlow<List<PortfolioPositions>>(emptyList())
-    val allPortfolioPositions: StateFlow<List<PortfolioPositions>> = _allPortfolioPositions
 
-    fun getAllPortfolioPositions() {
-        viewModelScope.launch {
-            _allPortfolioPositions.value = repository.getAllPortfolioPositions()
-        }
-    }
+    val allPortfolioPositions: StateFlow<List<PortfolioPositions>> =
+        repository.getAllPortfolioPositions()
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(),
+                initialValue = emptyList()
+            )
 
-    private val _allTransactionPositions =
-        MutableStateFlow<List<TransactionPositions>>(emptyList())
     val allTransactionPositions: StateFlow<List<TransactionPositions>> =
-        _allTransactionPositions
-
-    fun getAllTransactionPositions() {
-        viewModelScope.launch {
-            _allTransactionPositions.value = repository.getAllTransactionPositions()
-        }
-    }
+        repository.getAllTransactionPositions()
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(),
+                initialValue = emptyList()
+            )
 
 }

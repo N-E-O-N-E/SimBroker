@@ -3,6 +3,7 @@ package de.neone.simbroker.data.repository
 import de.neone.simbroker.data.local.models.PortfolioPositions
 import de.neone.simbroker.data.local.models.TransactionPositions
 import de.neone.simbroker.data.remote.models.Coin
+import kotlinx.coroutines.flow.Flow
 
 interface SimBrokerRepositoryInterface {
 
@@ -13,8 +14,8 @@ interface SimBrokerRepositoryInterface {
     suspend fun insertTransaction(transaction: TransactionPositions)
     suspend fun insertPortfolio(portfolio: PortfolioPositions)
 
-    suspend fun getAllPortfolioPositions(): List<PortfolioPositions>
-    suspend fun getAllTransactionPositions(): List<TransactionPositions>
+    fun getAllPortfolioPositions(): Flow<List<PortfolioPositions>>
+    fun getAllTransactionPositions(): Flow<List<TransactionPositions>>
 
 
 

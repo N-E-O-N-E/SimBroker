@@ -5,6 +5,7 @@ import de.neone.simbroker.data.local.mockdata.coins_Mockdata
 import de.neone.simbroker.data.local.models.PortfolioPositions
 import de.neone.simbroker.data.local.models.TransactionPositions
 import de.neone.simbroker.data.remote.models.Coin
+import kotlinx.coroutines.flow.Flow
 
 class SimBrokerRepositoryMock(
     private val simBrokerDAO: SimBrokerDAO,
@@ -35,10 +36,10 @@ class SimBrokerRepositoryMock(
         simBrokerDAO.insertPortfolio(portfolio)
     }
 
-    override suspend fun getAllPortfolioPositions(): List<PortfolioPositions> {
+    override fun getAllPortfolioPositions(): Flow<List<PortfolioPositions>> {
         return simBrokerDAO.getAllPortfolioPositions()
     }
-    override suspend fun getAllTransactionPositions(): List<TransactionPositions> {
+    override fun getAllTransactionPositions(): Flow<List<TransactionPositions>> {
         return simBrokerDAO.getAllTransactionPositions()
     }
 

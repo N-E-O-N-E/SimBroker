@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -26,7 +25,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,31 +48,28 @@ import de.neone.simbroker.ui.theme.colorDown
 import de.neone.simbroker.ui.theme.colorUp
 import de.neone.simbroker.ui.theme.sell
 import de.neone.simbroker.ui.views.coinDetailView.components.CoinDetailChartPlotter
+import de.neone.simbroker.ui.views.components.AlertDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoinDetailSheet(
     modifier: Modifier = Modifier,
-    onDismiss: () -> Unit,
-    alertDialog: () -> Unit,
+    coinDetails: Coin,
+    selectedCoin: Coin,
+    accountCreditState: Double,
     onBuyClicked: (TransactionPositions, PortfolioPositions) -> Unit,
     onSellClicked: () -> Unit,
-    selectedCoin: Coin,
-    coinDetails: Coin
+    feeValue: Double,
+    onDismiss: () -> Unit,
 ) {
-
-    val feeValue = 1.5
-
     val uriHandler = LocalUriHandler.current
-
-    val skipPartiallyExpanded by rememberSaveable { mutableStateOf(false) }
-    val coinDetailSheetState =
-        rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val coinDetailSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val showEmptyInputDialog = remember { mutableStateOf(false) }
+    val showNotEnoughCreditDialog = remember { mutableStateOf(false) }
 
     val imageRequest =
         ImageRequest.Builder(LocalContext.current).data(selectedCoin.iconUrl).crossfade(true)
             .error(R.drawable.coinplaceholder).build()
-
 
     ModalBottomSheet(
         onDismissRequest = { onDismiss() },
@@ -82,8 +77,8 @@ fun CoinDetailSheet(
         tonalElevation = 3.dp,
         scrimColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
         shape = MaterialTheme.shapes.large,
-    ) {
 
+        ) {
 
         var selectedOption by remember { mutableStateOf("amount") } // "amount" oder "price"
         var inputValue by remember { mutableStateOf("") }
@@ -97,12 +92,23 @@ fun CoinDetailSheet(
             }
         } ?: 0.0
 
-
         Column(
-            modifier = modifier
-                .fillMaxSize(1f)
-                .padding(horizontal = 15.dp)
+            modifier = Modifier
+                .fillMaxWidth(1f)
+                .padding(horizontal = 8.dp)
         ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Accound Credit: $accountCreditState €",
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+
             CoinDetailChartPlotter(coinSparklineData = selectedCoin.sparkline)
 
             Row(
@@ -112,6 +118,7 @@ fun CoinDetailSheet(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+
                 Column {
                     AsyncImage(
                         modifier = Modifier
@@ -126,6 +133,7 @@ fun CoinDetailSheet(
                         clipToBounds = true,
                     )
                 }
+
                 Column {
                     Text(
                         text = selectedCoin.symbol,
@@ -159,15 +167,19 @@ fun CoinDetailSheet(
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp))
 
-            Text(
-                text = "Description:",
-                style = MaterialTheme.typography.bodyLarge
-            )
-            Text(
-                text = "${coinDetails.description}",
-                style = MaterialTheme.typography.titleSmall
-            )
+            Column {
+                Text(
+                    text = "Description:",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Text(
+                    text = "${coinDetails.description}",
+                    style = MaterialTheme.typography.titleSmall
+                )
+            }
+
             HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp))
+
             Text(
                 text = "Coinbase link (USD):",
                 style = MaterialTheme.typography.bodyLarge
@@ -241,35 +253,45 @@ fun CoinDetailSheet(
                         containerColor = buy,
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                     ), modifier = Modifier.weight(0.5f), onClick = {
-
                         if (inputValue.isEmpty()) {
-                            alertDialog()
+                            Log.d("simDebug", "inputValue is empty")
+                            showEmptyInputDialog.value = true
                             return@Button
-                        }
+                        } else {
+                            if (accountCreditState > 0.0 && accountCreditState >= calculatedValue + feeValue) {
+                                Log.d("simDebug", "inputValue is not empty")
+                                showNotEnoughCreditDialog.value = false
 
-                        onBuyClicked(
-                            TransactionPositions(
-                                fee = feeValue,
-                                coinUuid = selectedCoin.uuid,
-                                symbol = selectedCoin.symbol,
-                                iconUrl = selectedCoin.iconUrl,
-                                name = selectedCoin.name,
-                                price = selectedCoin.price.toDouble(),
-                                amount = if (selectedOption == "amount") inputValue.toDouble() else inputValue.toDouble() / selectedCoin.price.toDouble(),
-                                type = TransactionType.BUY,
-                                totalValue = if (selectedOption == "amount") inputValue.toDouble() * selectedCoin.price.toDouble() + feeValue else inputValue.toDouble() + feeValue
-                            ),
-                            PortfolioPositions(
-                                coinUuid = selectedCoin.uuid,
-                                symbol = selectedCoin.symbol,
-                                iconUrl = selectedCoin.iconUrl,
-                                name = selectedCoin.name,
-                                amountBought = if (selectedOption == "amount") inputValue.toDouble() else inputValue.toDouble() / selectedCoin.price.toDouble(),
-                                amountRemaining = if (selectedOption == "amount") inputValue.toDouble() else inputValue.toDouble() / selectedCoin.price.toDouble(),
-                                pricePerUnit = selectedCoin.price.toDouble(),
-                                totalValue = if (selectedOption == "amount") inputValue.toDouble() * selectedCoin.price.toDouble() + feeValue else inputValue.toDouble() + feeValue
-                            )
-                        )
+                                val amount =
+                                    if (selectedOption == "amount") inputValue.toDouble() else inputValue.toDouble() / selectedCoin.price.toDouble()
+                                val totalValue =
+                                    if (selectedOption == "amount") inputValue.toDouble() * selectedCoin.price.toDouble() + feeValue else inputValue.toDouble() + feeValue
+
+                                onBuyClicked(
+                                    TransactionPositions(
+                                        fee = feeValue,
+                                        coinUuid = selectedCoin.uuid,
+                                        symbol = selectedCoin.symbol,
+                                        iconUrl = selectedCoin.iconUrl,
+                                        name = selectedCoin.name,
+                                        price = selectedCoin.price.toDouble(),
+                                        amount = amount,
+                                        type = TransactionType.BUY,
+                                        totalValue = totalValue
+                                    ),
+                                    PortfolioPositions(
+                                        coinUuid = selectedCoin.uuid,
+                                        symbol = selectedCoin.symbol,
+                                        iconUrl = selectedCoin.iconUrl,
+                                        name = selectedCoin.name,
+                                        amountBought = amount,
+                                        amountRemaining = amount,
+                                        pricePerUnit = selectedCoin.price.toDouble(),
+                                        totalValue = totalValue
+                                    )
+                                )
+                            }
+                        }
                         onDismiss()
                     }) {
                     Text(text = "BUY")
@@ -283,7 +305,15 @@ fun CoinDetailSheet(
                         containerColor = sell,
                         contentColor = MaterialTheme.colorScheme.onErrorContainer
                     ), modifier = Modifier.weight(0.5f), onClick = {
-                        onSellClicked()
+                        if (inputValue.isEmpty()) {
+                            Log.d("simDebug", "inputValue is not empty")
+                            showEmptyInputDialog.value = true
+                            return@Button
+                        }
+
+                        onSellClicked(
+
+                        )
                         onDismiss()
                     }) {
                     Text(text = "SELL")
@@ -291,6 +321,15 @@ fun CoinDetailSheet(
             }
         }
     }
+
+    if (showEmptyInputDialog.value) {
+        AlertDialog("The Input must not be empty!") { showEmptyInputDialog.value = false }
+    }
+
+    if (showNotEnoughCreditDialog.value) {
+        AlertDialog("You have not enough Credit!") { showNotEnoughCreditDialog.value = false }
+    }
+
 }
 
 

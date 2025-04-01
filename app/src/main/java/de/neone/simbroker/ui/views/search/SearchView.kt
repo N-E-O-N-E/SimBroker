@@ -1,5 +1,6 @@
 package de.neone.simbroker.ui.views.search
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -32,11 +33,11 @@ import de.neone.simbroker.data.remote.models.Coin
 import de.neone.simbroker.ui.SimBrokerViewModel
 import de.neone.simbroker.ui.theme.activity.ViewWallpaperImageBox
 import de.neone.simbroker.ui.views.coinDetailView.CoinDetailSheet
-import de.neone.simbroker.ui.views.components.AlertDialog
 import de.neone.simbroker.ui.views.search.components.SearchCoinListItem
 import de.neone.simbroker.ui.views.search.components.SearchSheet
 import de.neone.simbroker.ui.views.search.components.SearchViewLoadIndicator
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun SearchView(
     viewModel: SimBrokerViewModel,
@@ -49,13 +50,16 @@ fun SearchView(
 
     val coinList by viewModel.coinList.collectAsState()
     val selectedCoinDetails by viewModel.coinDetails.collectAsState()
+    val accountCreditState by viewModel.accountValueState.collectAsState()
+    val investedValueState by viewModel.investedValueState.collectAsState()
     var selectedCoin by remember { mutableStateOf<Coin?>(null) }
-
-    var showAlertDialog by rememberSaveable { mutableStateOf(false) }
     var openSucheSheet by rememberSaveable { mutableStateOf(false) }
     var openCoinDetailSheet by rememberSaveable { mutableStateOf(false) }
 
     val timer by viewModel.refreshTimer.collectAsState()
+
+    var alertInput by rememberSaveable { mutableStateOf(false) }
+    var alertCredit by rememberSaveable { mutableStateOf(false) }
 
 
     LaunchedEffect(Unit) {
@@ -67,8 +71,6 @@ fun SearchView(
             .fillMaxSize(),
         verticalArrangement = Arrangement.Top
     ) {
-
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -81,6 +83,16 @@ fun SearchView(
                 text = "RealoadTime: $timer",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface
+            )
+
+            Text(
+                text = "Credit: ${
+                    String.format(
+                        "%.2f",
+                        accountCreditState - investedValueState
+                    )
+                } €",
+                style = MaterialTheme.typography.bodyLarge
             )
 
             IconButton(onClick = {
@@ -140,12 +152,15 @@ fun SearchView(
 
 
     if (openCoinDetailSheet) {
+
+
         selectedCoin?.let { it ->
             viewModel.getCoinDetails(it.uuid, "3h")
             selectedCoinDetails?.let { coinDetails ->
                 CoinDetailSheet(
                     selectedCoin = it,
                     coinDetails = coinDetails,
+                    feeValue = viewModel.fee,
                     onDismiss = {
                         openCoinDetailSheet = false
                     },
@@ -156,21 +171,10 @@ fun SearchView(
                     onSellClicked = {
 
                     },
-                    alertDialog = {
-                        showAlertDialog = true
-                    }
+                    accountCreditState = accountCreditState,
                 )
             }
         }
     }
-
-    if (showAlertDialog) {
-        AlertDialog(
-            message = "Das Eingabefeld darf nicht leer sein!"
-        ) {
-            showAlertDialog = false
-        }
-    }
-
 }
 

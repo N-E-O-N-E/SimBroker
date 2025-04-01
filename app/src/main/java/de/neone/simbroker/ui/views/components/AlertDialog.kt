@@ -45,7 +45,7 @@ fun AlertDialog(
                     onClick = {
                         onDismiss()
                     }, modifier = Modifier.align(Alignment.End)
-                ) { Text("Alles klar!", style = MaterialTheme.typography.bodyLarge) }
+                ) { Text("Okay", style = MaterialTheme.typography.bodyLarge) }
             }
         }
     }

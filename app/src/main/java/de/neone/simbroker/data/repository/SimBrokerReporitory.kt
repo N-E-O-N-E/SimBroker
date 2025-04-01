@@ -6,6 +6,7 @@ import de.neone.simbroker.data.local.models.PortfolioPositions
 import de.neone.simbroker.data.local.models.TransactionPositions
 import de.neone.simbroker.data.remote.APIService
 import de.neone.simbroker.data.remote.models.Coin
+import kotlinx.coroutines.flow.Flow
 
 class SimBrokerRepositoryImpl(
     private val apiService: APIService,
@@ -53,11 +54,11 @@ class SimBrokerRepositoryImpl(
         simBrokerDAO.insertPortfolio(portfolio)
     }
 
-    override suspend fun getAllPortfolioPositions(): List<PortfolioPositions> {
+    override fun getAllPortfolioPositions(): Flow<List<PortfolioPositions>> {
         return simBrokerDAO.getAllPortfolioPositions()
     }
 
-    override suspend fun getAllTransactionPositions(): List<TransactionPositions> {
+    override fun getAllTransactionPositions(): Flow<List<TransactionPositions>> {
         return simBrokerDAO.getAllTransactionPositions()
     }
 

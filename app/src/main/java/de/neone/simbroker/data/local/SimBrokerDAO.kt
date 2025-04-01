@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import de.neone.simbroker.data.local.models.PortfolioPositions
 import de.neone.simbroker.data.local.models.TransactionPositions
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SimBrokerDAO {
@@ -17,10 +18,10 @@ suspend fun insertTransaction(transaction: TransactionPositions)
 suspend fun insertPortfolio(portfolio: PortfolioPositions)
 
 @Query("Select * From TBL_PORTFOLIO")
-suspend fun getAllPortfolioPositions(): List<PortfolioPositions>
+fun getAllPortfolioPositions(): Flow<List<PortfolioPositions>>
 
 @Query("Select * From TBL_TRANSACTION")
-suspend fun getAllTransactionPositions(): List<TransactionPositions>
+fun getAllTransactionPositions(): Flow<List<TransactionPositions>>
 
 
 

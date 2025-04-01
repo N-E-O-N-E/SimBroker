@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -30,9 +32,6 @@ fun PortfolioView(
         imageDarkTheme = R.drawable.simbroker_dark_clear
     )
 
-    viewModel.getAllPortfolioPositions()
-    viewModel.getAllTransactionPositions()
-
     val coinList by viewModel.coinList.collectAsState()
     val allPortfolioPositions by viewModel.allPortfolioPositions.collectAsState()
     val allPortfolioPositionsGrouped = allPortfolioPositions.groupBy { it.coinUuid }
@@ -40,7 +39,6 @@ fun PortfolioView(
     val allTransactionPositions by viewModel.allTransactionPositions.collectAsState()
 
     var showCoinSheet by remember { mutableStateOf(false) }
-    val timer = viewModel.refreshTimer.collectAsState()
 
 
     Column(
@@ -51,12 +49,21 @@ fun PortfolioView(
         verticalArrangement = Arrangement.Top
     ) {
 
-
-        LazyColumn(modifier = Modifier.clickable {
-            showCoinSheet = !showCoinSheet
-        }) {
-            itemsIndexed(allPortfolioGroupedList) { _, position ->
-                PortfolioCoinListPositionObject(coinList, allTransactionPositions, position)
+        if (allPortfolioGroupedList.isEmpty()) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(text = "No Data found", style = MaterialTheme.typography.headlineMedium)
+            }
+        } else {
+            LazyColumn(modifier = Modifier.clickable {
+                showCoinSheet = !showCoinSheet
+            }) {
+                itemsIndexed(allPortfolioGroupedList) { _, position ->
+                    PortfolioCoinListPositionObject(coinList, allTransactionPositions, position)
+                }
             }
         }
     }

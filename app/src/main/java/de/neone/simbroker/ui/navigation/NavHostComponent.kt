@@ -25,7 +25,7 @@ fun NavHostComponent(
 
     NavHost(
         navController = navController,
-        startDestination = MainActivity.SearchRoute,
+        startDestination = MainActivity.PortfolioRoute,
         modifier = Modifier.padding(innerPadding)
     ) {
         composable<MainActivity.PortfolioRoute> {
