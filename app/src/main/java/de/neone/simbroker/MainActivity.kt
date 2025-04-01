@@ -80,7 +80,7 @@ class MainActivity : ComponentActivity() {
     object PortfolioRoute
 
     @Serializable
-    object SearchRoute
+    object CoinRoute
 
     @Serializable
     object AccountRoute

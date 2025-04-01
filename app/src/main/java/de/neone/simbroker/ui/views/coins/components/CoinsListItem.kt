@@ -1,4 +1,4 @@
-package de.neone.simbroker.ui.views.search.components
+package de.neone.simbroker.ui.views.coins.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.clickable
@@ -31,7 +31,7 @@ import de.neone.simbroker.ui.theme.colorDown
 import de.neone.simbroker.ui.theme.colorUp
 
 @Composable
-fun SearchCoinListItem(
+fun CoinsListItem(
     coin: Coin,
     onListSearchItemSelected: () -> Unit,
 ) {
@@ -57,7 +57,7 @@ fun SearchCoinListItem(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            SearchCoinChartPlotter(
+            CoinsChartPlotter(
                 coinSparklineData = coin.sparkline
             )
             
@@ -138,5 +138,5 @@ private fun SucheCoinListPreview() {
         "32000000000",
         "1.0",
     )
-    SearchCoinListItem(testCoin, onListSearchItemSelected = { })
+    CoinsListItem(testCoin, onListSearchItemSelected = { })
 }

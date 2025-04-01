@@ -27,7 +27,6 @@ fun PortfolioView(
     viewModel: SimBrokerViewModel,
 ) {
     ViewWallpaperImageBox(
-        toMainActivity = { },
         imageLightTheme = R.drawable.simbroker_light_clear,
         imageDarkTheme = R.drawable.simbroker_dark_clear
     )

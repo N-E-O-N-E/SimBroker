@@ -1,4 +1,4 @@
-package de.neone.simbroker.ui.views.search
+package de.neone.simbroker.ui.views.coins
 
 import android.annotation.SuppressLint
 import android.util.Log
@@ -33,17 +33,16 @@ import de.neone.simbroker.data.remote.models.Coin
 import de.neone.simbroker.ui.SimBrokerViewModel
 import de.neone.simbroker.ui.theme.activity.ViewWallpaperImageBox
 import de.neone.simbroker.ui.views.coinDetailView.CoinDetailSheet
-import de.neone.simbroker.ui.views.search.components.SearchCoinListItem
-import de.neone.simbroker.ui.views.search.components.SearchSheet
-import de.neone.simbroker.ui.views.search.components.SearchViewLoadIndicator
+import de.neone.simbroker.ui.views.coins.components.CoinsListItem
+import de.neone.simbroker.ui.views.coins.components.CoinsSearchLoadIndicator
+import de.neone.simbroker.ui.views.coins.components.CoinsSearchSheet
 
 @SuppressLint("DefaultLocale")
 @Composable
-fun SearchView(
+fun CoinsView(
     viewModel: SimBrokerViewModel,
 ) {
     ViewWallpaperImageBox(
-        toMainActivity = { },
         imageLightTheme = R.drawable.simbroker_light_clear,
         imageDarkTheme = R.drawable.simbroker_dark_clear
     )
@@ -52,15 +51,13 @@ fun SearchView(
     val selectedCoinDetails by viewModel.coinDetails.collectAsState()
     val accountCreditState by viewModel.accountValueState.collectAsState()
     val investedValueState by viewModel.investedValueState.collectAsState()
+    val feeValue by viewModel.feeValueState.collectAsState()
+
     var selectedCoin by remember { mutableStateOf<Coin?>(null) }
     var openSucheSheet by rememberSaveable { mutableStateOf(false) }
     var openCoinDetailSheet by rememberSaveable { mutableStateOf(false) }
 
     val timer by viewModel.refreshTimer.collectAsState()
-
-    var alertInput by rememberSaveable { mutableStateOf(false) }
-    var alertCredit by rememberSaveable { mutableStateOf(false) }
-
 
     LaunchedEffect(Unit) {
         viewModel.loadMoreCoins()
@@ -110,7 +107,7 @@ fun SearchView(
 
         LazyColumn() {
             items(coinList) { coin ->
-                SearchCoinListItem(
+                CoinsListItem(
                     coin = coin,
                     onListSearchItemSelected = {
                         selectedCoin = coin
@@ -123,7 +120,7 @@ fun SearchView(
 
             item {
                 if (coinList.isNotEmpty()) {
-                    SearchViewLoadIndicator()
+                    CoinsSearchLoadIndicator()
                     LaunchedEffect(Unit) {
                         viewModel.loadMoreCoins()
                     }
@@ -136,7 +133,7 @@ fun SearchView(
 
 
     if (openSucheSheet) {
-        SearchSheet(
+        CoinsSearchSheet(
             coinList = coinList,
             onDismiss = {
                 openSucheSheet = false
@@ -152,21 +149,20 @@ fun SearchView(
 
 
     if (openCoinDetailSheet) {
-
-
         selectedCoin?.let { it ->
             viewModel.getCoinDetails(it.uuid, "3h")
             selectedCoinDetails?.let { coinDetails ->
                 CoinDetailSheet(
                     selectedCoin = it,
                     coinDetails = coinDetails,
-                    feeValue = viewModel.fee,
+                    feeValue = feeValue,
                     onDismiss = {
                         openCoinDetailSheet = false
                     },
                     onBuyClicked = { transaction, portfolio ->
                         viewModel.addTransaction(transaction)
                         viewModel.addPortfolio(portfolio)
+                        viewModel.reduceAccountValue(portfolio.totalValue)
                     },
                     onSellClicked = {
 

@@ -1,4 +1,4 @@
-package de.neone.simbroker.ui.views.search.components
+package de.neone.simbroker.ui.views.coins.components
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,7 +23,7 @@ import dev.anirban.charts.linear.plots.LinePlotStrategy
 
 
 @Composable
-fun SearchCoinChartPlotter(
+fun CoinsChartPlotter(
     modifier: Modifier = Modifier,
     coinSparklineData: List<String> = emptyList(),
 ) {

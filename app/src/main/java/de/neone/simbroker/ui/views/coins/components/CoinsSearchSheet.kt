@@ -1,4 +1,4 @@
-package de.neone.simbroker.ui.views.search.components
+package de.neone.simbroker.ui.views.coins.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -30,7 +30,7 @@ import de.neone.simbroker.data.remote.models.Coin
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchSheet(
+fun CoinsSearchSheet(
     modifier: Modifier = Modifier,
     coinList: List<Coin>,
     onDismiss: () -> Unit,
@@ -82,7 +82,7 @@ fun SearchSheet(
             LazyColumn() {
                 if (searchField.isNotEmpty()) {
                     items(filteredCoins) { coin ->
-                        SearchCoinListItem(
+                        CoinsListItem(
                             coin = coin,
                             onListSearchItemSelected = { selectedCoin(coin) },
                         )

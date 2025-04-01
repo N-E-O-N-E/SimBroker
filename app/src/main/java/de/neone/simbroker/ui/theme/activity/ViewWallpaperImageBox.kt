@@ -11,7 +11,6 @@ import androidx.compose.ui.res.painterResource
 
 @Composable
 fun ViewWallpaperImageBox(
-    toMainActivity: () -> Unit,
     imageLightTheme: Int,
     imageDarkTheme: Int
 ) {

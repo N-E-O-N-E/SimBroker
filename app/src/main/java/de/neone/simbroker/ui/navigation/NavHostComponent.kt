@@ -10,8 +10,8 @@ import androidx.navigation.compose.composable
 import de.neone.simbroker.MainActivity
 import de.neone.simbroker.ui.SimBrokerViewModel
 import de.neone.simbroker.ui.views.account.AccountView
+import de.neone.simbroker.ui.views.coins.CoinsView
 import de.neone.simbroker.ui.views.portfolio.PortfolioView
-import de.neone.simbroker.ui.views.search.SearchView
 import org.koin.androidx.compose.koinViewModel
 
 
@@ -31,8 +31,8 @@ fun NavHostComponent(
         composable<MainActivity.PortfolioRoute> {
             PortfolioView(viewModel)
         }
-        composable<MainActivity.SearchRoute> {
-            SearchView(viewModel)
+        composable<MainActivity.CoinRoute> {
+            CoinsView(viewModel)
         }
         composable<MainActivity.AccountRoute> {
             AccountView(viewModel)

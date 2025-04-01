@@ -14,9 +14,9 @@ enum class NavigationItem(
         route = MainActivity.PortfolioRoute
     ),
     Suche(
-        label = "Search",
+        label = "Coins",
         icon = R.drawable.baseline_search_48,
-        route = MainActivity.SearchRoute
+        route = MainActivity.CoinRoute
 
     ),
     Konto(

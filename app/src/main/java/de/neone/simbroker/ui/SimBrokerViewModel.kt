@@ -24,13 +24,12 @@ import kotlinx.coroutines.launch
 private val DATASTORE_MOCKDATA = booleanPreferencesKey("mockData")
 private val DATASTORE_ACCOUNTVALUE = doublePreferencesKey("accountValue")
 private val DATASTORE_TOTALINVESTVALUE = doublePreferencesKey("totalInvested")
+private val DATASTORE_FEE = doublePreferencesKey("fee")
 
 class SimBrokerViewModel(
     application: Application,
     private val repository: SimBrokerRepositoryInterface,
 ) : AndroidViewModel(application) {
-    // Fee
-    val fee = 1.5
 
     // Dialog States
     private var _showAccountMaxValueDialog = MutableStateFlow(false)
@@ -38,6 +37,13 @@ class SimBrokerViewModel(
 
     fun setShowAccountMaxValueDialog(value: Boolean) {
         _showAccountMaxValueDialog.value = value
+    }
+
+    private var _showAccountNotEnoughMoney = MutableStateFlow(false)
+    var showAccountNotEnoughMoney: StateFlow<Boolean> = _showAccountNotEnoughMoney
+
+    fun setShowAccountNotEnoughMoney(value: Boolean) {
+        _showAccountNotEnoughMoney.value = value
     }
 
 
@@ -66,6 +72,26 @@ class SimBrokerViewModel(
         }
     }
 
+    private val feeFlow = dataStore.data
+        .map {
+            it[DATASTORE_FEE] ?: 0.0
+        }
+
+    val feeValueState: StateFlow<Double> = feeFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = 0.0
+        )
+
+    fun setFeeValue(value: Double) {
+        viewModelScope.launch {
+            dataStore.edit {
+                it[DATASTORE_FEE] = value
+            }
+        }
+    }
+
     private val accountValueFlow = dataStore.data
         .map {
             it[DATASTORE_ACCOUNTVALUE] ?: 0.0
@@ -78,18 +104,34 @@ class SimBrokerViewModel(
             initialValue = 0.0
         )
 
-    fun setAccountValue(accountValue: Double) {
-        val newAccountValue = accountValueState.value + accountValue
+    fun setAccountValue(value: Double) {
+        val newValue = accountValueState.value + value
         if (accountValueState.value >= 0.0 && accountValueState.value < 500.0) {
             viewModelScope.launch {
                 dataStore.edit {
-                    it[DATASTORE_ACCOUNTVALUE] = newAccountValue
+                    it[DATASTORE_ACCOUNTVALUE] = newValue
                 }
-                Log.d("simDebug", "DataStore Account Credit updated")
+                Log.d("simDebug", "DataStore Account Credit increased")
             }
             _showAccountMaxValueDialog.value = false
         } else {
             _showAccountMaxValueDialog.value = true
+        }
+    }
+
+    fun reduceAccountValue(value: Double) {
+        val newAccountValue = accountValueState.value - value
+        if (accountValueState.value >= value) {
+            viewModelScope.launch {
+                dataStore.edit {
+                    it[DATASTORE_ACCOUNTVALUE] = newAccountValue
+                }
+                setInvestedValue(value)
+                _showAccountNotEnoughMoney.value = false
+                Log.d("simDebug", "DataStore Account Credit reduce. Current Credit: ${accountValueState.value}. InputValue: $value. Save Value: $newAccountValue")
+            }
+        } else {
+            _showAccountNotEnoughMoney.value = true
         }
     }
 
@@ -105,12 +147,25 @@ class SimBrokerViewModel(
             initialValue = 0.0
         )
 
-    fun setInvestedValue(newInvestedValue: Double) {
+    private fun setInvestedValue(value: Double) {
+
+            val newValue = investedValueState.value + value
+            viewModelScope.launch {
+                dataStore.edit {
+                    it[DATASTORE_TOTALINVESTVALUE] = newValue
+                }
+                Log.d("simDebug", "DataStore invested value increased. New Value: $newValue")
+            }
+
+    }
+
+    private fun reduceInvestedValue(value: Double) {
+        val newValue = investedValueState.value - value
         viewModelScope.launch {
             dataStore.edit {
-                it[DATASTORE_TOTALINVESTVALUE] = newInvestedValue
+                it[DATASTORE_TOTALINVESTVALUE] = newValue
             }
-            Log.d("simDebug", "DataStore Account Credit updated")
+            Log.d("simDebug", "DataStore invested value reduce. New Value: $newValue")
         }
     }
 

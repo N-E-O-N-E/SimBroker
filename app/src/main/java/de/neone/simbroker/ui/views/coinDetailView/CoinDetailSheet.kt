@@ -236,7 +236,6 @@ fun CoinDetailSheet(
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(top = 8.dp)
                 )
-
             }
 
 
@@ -258,10 +257,7 @@ fun CoinDetailSheet(
                             showEmptyInputDialog.value = true
                             return@Button
                         } else {
-                            if (accountCreditState > 0.0 && accountCreditState >= calculatedValue + feeValue) {
-                                Log.d("simDebug", "inputValue is not empty")
-                                showNotEnoughCreditDialog.value = false
-
+                            if (accountCreditState >= calculatedValue + feeValue) {
                                 val amount =
                                     if (selectedOption == "amount") inputValue.toDouble() else inputValue.toDouble() / selectedCoin.price.toDouble()
                                 val totalValue =
@@ -290,6 +286,11 @@ fun CoinDetailSheet(
                                         totalValue = totalValue
                                     )
                                 )
+                            } else {
+                                Log.d("simDebug", "Your Credit is $accountCreditState")
+                                showNotEnoughCreditDialog.value = true
+                                return@Button
+
                             }
                         }
                         onDismiss()
