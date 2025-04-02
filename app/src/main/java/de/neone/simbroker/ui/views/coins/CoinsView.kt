@@ -86,7 +86,7 @@ fun CoinsView(
                 text = "Credit: ${
                     String.format(
                         "%.2f",
-                        accountCreditState - investedValueState
+                        accountCreditState
                     )
                 } €",
                 style = MaterialTheme.typography.bodyLarge

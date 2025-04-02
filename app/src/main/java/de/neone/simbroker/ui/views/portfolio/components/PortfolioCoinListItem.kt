@@ -62,7 +62,7 @@ fun PortfolioCoinListItem(
     Card(
         modifier = Modifier.padding(8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.5f),
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.7f),
         )
     ) {
 
@@ -138,15 +138,15 @@ fun PortfolioCoinListItem(
                             }
 
                             Text(
-                                text = "Current price: %.2f".format(currentPrice),
+                                text = "Current price: %.2f €".format(currentPrice),
                                 style = MaterialTheme.typography.labelSmall
                             )
                             Text(
-                                text = "Invested: %.2f".format(totalInvested),
+                                text = "Invested: %.2f €".format(totalInvested),
                                 style = MaterialTheme.typography.labelSmall
                             )
                             Text(
-                                text = "Fees: %.2f".format(totalFee),
+                                text = "Fees: %.2f €".format(totalFee),
                                 style = MaterialTheme.typography.labelSmall
                             )
                         }
@@ -160,7 +160,7 @@ fun PortfolioCoinListItem(
                                 style = MaterialTheme.typography.labelMedium,
                             )
                             Text(
-                                text = "%.2f".format(profit),
+                                text = "%.2f €".format(profit-totalFee),
                                 style = MaterialTheme.typography.titleLarge,
                                 color = if (profit.toString().contains("-")) colorDown else colorUp
                             )
@@ -184,7 +184,7 @@ fun PortfolioCoinListItem(
             if (showTransactionsForCoinState) {
                         coinTransactions.forEach {
                             val anteilEUR = it.price * it.amount
-                            val gewVer = (currentPrice - it.price) * it.amount
+                            val gewVer = (currentPrice - it.price) * it.amount - it.fee
                             val gvProzent = (((currentPrice / it.price) -1) * 100)
 
                             Card(
@@ -230,20 +230,7 @@ fun PortfolioCoinListItem(
                                         )
                                         Spacer(modifier = Modifier.weight(1f))
                                         Text(
-                                            text = "%.2f".format(it.price),
-                                            style = MaterialTheme.typography.labelMedium
-                                        )
-
-                                    }
-
-                                    Row() {
-                                        Text(
-                                            text = "Invested",
-                                            style = MaterialTheme.typography.labelMedium
-                                        )
-                                        Spacer(modifier = Modifier.weight(1f))
-                                        Text(
-                                            text = "%.2f €".format(anteilEUR),
+                                            text = "%.2f €".format(it.price),
                                             style = MaterialTheme.typography.labelMedium
                                         )
 
@@ -257,6 +244,23 @@ fun PortfolioCoinListItem(
                                         Spacer(modifier = Modifier.weight(1f))
                                         Text(
                                             text = "%.2f €".format(coinTransactions.first().fee),
+                                            style = MaterialTheme.typography.labelMedium
+                                        )
+
+                                    }
+
+                                    Row() {
+                                        Text(
+                                            text = "Invested (incl. Fee)",
+                                            style = MaterialTheme.typography.labelMedium
+                                        )
+                                        Spacer(modifier = Modifier.weight(1f))
+                                        Text(
+                                            text = "%.2f €  ".format(anteilEUR),
+                                            style = MaterialTheme.typography.labelMedium
+                                        )
+                                        Text(
+                                            text = "(%.2f €)".format(anteilEUR + coinTransactions.first().fee),
                                             style = MaterialTheme.typography.labelMedium
                                         )
 

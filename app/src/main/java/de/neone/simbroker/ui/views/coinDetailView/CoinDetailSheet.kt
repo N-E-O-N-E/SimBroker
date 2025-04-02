@@ -61,7 +61,8 @@ fun CoinDetailSheet(
     onSellClicked: () -> Unit,
     feeValue: Double,
     onDismiss: () -> Unit,
-) {
+) {10
+    Log.d("simDebug", accountCreditState.toString())
     val uriHandler = LocalUriHandler.current
     val coinDetailSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val showEmptyInputDialog = remember { mutableStateOf(false) }
@@ -229,10 +230,9 @@ fun CoinDetailSheet(
                     label = { Text(if (selectedOption == "amount") "Amount in Coin" else "Price in EUR") })
 
                 Text(
-                    text = if (selectedOption == "amount") "Invest incl. Fee : %.2f €".format(
-                        calculatedValue + feeValue
-                    )
-                    else "Coin shares: %.6f Coins".format(calculatedValue),
+                    text = if (selectedOption == "amount") "Invest incl. Fee : %.2f €"
+                        .format(calculatedValue + feeValue)
+                    else "Coins: %.6f Coins".format(calculatedValue),
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(top = 8.dp)
                 )
@@ -257,11 +257,14 @@ fun CoinDetailSheet(
                             showEmptyInputDialog.value = true
                             return@Button
                         } else {
-                            if (accountCreditState >= calculatedValue + feeValue) {
-                                val amount =
-                                    if (selectedOption == "amount") inputValue.toDouble() else inputValue.toDouble() / selectedCoin.price.toDouble()
-                                val totalValue =
-                                    if (selectedOption == "amount") inputValue.toDouble() * selectedCoin.price.toDouble() + feeValue else inputValue.toDouble() + feeValue
+                            val amount =
+                                if (selectedOption == "amount") inputValue.toDouble() else inputValue.toDouble() / selectedCoin.price.toDouble()
+                            val totalValue =
+                                if (selectedOption == "amount") inputValue.toDouble() * selectedCoin.price.toDouble() + feeValue else inputValue.toDouble() + feeValue
+
+                            if (accountCreditState >= totalValue) {
+                                Log.d("simDebug", "${accountCreditState}")
+                                Log.d("simDebug", "${calculatedValue + feeValue}")
 
                                 onBuyClicked(
                                     TransactionPositions(
@@ -290,7 +293,6 @@ fun CoinDetailSheet(
                                 Log.d("simDebug", "Your Credit is $accountCreditState")
                                 showNotEnoughCreditDialog.value = true
                                 return@Button
-
                             }
                         }
                         onDismiss()

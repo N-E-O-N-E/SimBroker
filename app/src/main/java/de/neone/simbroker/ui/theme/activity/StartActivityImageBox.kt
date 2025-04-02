@@ -56,14 +56,14 @@ fun StartActivityImageBox(
                 modifier = Modifier.fillMaxSize(),
                 painter = painterResource(id = imageLightTheme),
                 contentDescription = null,
-                contentScale = ContentScale.FillBounds,
+                contentScale = ContentScale.Crop,
             )
         } else {
             Image(
                 modifier = Modifier.fillMaxSize(),
                 painter = painterResource(id = imageDarkTheme),
                 contentDescription = null,
-                contentScale = ContentScale.FillBounds,
+                contentScale = ContentScale.Crop,
             )
         }
 
