@@ -100,7 +100,7 @@ fun AccountView(
                 )) {
                 Row(modifier = Modifier.fillMaxWidth().padding(10.dp), horizontalArrangement = Arrangement.Center) {
                     Text(
-                        text = "Coin Wallet: %.2f €".format(accountCreditState + totalInvested),
+                        text = "Account: %.2f €".format(accountCreditState + totalInvested),
                         style = typography.headlineMedium
                     )
                 }

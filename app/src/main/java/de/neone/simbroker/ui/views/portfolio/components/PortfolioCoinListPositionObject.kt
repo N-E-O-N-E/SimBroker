@@ -13,30 +13,24 @@ fun PortfolioCoinListPositionObject(
     portfolioPosition: List<PortfolioPositions>,
 ) {
 
-    var totalFee = transactionList.filter {
-        it.type == TransactionType.BUY && it.coinUuid == portfolioPosition.first().coinUuid
-    }.sumOf {
-        it.fee
-    }
+    val coinUuid = portfolioPosition.first().coinUuid
 
-    var totalInvest = transactionList.filter {
-        it.type == TransactionType.BUY && it.coinUuid == portfolioPosition.first().coinUuid
-    }.sumOf {
-        (it.amount * it.price) + totalFee
-    }
-
-    val currentPrice =
-        coinList.find { it.uuid == portfolioPosition.first().coinUuid }?.price?.toDouble() ?: 0.0
     val coinTransactions =
-        transactionList.filter { it.coinUuid == portfolioPosition.first().coinUuid && it.type == TransactionType.BUY }
+        transactionList.filter { it.coinUuid == coinUuid && it.type == TransactionType.BUY }
+
+    val totalFee = coinTransactions.sumOf { it.fee }
+
+    val totalInvested = coinTransactions.sumOf { it.amount * it.price }  // ohne Fee
+    val totalInvestedWithFees = totalInvested + totalFee
 
     val totalAmount = coinTransactions.sumOf { it.amount }
-    val totalInvested = coinTransactions.sumOf { it.amount * it.price }
-    val averagePrice = if (totalAmount > 0) totalInvested / totalAmount else 0.0
-    val profit = (currentPrice - averagePrice) * totalAmount
 
-    val sparksForPosition =
-        coinList.find { it.uuid == portfolioPosition.first().coinUuid }?.sparkline.orEmpty()
+    val currentPrice = coinList.find { it.uuid == coinUuid }?.price?.toDouble() ?: 0.0
+    val currentValue = totalAmount * currentPrice
+
+    val profit = currentValue - totalInvestedWithFees
+
+    val sparksForPosition = coinList.find { it.uuid == coinUuid }?.sparkline.orEmpty()
 
     val result = PortfolioCoinListItem(
         coin = portfolioPosition.first(),
@@ -45,7 +39,7 @@ fun PortfolioCoinListPositionObject(
         profit = profit,
         sparks = sparksForPosition,
         totalFee = totalFee,
-        totalInvested = totalInvest
+        totalInvested = totalInvestedWithFees
     )
 
     return result

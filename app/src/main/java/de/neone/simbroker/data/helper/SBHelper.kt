@@ -1,6 +1,8 @@
 package de.neone.simbroker.data.helper
 
 import android.annotation.SuppressLint
+import java.math.BigDecimal
+import java.math.RoundingMode
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
@@ -25,5 +27,11 @@ object SBHelper {
         return data.map { ((it - min) / (max - min)) * scaleMax }
     }
 
+    fun Double.roundTo2(): Double = BigDecimal(this).setScale(2, RoundingMode.HALF_EVEN).toDouble()
+    fun Double.roundTo6(): Double = BigDecimal(this).setScale(6, RoundingMode.HALF_EVEN).toDouble()
+
+    fun Double.toEuroString(): String = "%.2f €".format(this)
+    fun Double.toPercentString(): String = "%.2f %%".format(this)
+    fun Double.toCoinString(): String = "%.6f".format(this)
 
 }

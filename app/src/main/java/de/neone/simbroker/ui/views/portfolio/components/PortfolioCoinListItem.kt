@@ -34,6 +34,8 @@ import coil3.request.crossfade
 import coil3.request.error
 import de.neone.simbroker.R
 import de.neone.simbroker.data.helper.SBHelper
+import de.neone.simbroker.data.helper.SBHelper.roundTo2
+import de.neone.simbroker.data.helper.SBHelper.roundTo6
 import de.neone.simbroker.data.local.mockdata.coins_Mockdata
 import de.neone.simbroker.data.local.models.PortfolioPositions
 import de.neone.simbroker.data.local.models.TransactionPositions
@@ -138,15 +140,15 @@ fun PortfolioCoinListItem(
                             }
 
                             Text(
-                                text = "Current price: %.2f €".format(currentPrice),
+                                text = "Current price: %.2f €".format(currentPrice.roundTo2()),
                                 style = MaterialTheme.typography.labelSmall
                             )
                             Text(
-                                text = "Invested: %.2f €".format(totalInvested),
+                                text = "Invested: %.2f €".format(totalInvested.roundTo2()),
                                 style = MaterialTheme.typography.labelSmall
                             )
                             Text(
-                                text = "Fees: %.2f €".format(totalFee),
+                                text = "incl. Fees: %.2f €".format(totalFee.roundTo2()),
                                 style = MaterialTheme.typography.labelSmall
                             )
                         }
@@ -160,7 +162,7 @@ fun PortfolioCoinListItem(
                                 style = MaterialTheme.typography.labelMedium,
                             )
                             Text(
-                                text = "%.2f €".format(profit-totalFee),
+                                text = "%.2f €".format(profit.roundTo2()),
                                 style = MaterialTheme.typography.titleLarge,
                                 color = if (profit.toString().contains("-")) colorDown else colorUp
                             )
@@ -183,9 +185,9 @@ fun PortfolioCoinListItem(
             }
             if (showTransactionsForCoinState) {
                         coinTransactions.forEach {
-                            val anteilEUR = it.price * it.amount
-                            val gewVer = (currentPrice - it.price) * it.amount - it.fee
-                            val gvProzent = (((currentPrice / it.price) -1) * 100)
+                            val anteilEUR = it.price.roundTo2() * it.amount.roundTo2()
+                            val gewVer = (currentPrice.roundTo2() - it.price.roundTo2()) * it.amount.roundTo6()
+                            val gvProzent = (((currentPrice.roundTo2() / it.price.roundTo2()) -1) * 100)
 
                             Card(
                                 modifier = Modifier
@@ -218,7 +220,7 @@ fun PortfolioCoinListItem(
                                         )
                                         Spacer(modifier = Modifier.weight(1f))
                                         Text(
-                                            text = "%.6f".format(it.amount),
+                                            text = "%.6f".format(it.amount.roundTo6()),
                                             style = MaterialTheme.typography.labelMedium
                                         )
 
@@ -230,11 +232,13 @@ fun PortfolioCoinListItem(
                                         )
                                         Spacer(modifier = Modifier.weight(1f))
                                         Text(
-                                            text = "%.2f €".format(it.price),
+                                            text = "%.2f €".format(it.price.roundTo2()),
                                             style = MaterialTheme.typography.labelMedium
                                         )
 
                                     }
+
+                                    HorizontalDivider(color = MaterialTheme.colorScheme.onSurface)
 
                                     Row() {
                                         Text(
@@ -243,7 +247,7 @@ fun PortfolioCoinListItem(
                                         )
                                         Spacer(modifier = Modifier.weight(1f))
                                         Text(
-                                            text = "%.2f €".format(coinTransactions.first().fee),
+                                            text = "%.2f €".format(coinTransactions.first().fee.roundTo2()),
                                             style = MaterialTheme.typography.labelMedium
                                         )
 
@@ -251,22 +255,18 @@ fun PortfolioCoinListItem(
 
                                     Row() {
                                         Text(
-                                            text = "Invested (incl. Fee)",
+                                            text = "Invested (excl.Fee)",
                                             style = MaterialTheme.typography.labelMedium
                                         )
                                         Spacer(modifier = Modifier.weight(1f))
                                         Text(
-                                            text = "%.2f €  ".format(anteilEUR),
+                                            text = "%.2f €".format(anteilEUR.roundTo2()),
                                             style = MaterialTheme.typography.labelMedium
                                         )
-                                        Text(
-                                            text = "(%.2f €)".format(anteilEUR + coinTransactions.first().fee),
-                                            style = MaterialTheme.typography.labelMedium
-                                        )
-
                                     }
 
                                     HorizontalDivider(color = MaterialTheme.colorScheme.onSurface)
+
                                     Row() {
                                         Text(
                                             text = "Profit/Loss",
@@ -275,7 +275,7 @@ fun PortfolioCoinListItem(
                                         Spacer(modifier = Modifier.weight(1f))
 
                                             Text(
-                                                text = "%.2f €  ".format(gewVer),
+                                                text = "%.2f €  ".format(gewVer.roundTo2()),
                                                 style = MaterialTheme.typography.labelMedium
                                             )
                                             Text(
