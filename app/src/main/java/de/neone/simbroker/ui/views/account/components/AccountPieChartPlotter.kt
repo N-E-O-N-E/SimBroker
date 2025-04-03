@@ -33,7 +33,8 @@ fun AccountPieChartPlotter(
             .padding(vertical = 5.dp),
         circularData = dataSet1,
         circularForeground = DonutForegroundStrategy(
-            strokeWidth = 100f,
+            strokeWidth = 120f,
+            radiusMultiplier = 1.4f
         ),
         circularDecoration = CircularDecoration.donutChartDecorations(
             textColor = MaterialTheme.colorScheme.onSurface,

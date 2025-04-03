@@ -28,8 +28,13 @@ private val DATASTORE_FEE = doublePreferencesKey("fee")
 
 class SimBrokerViewModel(
     application: Application,
-    private val repository: SimBrokerRepositoryInterface,
+    private val realRepo: SimBrokerRepositoryInterface,
+    private val mockRepo: SimBrokerRepositoryInterface
+
 ) : AndroidViewModel(application) {
+
+    private val repository: SimBrokerRepositoryInterface
+        get() = if (mockDataState.value) realRepo else mockRepo
 
     // Dialog States
     private var _showAccountMaxValueDialog = MutableStateFlow(false)
@@ -53,14 +58,14 @@ class SimBrokerViewModel(
 
     private val mockDataFlow = dataStore.data
         .map {
-            it[DATASTORE_MOCKDATA] ?: false
+            it[DATASTORE_MOCKDATA] ?: true
         }
 
     val mockDataState: StateFlow<Boolean> = mockDataFlow
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
-            initialValue = false
+            initialValue = true
         )
 
     fun setMockData(value: Boolean) {
@@ -105,8 +110,8 @@ class SimBrokerViewModel(
         )
 
     fun setAccountValue(value: Double) {
-        val newValue = accountValueState.value + value
-        if (accountValueState.value >= 0.0 && accountValueState.value < 450.0) {
+        if (accountValueState.value in 0.0..450.0) {
+            val newValue = accountValueState.value + value
             viewModelScope.launch {
                 dataStore.edit {
                     it[DATASTORE_ACCOUNTVALUE] = newValue
@@ -178,14 +183,6 @@ class SimBrokerViewModel(
 
     private val _refreshTimer = MutableStateFlow(0)
     val refreshTimer: StateFlow<Int> = _refreshTimer
-
-    init {
-        viewModelScope.launch {
-            loadMoreCoins()
-            startTimer()
-        }
-
-    }
 
     private fun startTimer() {
         viewModelScope.launch {
@@ -286,5 +283,17 @@ class SimBrokerViewModel(
                 started = SharingStarted.WhileSubscribed(),
                 initialValue = emptyList()
             )
+
+
+    init {
+        viewModelScope.launch {
+            mockDataState.collect {
+                Log.d("simDebug", "DataStore Mockdata value: $it")
+                refreshCoins()
+            }
+            loadMoreCoins()
+            startTimer()
+        }
+    }
 
 }

@@ -68,7 +68,7 @@ fun CoinsSearchSheet(
                     modifier = Modifier.fillMaxWidth(),
                     value = searchField,
                     onValueChange = { searchField = it },
-                    label = { Text("Schnellsuche") },
+                    label = { Text("Quicksearch") },
                     singleLine = true,
                     leadingIcon = {
                         Icon(

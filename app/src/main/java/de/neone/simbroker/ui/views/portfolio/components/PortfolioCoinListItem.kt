@@ -144,7 +144,7 @@ fun PortfolioCoinListItem(
                             }
 
                             Text(
-                                text = "Current price: ${currentPrice.toEuroString()} €",
+                                text = "Current price: ${currentPrice.toEuroString()}",
                                 style = MaterialTheme.typography.labelSmall
                             )
                             Text(
@@ -190,7 +190,7 @@ fun PortfolioCoinListItem(
             if (showTransactionsForCoinState) {
                         coinTransactions.forEach {
 
-                            val anteilEUR = it.price.roundTo2() * it.amount.roundTo2()
+                            val anteilEUR = it.price.roundTo2() * it.amount
                             val gewVer = (currentPrice.roundTo2() - it.price.roundTo2()) * it.amount.roundTo6()
                             val gvProzent = (((currentPrice.roundTo2() / it.price.roundTo2()) -1) * 100)
 

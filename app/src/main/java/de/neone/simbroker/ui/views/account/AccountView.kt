@@ -14,7 +14,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.typography
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Slider
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -47,6 +49,7 @@ fun AccountView(
     val accountCreditState by viewModel.accountValueState.collectAsState()
     val totalInvested by viewModel.investedValueState.collectAsState()
     val feeValue by viewModel.feeValueState.collectAsState()
+    val mockdataValue by viewModel.mockDataState.collectAsState()
 
     Column(
         modifier = Modifier
@@ -92,6 +95,55 @@ fun AccountView(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
+            Card(modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
+                )) {
+
+                Column(modifier = Modifier.fillMaxWidth().padding(10.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "Game Difficulty",
+                        style = typography.titleLarge
+                    )
+
+                Row(modifier = Modifier.fillMaxWidth().padding(10.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+
+                        RadioButton(
+                            selected = false,
+                            onClick = { /*TODO*/ },
+                        )
+                        Text(
+                            text = "Easy    ",
+                            style = typography.titleMedium
+                        )
+
+
+                        RadioButton(
+                            selected = true,
+                            onClick = { /*TODO*/ }
+                        )
+                        Text(
+                            text = "Medium  ",
+                            style = typography.titleMedium
+                        )
+
+
+
+                        RadioButton(
+                            selected = false,
+                            onClick = { /*TODO*/ }
+                        )
+                        Text(
+                            text = "Pro   ",
+                            style = typography.titleMedium
+                        )
+
+                }
+
+                }
+            }
+
+
             Card(modifier = Modifier.padding(vertical = 5.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
@@ -101,13 +153,13 @@ fun AccountView(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "Account: ${(accountCreditState + totalInvested).toEuroString()}",
+                        text = "Your Account: ${(accountCreditState + totalInvested).toEuroString()}",
                         style = typography.headlineMedium
                     )
                 }
             }
 
-            Card(modifier = Modifier.padding(vertical = 5.dp),
+            Card(modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
                 )) {
@@ -118,15 +170,16 @@ fun AccountView(
                 )
             }
 
-            Card(modifier = Modifier.padding(vertical = 5.dp),
+
+            Card(modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
                 )) {
 
-                Column(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.Start,) {
                     Text(
-                        text = "Game Level (Fee): ${feeValue.toEuroString()}",
-                        style = typography.headlineSmall
+                        text = "Trading Fee: ${feeValue.toEuroString()}",
+                        style = typography.titleMedium
                     )
                     Slider(
                         modifier = Modifier
@@ -143,6 +196,29 @@ fun AccountView(
                     )
                 }
             }
+
+
+            Card(modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
+                )) {
+
+                Row(modifier = Modifier.fillMaxWidth().padding(10.dp), horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
+                    Switch(
+                        checked = mockdataValue,
+                        onCheckedChange = {
+                            viewModel.setMockData(it)
+                        }
+                    )
+                    Text(
+                        modifier = Modifier.padding(start = 20.dp),
+                        text = if (mockdataValue) "Real data is activated" else "Real data is deactivated!",
+                        style = typography.titleMedium
+                    )
+                }
+            }
+
+
         }
     }
 
