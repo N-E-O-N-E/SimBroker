@@ -1,5 +1,6 @@
 package de.neone.simbroker.ui.views.portfolio
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,12 +22,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import de.neone.simbroker.R
 import de.neone.simbroker.ui.SimBrokerViewModel
 import de.neone.simbroker.ui.theme.activity.ViewWallpaperImageBox
 import de.neone.simbroker.ui.views.portfolio.components.PortfolioCoinListPositionObject
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun PortfolioView(
     viewModel: SimBrokerViewModel,
@@ -54,16 +57,21 @@ fun PortfolioView(
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth().height(35.dp)
+                .fillMaxWidth()
+                .height(35.dp)
                 .background(MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.9f))
                 .padding(horizontal = 10.dp),
-            horizontalArrangement = Arrangement.Start,
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = "RealoadTime: $timer",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = "Game Difficulty: ${viewModel.gameDifficultState.value.uppercase()}",
+                style = MaterialTheme.typography.bodyMedium
             )
         }
 
@@ -73,7 +81,12 @@ fun PortfolioView(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Text(text = "No Data found", style = MaterialTheme.typography.headlineMedium)
+                Text(text = "No Data found", style = MaterialTheme.typography.headlineLarge)
+                Text(
+                    text = "Top up your account to be able to trade. \nSet the game difficulty.",
+                    style = MaterialTheme.typography.titleLarge,
+                    textAlign = TextAlign.Center
+                )
             }
         } else {
             LazyColumn(modifier = Modifier.clickable {

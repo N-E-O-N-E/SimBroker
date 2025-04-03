@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -21,6 +23,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -34,6 +39,7 @@ import de.neone.simbroker.ui.SimBrokerViewModel
 import de.neone.simbroker.ui.theme.activity.ViewWallpaperImageBox
 import de.neone.simbroker.ui.views.account.components.AccountPieChartPlotter
 import de.neone.simbroker.ui.views.components.AlertDialog
+import de.neone.simbroker.ui.views.components.AlertDialogEraseAll
 
 @SuppressLint("DefaultLocale")
 @Composable
@@ -46,10 +52,19 @@ fun AccountView(
     )
 
     val showAccountMaxValueDialog by viewModel.showAccountMaxValueDialog.collectAsState()
+    val showGameDifficultDialog by viewModel.showGameDifficultDialog.collectAsState()
+    val showMockOrRealdataDialog by viewModel.showMockOrRealdataDialog.collectAsState()
+    val showFirstGameAccountValueDialog by viewModel.showFirstGameAccountValueDialog.collectAsState()
+    val showEraseDialog by viewModel.showEraseDialog.collectAsState()
+
     val accountCreditState by viewModel.accountValueState.collectAsState()
     val totalInvested by viewModel.investedValueState.collectAsState()
     val feeValue by viewModel.feeValueState.collectAsState()
     val mockdataValue by viewModel.mockDataState.collectAsState()
+    val selectedOption by viewModel.gameDifficultState.collectAsState()
+
+    val firstGame by viewModel.firstGameState.collectAsState()
+    var radioEnable by remember { mutableStateOf(true) }
 
     Column(
         modifier = Modifier
@@ -95,61 +110,105 @@ fun AccountView(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            Card(modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp),
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 5.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
-                )) {
+                )
+            ) {
 
-                Column(modifier = Modifier.fillMaxWidth().padding(10.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     Text(
                         text = "Game Difficulty",
                         style = typography.titleLarge
                     )
 
-                Row(modifier = Modifier.fillMaxWidth().padding(10.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
 
                         RadioButton(
-                            selected = false,
-                            onClick = { /*TODO*/ },
+                            selected = selectedOption == "Easy",
+                            onClick = {
+                                if (firstGame) {
+                                    viewModel.setFirstGameState(false)
+                                    viewModel.setGameDifficult("Easy")
+                                    viewModel.setFeeValue(4.0)
+                                    viewModel.setAccountValue(1500.0)
+                                    viewModel.setShowGameDifficultDialog(true)
+                                } else {
+                                    viewModel.setShowFirstGameAccountValueDialog(true)
+                                }
+                            }
                         )
                         Text(
                             text = "Easy    ",
                             style = typography.titleMedium
                         )
-
-
                         RadioButton(
-                            selected = true,
-                            onClick = { /*TODO*/ }
+                            selected = selectedOption == "Medium",
+                            onClick = {
+                                if (firstGame) {
+                                    viewModel.setFirstGameState(false)
+                                    viewModel.setGameDifficult("Medium")
+                                    viewModel.setFeeValue(8.0)
+                                    viewModel.setAccountValue(750.0)
+                                    viewModel.setShowGameDifficultDialog(true)
+                                } else {
+                                    viewModel.setShowFirstGameAccountValueDialog(true)
+                                }
+                            }
                         )
                         Text(
-                            text = "Medium  ",
+                            text = "Medium    ",
+                            style = typography.titleMedium
+                        )
+                        RadioButton(
+                            selected = selectedOption == "Pro",
+                            onClick = {
+                                if (firstGame) {
+                                    viewModel.setFirstGameState(false)
+                                    viewModel.setGameDifficult("Pro")
+                                    viewModel.setFeeValue(16.0)
+                                    viewModel.setAccountValue(375.0)
+                                    viewModel.setShowGameDifficultDialog(true)
+                                } else {
+                                    viewModel.setShowFirstGameAccountValueDialog(true)
+                                }
+                            }
+                        )
+                        Text(
+                            text = "Pro    ",
                             style = typography.titleMedium
                         )
 
-
-
-                        RadioButton(
-                            selected = false,
-                            onClick = { /*TODO*/ }
-                        )
-                        Text(
-                            text = "Pro   ",
-                            style = typography.titleMedium
-                        )
-
-                }
-
+                    }
                 }
             }
 
 
-            Card(modifier = Modifier.padding(vertical = 5.dp),
+            Card(
+                modifier = Modifier.padding(vertical = 5.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
-                )) {
+                )
+            ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 15.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 15.dp),
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
@@ -159,10 +218,14 @@ fun AccountView(
                 }
             }
 
-            Card(modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp),
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 5.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
-                )) {
+                )
+            ) {
 
                 AccountPieChartPlotter(
                     creditValue = accountCreditState,
@@ -171,12 +234,16 @@ fun AccountView(
             }
 
 
-            Card(modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp),
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 5.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
-                )) {
+                )
+            ) {
 
-                Column(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.Start,) {
+                Column(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.Start) {
                     Text(
                         text = "Trading Fee: ${feeValue.toEuroString()}",
                         style = typography.titleMedium
@@ -198,16 +265,27 @@ fun AccountView(
             }
 
 
-            Card(modifier = Modifier.fillMaxWidth().padding(vertical = 5.dp),
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 5.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
-                )) {
+                )
+            ) {
 
-                Row(modifier = Modifier.fillMaxWidth().padding(10.dp), horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Switch(
                         checked = mockdataValue,
                         onCheckedChange = {
                             viewModel.setMockData(it)
+                            viewModel.setShowMockOrRealdataDialog(true)
                         }
                     )
                     Text(
@@ -218,13 +296,56 @@ fun AccountView(
                 }
             }
 
+            Button(
+                modifier = Modifier.fillMaxWidth(1f),
+                onClick = {
+                    viewModel.setShowEraseDialog(true)
+
+                },
+                elevation = ButtonDefaults.buttonElevation(3.dp)
+            ) {
+                Text(text = "Reset all data", style = typography.titleLarge)
+            }
 
         }
+    }
+
+    if (showEraseDialog) {
+        AlertDialogEraseAll(
+            message = "Click on Delete to delete all your data. Purchases, sales and all settings.\n" +
+                    "\n" + "If you do not want this, click outside the message without confirming it!",
+            onConfirm = {
+                viewModel.setFirstGameState(true)
+                viewModel.setGameDifficult("empty")
+                viewModel.setFeeValue(0.0)
+                viewModel.resetAccountValue()
+
+                //TODO Hier müssen weitere Resetparameter gesetzt werden! ( Löschen aller Roomdaten )
+            },
+            onDismiss = { viewModel.setShowEraseDialog(false) }
+        )
     }
 
     if (showAccountMaxValueDialog) {
         AlertDialog("You can not set a credit higher than 500€") {
             viewModel.setShowAccountMaxValueDialog(false)
+        }
+    }
+    if (showGameDifficultDialog) {
+        AlertDialog("Game Difficulty is now: ${selectedOption.uppercase()}") {
+            viewModel.setShowGameDifficultDialog(false)
+        }
+    }
+    if (showMockOrRealdataDialog) {
+        AlertDialog("Datasource is now: ${if (mockdataValue) "Real API Data" else "Mockdata"}") {
+            viewModel.setShowMockOrRealdataDialog(false)
+        }
+    }
+
+    if (showFirstGameAccountValueDialog) {
+        AlertDialog("This option is only available in the first game. Reset all data to activate this option.\n\n" +
+            "Currently you can only adjust the fees!") {
+            viewModel.setShowFirstGameAccountValueDialog(false)
         }
     }
 }

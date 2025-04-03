@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import de.neone.simbroker.data.local.models.PortfolioPositions
@@ -22,16 +23,18 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 private val DATASTORE_MOCKDATA = booleanPreferencesKey("mockData")
+private val DATASTORE_FIRSTGAME = booleanPreferencesKey("firstGame")
 private val DATASTORE_ACCOUNTVALUE = doublePreferencesKey("accountValue")
 private val DATASTORE_TOTALINVESTVALUE = doublePreferencesKey("totalInvested")
 private val DATASTORE_FEE = doublePreferencesKey("fee")
+private val DATASTORE_GAMEDIFFICULTY = stringPreferencesKey("gameDifficulty")
 
 class SimBrokerViewModel(
     application: Application,
     private val realRepo: SimBrokerRepositoryInterface,
-    private val mockRepo: SimBrokerRepositoryInterface
+    private val mockRepo: SimBrokerRepositoryInterface,
 
-) : AndroidViewModel(application) {
+    ) : AndroidViewModel(application) {
 
     private val repository: SimBrokerRepositoryInterface
         get() = if (mockDataState.value) realRepo else mockRepo
@@ -51,6 +54,34 @@ class SimBrokerViewModel(
         _showAccountNotEnoughMoney.value = value
     }
 
+    private var _showGameDifficultDialog = MutableStateFlow(false)
+    var showGameDifficultDialog: StateFlow<Boolean> = _showGameDifficultDialog
+
+    fun setShowGameDifficultDialog(value: Boolean) {
+        _showGameDifficultDialog.value = value
+    }
+
+    private var _showMockOrRealdataDialog = MutableStateFlow(false)
+    var showMockOrRealdataDialog: StateFlow<Boolean> = _showMockOrRealdataDialog
+
+    fun setShowMockOrRealdataDialog(value: Boolean) {
+        _showMockOrRealdataDialog.value = value
+    }
+
+    private var _showFirstGameAccountValueDialog = MutableStateFlow(false)
+    var showFirstGameAccountValueDialog: StateFlow<Boolean> = _showFirstGameAccountValueDialog
+
+    fun setShowFirstGameAccountValueDialog(value: Boolean) {
+        _showFirstGameAccountValueDialog.value = value
+    }
+
+    private var _showEraseDialog = MutableStateFlow(false)
+    var showEraseDialog: StateFlow<Boolean> = _showEraseDialog
+
+    fun setShowEraseDialog(value: Boolean) {
+        _showEraseDialog.value = value
+    }
+
 
     // DataStore -----------------------------------------------------------------------------
 
@@ -58,14 +89,14 @@ class SimBrokerViewModel(
 
     private val mockDataFlow = dataStore.data
         .map {
-            it[DATASTORE_MOCKDATA] ?: true
+            it[DATASTORE_MOCKDATA] ?: false
         }
 
     val mockDataState: StateFlow<Boolean> = mockDataFlow
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
-            initialValue = true
+            initialValue = false
         )
 
     fun setMockData(value: Boolean) {
@@ -76,6 +107,28 @@ class SimBrokerViewModel(
             Log.d("simDebug", "DataStore Mockdata value updated: $value")
         }
     }
+
+
+    private val gameDifficultFlow = dataStore.data
+        .map {
+            it[DATASTORE_GAMEDIFFICULTY] ?: "empty"
+        }
+
+    val gameDifficultState: StateFlow<String> = gameDifficultFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = "empty"
+        )
+
+    fun setGameDifficult(value: String) {
+        viewModelScope.launch {
+            dataStore.edit {
+                it[DATASTORE_GAMEDIFFICULTY] = value
+            }
+        }
+    }
+
 
     private val feeFlow = dataStore.data
         .map {
@@ -97,6 +150,42 @@ class SimBrokerViewModel(
         }
     }
 
+    private val firstGame = dataStore.data
+        .map {
+            it[DATASTORE_FIRSTGAME] ?: true
+        }
+
+    val firstGameState: StateFlow<Boolean> = firstGame
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = true
+        )
+
+    fun setFirstGameState(value: Boolean) {
+        viewModelScope.launch {
+            dataStore.edit {
+                it[DATASTORE_FIRSTGAME] = value
+            }
+        }
+    }
+
+    fun setFirstGameAccountValue(value: Double) {
+        if (firstGameState.value) {
+            val newValue = accountValueState.value + value
+            viewModelScope.launch {
+                dataStore.edit {
+                    it[DATASTORE_ACCOUNTVALUE] = newValue
+                }
+                Log.d("simDebug", "DataStore First Account Credit increased")
+            }
+            _showFirstGameAccountValueDialog.value = false
+        } else {
+            _showFirstGameAccountValueDialog.value = true
+        }
+    }
+
+
     private val accountValueFlow = dataStore.data
         .map {
             it[DATASTORE_ACCOUNTVALUE] ?: 0.0
@@ -108,6 +197,15 @@ class SimBrokerViewModel(
             started = SharingStarted.WhileSubscribed(),
             initialValue = 0.0
         )
+
+    fun resetAccountValue() {
+        viewModelScope.launch {
+            dataStore.edit {
+                it[DATASTORE_ACCOUNTVALUE] = 0.0
+            }
+            Log.d("simDebug", "DataStore Account Credit reset done")
+        }
+    }
 
     fun setAccountValue(value: Double) {
         if (accountValueState.value in 0.0..450.0) {
@@ -133,7 +231,10 @@ class SimBrokerViewModel(
                 }
                 setInvestedValue(value)
                 _showAccountNotEnoughMoney.value = false
-                Log.d("simDebug", "DataStore Account Credit reduce. Current Credit: ${accountValueState.value}. InputValue: $value. Save Value: $newAccountValue")
+                Log.d(
+                    "simDebug",
+                    "DataStore Account Credit reduce. Current Credit: ${accountValueState.value}. InputValue: $value. Save Value: $newAccountValue"
+                )
             }
         } else {
             _showAccountNotEnoughMoney.value = true
@@ -154,13 +255,13 @@ class SimBrokerViewModel(
 
     private fun setInvestedValue(value: Double) {
 
-            val newValue = investedValueState.value + value
-            viewModelScope.launch {
-                dataStore.edit {
-                    it[DATASTORE_TOTALINVESTVALUE] = newValue
-                }
-                Log.d("simDebug", "DataStore invested value increased. New Value: $newValue")
+        val newValue = investedValueState.value + value
+        viewModelScope.launch {
+            dataStore.edit {
+                it[DATASTORE_TOTALINVESTVALUE] = newValue
             }
+            Log.d("simDebug", "DataStore invested value increased. New Value: $newValue")
+        }
 
     }
 
@@ -290,9 +391,9 @@ class SimBrokerViewModel(
             mockDataState.collect {
                 Log.d("simDebug", "DataStore Mockdata value: $it")
                 refreshCoins()
+                loadMoreCoins()
+                startTimer()
             }
-            loadMoreCoins()
-            startTimer()
         }
     }
 

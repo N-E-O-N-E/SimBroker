@@ -37,7 +37,7 @@ class StartActivity : ComponentActivity() {
                         toMainActivity = {
                             startMainActivity()
                         },
-                        buttonText = "Handel starten",
+                        buttonText = "Start trading now",
                         imageLightTheme = R.drawable.simbroker_light,
                         imageDarkTheme = R.drawable.simbroker_dark,
                     )
