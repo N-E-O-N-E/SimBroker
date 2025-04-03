@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -29,6 +30,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import de.neone.simbroker.R
+import de.neone.simbroker.data.helper.SBHelper.roundTo2
 import de.neone.simbroker.data.remote.models.Coin
 import de.neone.simbroker.ui.SimBrokerViewModel
 import de.neone.simbroker.ui.theme.activity.ViewWallpaperImageBox
@@ -70,34 +72,29 @@ fun CoinsView(
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f))
+                .fillMaxWidth().height(35.dp)
+                .background(MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.9f))
                 .padding(horizontal = 10.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = "RealoadTime: $timer",
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )
 
             Text(
-                text = "Credit: ${
-                    String.format(
-                        "%.2f",
-                        accountCreditState
-                    )
-                } €",
-                style = MaterialTheme.typography.bodyLarge
+                text = "Credit: ${accountCreditState.roundTo2()} €",
+                style = MaterialTheme.typography.bodyMedium
             )
 
             IconButton(onClick = {
                 openSucheSheet = !openSucheSheet
             }) {
                 Icon(
-                    modifier = Modifier.scale(1.3f),
-                    painter = painterResource(id = R.drawable.baseline_manage_search_24),
+                    modifier = Modifier.scale(1.0f),
+                    painter = painterResource(id = R.drawable.baseline_search_24),
                     contentDescription = null
                 )
             }

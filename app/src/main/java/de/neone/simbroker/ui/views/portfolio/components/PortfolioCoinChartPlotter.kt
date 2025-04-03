@@ -28,9 +28,8 @@ fun PortfolioCoinChartPlotter(
     modifier: Modifier = Modifier,
     coinSparklineData: List<String> = emptyList(),
 ) {
-
     val xAxisLabels = List(coinSparklineData.size) {
-        // Coordinate("${ it + 1 }")
+//        Coordinate("${ it + 1 }")
         Coordinate("")
     }
 
@@ -40,7 +39,7 @@ fun PortfolioCoinChartPlotter(
 
     val sparkRangeMin = coinDataFloat.minOrNull()?.roundTo(2) ?: 0f
     val sparkRangeMax = coinDataFloat.maxOrNull()?.roundTo(2) ?: 1f
-    val sparkRangeMid = ((sparkRangeMin + sparkRangeMax) / 2f).roundTo(2)
+//    val sparkRangeMid = ((sparkRangeMin + sparkRangeMax) / 2f).roundTo(2)
 
     // Y Achsen festlegen
     val yAxisLabels = listOf(
@@ -61,7 +60,7 @@ fun PortfolioCoinChartPlotter(
     )
 
     BasicLinearStrategy.GradientPlot(
-        modifier = Modifier.fillMaxWidth().height(450.dp).padding(15.dp),
+        modifier = Modifier.fillMaxWidth().height(450.dp).padding(10.dp),
         plot = GradientPlotStrategy(
             lineStroke = 6.0f,
             circleRadius = 0.0f

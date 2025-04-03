@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -28,6 +27,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import de.neone.simbroker.R
+import de.neone.simbroker.data.helper.SBHelper.toEuroString
 import de.neone.simbroker.ui.SimBrokerViewModel
 import de.neone.simbroker.ui.theme.activity.ViewWallpaperImageBox
 import de.neone.simbroker.ui.views.account.components.AccountPieChartPlotter
@@ -59,7 +59,7 @@ fun AccountView(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f))
+                .background(MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.9f))
                 .padding(horizontal = 10.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
@@ -67,9 +67,7 @@ fun AccountView(
 
             // Head -----------------------------------------------------------------
 
-            Text("Receive 50€ now!", style = typography.bodyLarge)
-
-            Spacer(modifier = Modifier.weight(1f))
+            Text("Fill your demo account to a maximum of 500", style = typography.bodyLarge)
 
             IconButton(onClick = {
                 if (!showAccountMaxValueDialog) {
@@ -89,34 +87,45 @@ fun AccountView(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(vertical = 20.dp)
+                .padding(vertical = 5.dp)
                 .padding(horizontal = 10.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            Card(modifier = Modifier.padding(vertical = 8.dp),
+            Card(modifier = Modifier.padding(vertical = 5.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.7f),
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
                 )) {
-                Row(modifier = Modifier.fillMaxWidth().padding(10.dp), horizontalArrangement = Arrangement.Center) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 15.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
                     Text(
-                        text = "Account: %.2f €".format(accountCreditState + totalInvested),
+                        text = "Account: ${(accountCreditState + totalInvested).toEuroString()}",
                         style = typography.headlineMedium
                     )
                 }
+            }
+
+            Card(modifier = Modifier.padding(vertical = 5.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
+                )) {
+
                 AccountPieChartPlotter(
                     creditValue = accountCreditState,
                     investedValue = totalInvested
                 )
             }
 
-            Card(modifier = Modifier.padding(vertical = 8.dp),
+            Card(modifier = Modifier.padding(vertical = 5.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.7f),
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
                 )) {
+
                 Column(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = "Game Level (Fee): %.2f €".format(feeValue),
+                        text = "Game Level (Fee): ${feeValue.toEuroString()}",
                         style = typography.headlineSmall
                     )
                     Slider(
@@ -134,9 +143,7 @@ fun AccountView(
                     )
                 }
             }
-
         }
-
     }
 
     if (showAccountMaxValueDialog) {

@@ -7,7 +7,7 @@ val coins_Mockdata: List<Coin> = listOf(
     Coin(
         uuid = "10",
         symbol = "ABC",
-        name = "Testcoin",
+        name = "This is a Testcoin with a long Coinname for testing",
         color = "#f7931a",
         iconUrl = "https://example.com/btc.png",
         price = Random.nextDouble(1.0, 5.0).toString(),

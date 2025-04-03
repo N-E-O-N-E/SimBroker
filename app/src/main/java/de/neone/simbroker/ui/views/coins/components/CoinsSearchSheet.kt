@@ -49,7 +49,7 @@ fun CoinsSearchSheet(
     ModalBottomSheet(
         onDismissRequest = { onDismiss() },
         sheetState = sucheSheetState,
-        tonalElevation = 3.dp,
+        tonalElevation = 5.dp,
         scrimColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
         shape = MaterialTheme.shapes.large,
     ) {

@@ -28,7 +28,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
@@ -39,6 +38,8 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.request.error
 import de.neone.simbroker.R
+import de.neone.simbroker.data.helper.SBHelper.toEuroString
+import de.neone.simbroker.data.helper.SBHelper.toPercentString
 import de.neone.simbroker.data.local.models.PortfolioPositions
 import de.neone.simbroker.data.local.models.TransactionPositions
 import de.neone.simbroker.data.local.models.TransactionType
@@ -61,7 +62,7 @@ fun CoinDetailSheet(
     onSellClicked: () -> Unit,
     feeValue: Double,
     onDismiss: () -> Unit,
-) {10
+) {
     Log.d("simDebug", accountCreditState.toString())
     val uriHandler = LocalUriHandler.current
     val coinDetailSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -105,7 +106,7 @@ fun CoinDetailSheet(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Accound Credit: $accountCreditState €",
+                    text = "Accound Credit: ${accountCreditState.toEuroString()}",
                     style = MaterialTheme.typography.titleMedium
                 )
             }
@@ -123,26 +124,24 @@ fun CoinDetailSheet(
                 Column {
                     AsyncImage(
                         modifier = Modifier
-                            .padding(end = 15.dp)
-                            .width(70.dp)
-                            .height(70.dp)
-                            .clip(shape = MaterialTheme.shapes.extraLarge),
+                            .padding(end = 10.dp)
+                            .width(80.dp)
+                            .height(70.dp),
                         onError = { Log.e("simDebug", "Error loading image") },
                         model = imageRequest,
                         contentDescription = selectedCoin.name,
                         contentScale = ContentScale.Fit,
-                        clipToBounds = true,
                     )
                 }
 
                 Column {
                     Text(
                         text = selectedCoin.symbol,
-                        style = MaterialTheme.typography.headlineSmall
+                        style = MaterialTheme.typography.titleLarge
                     )
                     Text(
-                        text = selectedCoin.name.take(23),
-                        style = MaterialTheme.typography.titleMedium
+                        text = if(selectedCoin.name.length > 23) selectedCoin.name.take(23) + "..." else selectedCoin.name,
+                        style = MaterialTheme.typography.titleSmall
                     )
                 }
 
@@ -150,16 +149,16 @@ fun CoinDetailSheet(
 
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
-                        text = "${selectedCoin.change} %",
+                        text = selectedCoin.change.toDouble().toPercentString(),
                         style = MaterialTheme.typography.titleMedium,
                         color = if (selectedCoin.change.contains("-")) colorDown else colorUp
                     )
                     Text(
-                        text = "%.2f €".format(selectedCoin.price.toDouble()),
+                        text = selectedCoin.price.toDouble().toEuroString(),
                         style = MaterialTheme.typography.titleMedium
                     )
                     Text(
-                        text = "Fee %.2f €".format(feeValue),
+                        text = "Fee ${feeValue.toEuroString()}",
                         style = MaterialTheme.typography.titleSmall
                     )
                 }
@@ -171,11 +170,11 @@ fun CoinDetailSheet(
             Column {
                 Text(
                     text = "Description:",
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.titleSmall
                 )
                 Text(
                     text = "${coinDetails.description}",
-                    style = MaterialTheme.typography.titleSmall
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
 
@@ -183,7 +182,7 @@ fun CoinDetailSheet(
 
             Text(
                 text = "Coinbase link (USD):",
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.titleSmall
             )
 
             Text(
@@ -191,7 +190,7 @@ fun CoinDetailSheet(
                     uriHandler.openUri(coinDetails.coinrankingUrl)
                 },
                 text = coinDetails.coinrankingUrl,
-                style = MaterialTheme.typography.titleSmall
+                style = MaterialTheme.typography.bodyMedium
             )
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp))
@@ -199,7 +198,7 @@ fun CoinDetailSheet(
             Row(
                 modifier = Modifier
                     .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
+                horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
@@ -230,11 +229,10 @@ fun CoinDetailSheet(
                     label = { Text(if (selectedOption == "amount") "Amount in Coin" else "Price in EUR") })
 
                 Text(
-                    text = if (selectedOption == "amount") "Invest incl. Fee : %.2f €"
-                        .format(calculatedValue + feeValue)
+                    text = if (selectedOption == "amount") "Invest incl. Fee : ${(calculatedValue + feeValue).toEuroString()}"
                     else "Coins: %.6f Coins".format(calculatedValue),
                     style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(top = 8.dp)
+                    modifier = Modifier.padding(top = 15.dp)
                 )
             }
 
@@ -242,7 +240,7 @@ fun CoinDetailSheet(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 10.dp),
+                    .padding(bottom = 15.dp),
                 horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -263,7 +261,7 @@ fun CoinDetailSheet(
                                 if (selectedOption == "amount") inputValue.toDouble() * selectedCoin.price.toDouble() + feeValue else inputValue.toDouble() + feeValue
 
                             if (accountCreditState >= totalValue) {
-                                Log.d("simDebug", "${accountCreditState}")
+                                Log.d("simDebug", "$accountCreditState")
                                 Log.d("simDebug", "${calculatedValue + feeValue}")
 
                                 onBuyClicked(
@@ -296,6 +294,7 @@ fun CoinDetailSheet(
                             }
                         }
                         onDismiss()
+
                     }) {
                     Text(text = "BUY")
                 }
@@ -318,6 +317,7 @@ fun CoinDetailSheet(
 
                         )
                         onDismiss()
+
                     }) {
                     Text(text = "SELL")
                 }

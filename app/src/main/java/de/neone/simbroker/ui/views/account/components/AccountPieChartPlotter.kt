@@ -5,14 +5,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import dev.anirban.charts.circular.charts.DonutColumnPlotStrategy
+import dev.anirban.charts.circular.charts.DonutRowPlotStrategy
 import dev.anirban.charts.circular.data.ListDataStrategy
 import dev.anirban.charts.circular.decoration.CircularDecoration
 import dev.anirban.charts.circular.foreground.DonutForegroundStrategy
-import dev.anirban.charts.circular.legend.GridLegendStrategy
 
 @Composable
 fun AccountPieChartPlotter(
@@ -23,29 +21,23 @@ fun AccountPieChartPlotter(
 
     val dataSet1 = ListDataStrategy(
         itemsList = listOf(
-            Pair("Credit", creditValue.toFloat()),
-            Pair("Invested", investedValue.toFloat())
+            Pair("Your Credit", creditValue.toFloat()),
+            Pair("Investments", investedValue.toFloat())
         ),
         unit = "€" // Unit
     )
 
-    DonutColumnPlotStrategy.CustomDonutPlotColumn(
+    DonutRowPlotStrategy.DonutPlotRow(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 10.dp),
+            .padding(vertical = 5.dp),
         circularData = dataSet1,
         circularForeground = DonutForegroundStrategy(
-            strokeWidth = 120f,
+            strokeWidth = 100f,
         ),
         circularDecoration = CircularDecoration.donutChartDecorations(
             textColor = MaterialTheme.colorScheme.onSurface,
         ),
-        legend = GridLegendStrategy(
-            style = TextStyle(
-                color = MaterialTheme.colorScheme.onSurface,
-                fontSize = MaterialTheme.typography.titleMedium.fontSize
-            )
-        )
     )
 }
 

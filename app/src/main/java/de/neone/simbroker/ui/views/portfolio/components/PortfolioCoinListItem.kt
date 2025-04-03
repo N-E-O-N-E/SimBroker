@@ -36,6 +36,9 @@ import de.neone.simbroker.R
 import de.neone.simbroker.data.helper.SBHelper
 import de.neone.simbroker.data.helper.SBHelper.roundTo2
 import de.neone.simbroker.data.helper.SBHelper.roundTo6
+import de.neone.simbroker.data.helper.SBHelper.toCoinString
+import de.neone.simbroker.data.helper.SBHelper.toEuroString
+import de.neone.simbroker.data.helper.SBHelper.toPercentString
 import de.neone.simbroker.data.local.mockdata.coins_Mockdata
 import de.neone.simbroker.data.local.models.PortfolioPositions
 import de.neone.simbroker.data.local.models.TransactionPositions
@@ -64,7 +67,7 @@ fun PortfolioCoinListItem(
     Card(
         modifier = Modifier.padding(8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.7f),
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
         )
     ) {
 
@@ -99,7 +102,7 @@ fun PortfolioCoinListItem(
                                 .height(220.dp)
                                 .padding(5.dp),
                             colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.6f),
+                                containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.7f),
                             )
                         ) {
                             // Sparkline Chart
@@ -123,11 +126,12 @@ fun PortfolioCoinListItem(
                             model = imageRequest,
                             contentDescription = coin.name,
                             contentScale = ContentScale.Fit,
-                            clipToBounds = false
                         )
 
                         Column(
-                            modifier = Modifier.weight(1f).padding(vertical = 5.dp),
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(vertical = 5.dp),
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.Start
                         ) {
@@ -140,15 +144,15 @@ fun PortfolioCoinListItem(
                             }
 
                             Text(
-                                text = "Current price: %.2f €".format(currentPrice.roundTo2()),
+                                text = "Current price: ${currentPrice.toEuroString()} €",
                                 style = MaterialTheme.typography.labelSmall
                             )
                             Text(
-                                text = "Invested: %.2f €".format(totalInvested.roundTo2()),
+                                text = "Invested: ${totalInvested.toEuroString()}",
                                 style = MaterialTheme.typography.labelSmall
                             )
                             Text(
-                                text = "incl. Fees: %.2f €".format(totalFee.roundTo2()),
+                                text = "incl. Fees: ${totalFee.toEuroString()}",
                                 style = MaterialTheme.typography.labelSmall
                             )
                         }
@@ -162,7 +166,7 @@ fun PortfolioCoinListItem(
                                 style = MaterialTheme.typography.labelMedium,
                             )
                             Text(
-                                text = "%.2f €".format(profit.roundTo2()),
+                                text = profit.toEuroString(),
                                 style = MaterialTheme.typography.titleLarge,
                                 color = if (profit.toString().contains("-")) colorDown else colorUp
                             )
@@ -185,6 +189,7 @@ fun PortfolioCoinListItem(
             }
             if (showTransactionsForCoinState) {
                         coinTransactions.forEach {
+
                             val anteilEUR = it.price.roundTo2() * it.amount.roundTo2()
                             val gewVer = (currentPrice.roundTo2() - it.price.roundTo2()) * it.amount.roundTo6()
                             val gvProzent = (((currentPrice.roundTo2() / it.price.roundTo2()) -1) * 100)
@@ -194,9 +199,7 @@ fun PortfolioCoinListItem(
                                     .fillMaxWidth()
                                     .padding(5.dp),
                                 colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceContainerLow.copy(
-                                        alpha = 0.5f
-                                    )
+                                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f)
                                 )
                             ) {
                                 Column(modifier = Modifier.padding(15.dp)) {
@@ -220,7 +223,7 @@ fun PortfolioCoinListItem(
                                         )
                                         Spacer(modifier = Modifier.weight(1f))
                                         Text(
-                                            text = "%.6f".format(it.amount.roundTo6()),
+                                            text = it.amount.toCoinString(),
                                             style = MaterialTheme.typography.labelMedium
                                         )
 
@@ -232,7 +235,7 @@ fun PortfolioCoinListItem(
                                         )
                                         Spacer(modifier = Modifier.weight(1f))
                                         Text(
-                                            text = "%.2f €".format(it.price.roundTo2()),
+                                            text = it.price.toEuroString(),
                                             style = MaterialTheme.typography.labelMedium
                                         )
 
@@ -247,7 +250,7 @@ fun PortfolioCoinListItem(
                                         )
                                         Spacer(modifier = Modifier.weight(1f))
                                         Text(
-                                            text = "%.2f €".format(coinTransactions.first().fee.roundTo2()),
+                                            text = coinTransactions.first().fee.toEuroString(),
                                             style = MaterialTheme.typography.labelMedium
                                         )
 
@@ -260,7 +263,7 @@ fun PortfolioCoinListItem(
                                         )
                                         Spacer(modifier = Modifier.weight(1f))
                                         Text(
-                                            text = "%.2f €".format(anteilEUR.roundTo2()),
+                                            text = anteilEUR.toEuroString(),
                                             style = MaterialTheme.typography.labelMedium
                                         )
                                     }
@@ -275,11 +278,12 @@ fun PortfolioCoinListItem(
                                         Spacer(modifier = Modifier.weight(1f))
 
                                             Text(
-                                                text = "%.2f €  ".format(gewVer.roundTo2()),
+                                                text = gewVer.toEuroString(),
                                                 style = MaterialTheme.typography.labelMedium
                                             )
+                                        Spacer(modifier = Modifier.weight(0.05f))
                                             Text(
-                                                text = "(%.2f %%)".format(gvProzent),
+                                                text = gvProzent.toPercentString(),
                                                 style = MaterialTheme.typography.labelMedium
                                             )
 
