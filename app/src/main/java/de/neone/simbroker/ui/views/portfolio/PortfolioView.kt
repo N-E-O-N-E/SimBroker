@@ -1,7 +1,14 @@
 package de.neone.simbroker.ui.views.portfolio
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,16 +20,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -32,6 +43,7 @@ import de.neone.simbroker.ui.theme.activity.ViewWallpaperImageBox
 import de.neone.simbroker.ui.theme.bottomBarColorDark
 import de.neone.simbroker.ui.theme.bottomBarColorLight
 import de.neone.simbroker.ui.views.portfolio.components.PortfolioCoinListPositionObject
+import kotlinx.coroutines.delay
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
@@ -47,7 +59,8 @@ fun PortfolioView(
     val allPortfolioPositions by viewModel.allPortfolioPositions.collectAsState()
 
     val allPortfolioPositionsGrouped = allPortfolioPositions.groupBy { it.coinUuid }
-    val allPortfolioGroupedList = allPortfolioPositionsGrouped.values.toList().filter { !it.first().isFavorite }
+    val allPortfolioGroupedList =
+        allPortfolioPositionsGrouped.values.toList().filter { !it.first().isFavorite }
 
     val allPortfolioPositionsGroupedByFavorite = allPortfolioPositions.groupBy { it.coinUuid }
     val allPortfolioGroupedFavorites =
@@ -58,7 +71,21 @@ fun PortfolioView(
 
     val timer by viewModel.refreshTimer.collectAsState()
 
-    val scrollState = rememberScrollState()
+    var showFavorites by rememberSaveable { mutableStateOf(true) }
+    var favoriteTrigger by rememberSaveable { mutableStateOf(false) }
+
+    val rotationAngle by animateFloatAsState(
+        targetValue = if (showFavorites) 180f else 0f,
+        label = "iconRotation"
+    )
+
+    LaunchedEffect(favoriteTrigger) {
+        if (favoriteTrigger) {
+            delay(100)
+            showFavorites = !showFavorites
+            favoriteTrigger = false
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -108,36 +135,57 @@ fun PortfolioView(
         } else {
             // Favoriten Head
 
-            LazyRow(modifier = Modifier) {
-                itemsIndexed(allPortfolioGroupedFavorites) { _, position ->
-                    PortfolioCoinListPositionObject(
-                        coinList, allTransactionPositions, position,
-                        isFavorite = { coinUuid, isFavorite ->
-                            viewModel.updatePortfolio(
-                                coinId = coinUuid,
-                                isFavorite = isFavorite
+            AnimatedVisibility(
+                visible = showFavorites,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut()
+            ) {
+                if (showFavorites) {
+                    LazyRow(modifier = Modifier) {
+                        itemsIndexed(allPortfolioGroupedFavorites) { _, position ->
+                            PortfolioCoinListPositionObject(
+                                coinList, allTransactionPositions, position,
+                                isFavorite = { coinUuid, isFavorite ->
+                                    viewModel.updatePortfolio(
+                                        coinId = coinUuid,
+                                        isFavorite = isFavorite
+                                    )
+                                }
                             )
                         }
-                    )
+                    }
                 }
             }
+
             if (allPortfolioGroupedFavorites.isNotEmpty()) {
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(25.dp)
-                    ,
-                    color = if(isSystemInDarkTheme()) bottomBarColorDark.copy(alpha = 0.6f) else bottomBarColorLight.copy(alpha = 0.6f),
+                        .clickable {
+                            favoriteTrigger = !favoriteTrigger
+                        },
+                    color = if (isSystemInDarkTheme()) bottomBarColorDark.copy(alpha = 0.6f) else bottomBarColorLight.copy(
+                        alpha = 0.6f
+                    ),
                 ) {
                     Row(horizontalArrangement = Arrangement.Center) {
-                        Icon(painterResource(id = R.drawable.baseline_arrow_drop_up_24), contentDescription = null)
+                        Icon(
+                            painterResource(id = R.drawable.baseline_arrow_drop_down_48),
+                            contentDescription = null,
+                            modifier = Modifier.rotate(rotationAngle)
+                        )
 
                         Text(
-                            "Favorites",
+                            text = if (showFavorites) "Hide Favorites" else " Show Favorites",
                             modifier = Modifier.padding(horizontal = 10.dp),
                             style = MaterialTheme.typography.titleSmall,
                         )
-                        Icon(painterResource(id = R.drawable.baseline_arrow_drop_up_24), contentDescription = null)
+                        Icon(
+                            painterResource(id = R.drawable.baseline_arrow_drop_down_48),
+                            contentDescription = null,
+                            modifier = Modifier.rotate(rotationAngle)
+                        )
 
                     }
                 }

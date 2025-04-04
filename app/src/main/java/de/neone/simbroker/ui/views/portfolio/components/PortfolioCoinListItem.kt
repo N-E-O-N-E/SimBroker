@@ -1,5 +1,10 @@
 package de.neone.simbroker.ui.views.portfolio.components
 
+import android.annotation.SuppressLint
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,13 +21,16 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -45,7 +53,9 @@ import de.neone.simbroker.data.local.models.PortfolioPositions
 import de.neone.simbroker.data.local.models.TransactionPositions
 import de.neone.simbroker.ui.theme.colorDown
 import de.neone.simbroker.ui.theme.colorUp
+import kotlinx.coroutines.delay
 
+@SuppressLint("SuspiciousIndentation")
 @Composable
 fun PortfolioCoinListItem(
     coin: PortfolioPositions,
@@ -66,266 +76,344 @@ fun PortfolioCoinListItem(
         .error(R.drawable.coinplaceholder)
         .build()
 
+    var zoomUp by remember { mutableStateOf(false) }
+    var zoomTrigger by rememberSaveable { mutableStateOf(false) }
 
-        Card(
-            modifier = Modifier.padding(horizontal = 8.dp).padding(vertical = 3.dp).width(395.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
-            )
+    var rotateChartArrow by remember { mutableStateOf(false) }
+    var rotateHistorieArrow by remember { mutableStateOf(false) }
+    var chartArrowTrigger by rememberSaveable { mutableStateOf(false) }
+    var historyArrowTrigger by rememberSaveable { mutableStateOf(false) }
+
+    val zoom by animateFloatAsState(
+        targetValue = if (zoomUp) 1.9f else 1.0f,
+        animationSpec = tween(durationMillis = 100, easing = FastOutSlowInEasing),
+        label = "zoomAnim"
+    )
+
+    val chartRotationAngle by animateFloatAsState(
+        targetValue = if (rotateChartArrow) 180f else 0f,
+        label = "iconRotation"
+    )
+
+    val historieRotationAngle by animateFloatAsState(
+        targetValue = if (rotateHistorieArrow) 180f else 0f,
+        label = "iconRotation"
+    )
+
+    val starRotationAngle by animateFloatAsState(
+        targetValue = if (zoomUp) 36f else 0f,
+        label = "iconRotation"
+    )
+
+
+    LaunchedEffect(chartArrowTrigger) {
+        if (chartArrowTrigger) {
+            rotateChartArrow = !rotateChartArrow
+            delay(100)
+            chartArrowTrigger = false
+        }
+    }
+
+    LaunchedEffect(historyArrowTrigger) {
+        if (historyArrowTrigger) {
+            rotateHistorieArrow = !rotateHistorieArrow
+            delay(100)
+            historyArrowTrigger = false
+        }
+    }
+
+    LaunchedEffect(zoomTrigger) {
+        if (zoomTrigger) {
+            zoomUp = true
+            delay(400)
+            zoomUp = false
+            delay(400)
+            zoomTrigger = false
+        }
+    }
+
+
+    Card(
+        modifier = Modifier
+            .padding(horizontal = 8.dp)
+            .padding(vertical = 3.dp)
+            .width(395.dp)
+            .animateContentSize(
+                animationSpec = tween(
+                    durationMillis = 100,
+                    easing = FastOutSlowInEasing
+                )
+            ),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(10.dp)
+                .fillMaxWidth()
         ) {
-
-            Column(
-                modifier = Modifier
-                    .padding(10.dp)
-                    .fillMaxWidth()
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Column(horizontalAlignment = Alignment.Start) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Start
+                Column(horizontalAlignment = Alignment.Start) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start
+                    ) {
+                        IconButton(
+                            onClick = {
+                                chartArrowTrigger = true
+                                slideInChart = !slideInChart
+                            }
                         ) {
-                            IconButton(
-                                onClick = {
-                                    slideInChart = !slideInChart
-                                }
-                            ) {
-                                Icon(
-                                    painterResource(id = if (slideInChart) R.drawable.baseline_arrow_drop_down_48 else R.drawable.baseline_arrow_drop_up_24),
-                                    contentDescription = null
-                                )
-                            }
-                            Text("Chart", style = MaterialTheme.typography.labelSmall)
-                            Spacer(modifier = Modifier.weight(1f))
-                            IconButton(
-                                onClick = {
-                                    setFavorite(coin.coinUuid, if (coin.isFavorite) false else true)
-                                },
-                            ) {
-                                Icon(
-                                    painterResource(id = if (coin.isFavorite) R.drawable.baseline_star_24 else R.drawable.baseline_star_border_24),
-                                    contentDescription = null,
-                                    modifier = Modifier.scale(1.2f)
-                                )
-                            }
-                        }
-
-                        if (slideInChart) {
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(220.dp)
-                                    .padding(5.dp),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(
-                                        alpha = 0.7f
-                                    ),
-                                )
-                            ) {
-                                // Sparkline Chart
-                                PortfolioCoinChartPlotter(coinSparklineData = sparks)
-                            }
-                        }
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Start,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-
-                            AsyncImage(
-                                modifier = Modifier
-                                    .padding(start = 5.dp)
-                                    .padding(end = 13.dp)
-                                    .width(70.dp)
-                                    .height(70.dp)
-                                    .clip(shape = MaterialTheme.shapes.extraLarge),
-                                model = imageRequest,
-                                contentDescription = coin.name,
-                                contentScale = ContentScale.Fit,
+                            Icon(
+                                painterResource(id = R.drawable.baseline_arrow_drop_up_24),
+                                contentDescription = null,
+                                modifier = Modifier.rotate(chartRotationAngle)
                             )
-
-                            Column(
+                        }
+                        Text("Chart", style = MaterialTheme.typography.labelSmall)
+                        Spacer(modifier = Modifier.weight(1f))
+                        IconButton(
+                            onClick = {
+                                zoomTrigger = true
+                                setFavorite(coin.coinUuid, if (coin.isFavorite) false else true)
+                            },
+                        ) {
+                            Icon(
+                                painterResource(id = if (coin.isFavorite) R.drawable.baseline_star_24 else R.drawable.baseline_star_border_24),
+                                contentDescription = null,
                                 modifier = Modifier
-                                    .weight(1f)
-                                    .padding(vertical = 5.dp),
-                                verticalArrangement = Arrangement.Center,
-                                horizontalAlignment = Alignment.Start
-                            ) {
-                                Text(
-                                    text = coin.symbol,
-                                    style = MaterialTheme.typography.headlineSmall
-                                )
-                                Row() {
-                                    Text(
-                                        text = "${coin.name.take(25)}  ",
-                                        style = MaterialTheme.typography.bodyLarge
-                                    )
-                                }
-
-                                Text(
-                                    text = "Current price: ${currentPrice.toEuroString()}",
-                                    style = MaterialTheme.typography.labelSmall
-                                )
-                                Text(
-                                    text = "Invested: ${totalInvested.toEuroString()}",
-                                    style = MaterialTheme.typography.labelSmall
-                                )
-                                Text(
-                                    text = "incl. Fees: ${totalFee.toEuroString()}",
-                                    style = MaterialTheme.typography.labelSmall
-                                )
-                            }
-
-                            Column(
-                                modifier = Modifier.fillMaxWidth(0.4f),
-                                horizontalAlignment = Alignment.End
-                            ) {
-                                Text(
-                                    text = "Profit/Loss",
-                                    style = MaterialTheme.typography.labelMedium,
-                                )
-                                Text(
-                                    text = profit.toEuroString(),
-                                    style = MaterialTheme.typography.titleLarge,
-                                    color = if (profit.toString()
-                                            .contains("-")
-                                    ) colorDown else colorUp
-                                )
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Text("History", style = MaterialTheme.typography.labelSmall)
-                                    IconButton(
-                                        onClick = {
-                                            showTransactionsForCoinState =
-                                                !showTransactionsForCoinState
-                                        }
-                                    ) {
-                                        Icon(
-                                            painterResource(id = if (showTransactionsForCoinState) R.drawable.baseline_arrow_drop_up_24 else R.drawable.baseline_arrow_drop_down_48),
-                                            contentDescription = null
-                                        )
-                                    }
-                                }
-                            }
+                                    .scale(zoom)
+                                    .rotate(starRotationAngle)
+                            )
                         }
                     }
-                }
-                if (showTransactionsForCoinState) {
-                    coinTransactions.forEach {
 
-                        val anteilEUR = it.price.roundTo2() * it.amount
-                        val gewVer =
-                            (currentPrice.roundTo2() - it.price.roundTo2()) * it.amount.roundTo6()
-                        val gvProzent =
-                            (((currentPrice.roundTo2() / it.price.roundTo2()) - 1) * 100)
-
+                    if (slideInChart) {
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(5.dp),
+                                .height(200.dp)
+                                .padding(3.dp),
                             colors = CardDefaults.cardColors(
                                 containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(
-                                    alpha = 0.6f
-                                )
+                                    alpha = 0.7f
+                                ),
                             )
                         ) {
-                            Column(modifier = Modifier.padding(15.dp)) {
+                            // Sparkline Chart
+                            PortfolioCoinChartPlotter(coinSparklineData = sparks)
+                        }
+                    }
 
-                                Row() {
-                                    Text(
-                                        text = "Date",
-                                        style = MaterialTheme.typography.labelMedium
-                                    )
-                                    Spacer(modifier = Modifier.weight(1f))
-                                    Text(
-                                        text = SBHelper.timestampToString(it.timestamp),
-                                        style = MaterialTheme.typography.labelMedium
-                                    )
-                                }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
 
-                                Row() {
-                                    Text(
-                                        text = "Amount",
-                                        style = MaterialTheme.typography.labelMedium
-                                    )
-                                    Spacer(modifier = Modifier.weight(1f))
-                                    Text(
-                                        text = it.amount.toCoinString(),
-                                        style = MaterialTheme.typography.labelMedium
-                                    )
+                        AsyncImage(
+                            modifier = Modifier
+                                .padding(start = 5.dp)
+                                .padding(end = 13.dp)
+                                .width(50.dp)
+                                .height(50.dp)
+                                .clip(shape = MaterialTheme.shapes.extraLarge),
+                            model = imageRequest,
+                            contentDescription = coin.name,
+                            contentScale = ContentScale.Fit,
+                        )
 
-                                }
-                                Row() {
-                                    Text(
-                                        text = "Price p. Coin",
-                                        style = MaterialTheme.typography.labelMedium
-                                    )
-                                    Spacer(modifier = Modifier.weight(1f))
-                                    Text(
-                                        text = it.price.toEuroString(),
-                                        style = MaterialTheme.typography.labelMedium
-                                    )
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(vertical = 2.dp),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.Start
+                        ) {
+                            Text(
+                                text = coin.symbol,
+                                style = MaterialTheme.typography.headlineSmall
+                            )
+                            Row() {
+                                Text(
+                                    text = "${coin.name.take(20) + "..."}  ",
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+                            }
 
-                                }
+                            Text(
+                                text = "Current price: ${currentPrice.toEuroString()}",
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                            Text(
+                                text = "Invested: ${totalInvested.toEuroString()}",
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                            Text(
+                                text = "incl. Fees: ${totalFee.toEuroString()}",
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        }
 
-                                HorizontalDivider(color = MaterialTheme.colorScheme.onSurface)
-
-                                Row() {
-                                    Text(
-                                        text = "Fee",
-                                        style = MaterialTheme.typography.labelMedium
+                        Column(
+                            modifier = Modifier.fillMaxWidth(0.4f),
+                            horizontalAlignment = Alignment.End
+                        ) {
+                            Text(
+                                text = "Profit/Loss",
+                                style = MaterialTheme.typography.labelMedium,
+                            )
+                            Text(
+                                text = profit.toEuroString(),
+                                style = MaterialTheme.typography.titleLarge,
+                                color = if (profit.toString()
+                                        .contains("-")
+                                ) colorDown else colorUp
+                            )
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text("History", style = MaterialTheme.typography.labelSmall)
+                                IconButton(
+                                    onClick = {
+                                        historyArrowTrigger = true
+                                        showTransactionsForCoinState =
+                                            !showTransactionsForCoinState
+                                    }
+                                ) {
+                                    Icon(
+                                        painterResource(id = R.drawable.baseline_arrow_drop_down_48),
+                                        contentDescription = null,
+                                        modifier = Modifier.rotate(historieRotationAngle)
                                     )
-                                    Spacer(modifier = Modifier.weight(1f))
-                                    Text(
-                                        text = coinTransactions.first().fee.toEuroString(),
-                                        style = MaterialTheme.typography.labelMedium
-                                    )
-
-                                }
-
-                                Row() {
-                                    Text(
-                                        text = "Invested (excl.Fee)",
-                                        style = MaterialTheme.typography.labelMedium
-                                    )
-                                    Spacer(modifier = Modifier.weight(1f))
-                                    Text(
-                                        text = anteilEUR.toEuroString(),
-                                        style = MaterialTheme.typography.labelMedium
-                                    )
-                                }
-
-                                HorizontalDivider(color = MaterialTheme.colorScheme.onSurface)
-
-                                Row() {
-                                    Text(
-                                        text = "Profit/Loss",
-                                        style = MaterialTheme.typography.labelMedium
-                                    )
-                                    Spacer(modifier = Modifier.weight(1f))
-
-                                    Text(
-                                        text = gewVer.toEuroString(),
-                                        style = MaterialTheme.typography.labelMedium
-                                    )
-                                    Spacer(modifier = Modifier.weight(0.05f))
-                                    Text(
-                                        text = gvProzent.toPercentString(),
-                                        style = MaterialTheme.typography.labelMedium
-                                    )
-
                                 }
                             }
                         }
                     }
                 }
             }
-        }
 
+            if (showTransactionsForCoinState) {
+                coinTransactions.forEach {
+
+                    val anteilEUR = it.price.roundTo2() * it.amount
+                    val gewVer =
+                        (currentPrice.roundTo2() - it.price.roundTo2()) * it.amount.roundTo6()
+                    val gvProzent =
+                        (((currentPrice.roundTo2() / it.price.roundTo2()) - 1) * 100)
+
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(5.dp)
+                            .animateContentSize(
+                                animationSpec = tween(
+                                    durationMillis = 100,
+                                    easing = FastOutSlowInEasing
+                                )
+                            )
+                        ,
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(
+                                alpha = 0.6f
+                            )
+                        )
+                    ) {
+                        Column(modifier = Modifier.padding(15.dp)) {
+
+                            Row() {
+                                Text(
+                                    text = "Date",
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+                                Spacer(modifier = Modifier.weight(1f))
+                                Text(
+                                    text = SBHelper.timestampToString(it.timestamp),
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+                            }
+
+                            Row() {
+                                Text(
+                                    text = "Amount",
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+                                Spacer(modifier = Modifier.weight(1f))
+                                Text(
+                                    text = it.amount.toCoinString(),
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+
+                            }
+                            Row() {
+                                Text(
+                                    text = "Price p. Coin",
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+                                Spacer(modifier = Modifier.weight(1f))
+                                Text(
+                                    text = it.price.toEuroString(),
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+
+                            }
+
+                            HorizontalDivider(color = MaterialTheme.colorScheme.onSurface)
+
+                            Row() {
+                                Text(
+                                    text = "Fee",
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+                                Spacer(modifier = Modifier.weight(1f))
+                                Text(
+                                    text = coinTransactions.first().fee.toEuroString(),
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+
+                            }
+
+                            Row() {
+                                Text(
+                                    text = "Invested (excl.Fee)",
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+                                Spacer(modifier = Modifier.weight(1f))
+                                Text(
+                                    text = anteilEUR.toEuroString(),
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+                            }
+
+                            HorizontalDivider(color = MaterialTheme.colorScheme.onSurface)
+
+                            Row() {
+                                Text(
+                                    text = "Profit/Loss",
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+                                Spacer(modifier = Modifier.weight(1f))
+
+                                Text(
+                                    text = gewVer.toEuroString(),
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+                                Spacer(modifier = Modifier.weight(0.05f))
+                                Text(
+                                    text = gvProzent.toPercentString(),
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Preview

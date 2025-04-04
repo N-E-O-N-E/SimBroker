@@ -41,9 +41,6 @@ class SimBrokerViewModel(
         get() = if (mockDataState.value) realRepo else mockRepo
 
 
-    private val timerValue = MutableStateFlow(0)
-
-
     // Dialog States -------------------------------------------------------------------------------
 
 
