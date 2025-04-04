@@ -5,6 +5,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -66,6 +67,7 @@ fun PortfolioCoinListItem(
     totalFee: Double = 0.0,
     totalInvested: Double = 0.0,
     setFavorite: (String, Boolean) -> Unit,
+    isClicked: () -> Unit
 ) {
     var slideInChart by remember { mutableStateOf(false) }
     var showTransactionsForCoinState by remember { mutableStateOf(false) }
@@ -134,7 +136,9 @@ fun PortfolioCoinListItem(
 
 
     Card(
-        modifier = Modifier
+        modifier = Modifier.clickable {
+            isClicked()
+        }
             .padding(horizontal = 8.dp)
             .padding(vertical = 3.dp)
             .width(395.dp)
@@ -433,6 +437,7 @@ private fun PortfolioCoinListPreview() {
         currentPrice = 3680.0,
         coinTransactions = emptyList(),
         profit = 1200.0,
-        setFavorite = { _, _ -> }
+        setFavorite = { _, _ -> },
+        isClicked = { }
     )
 }

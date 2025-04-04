@@ -29,6 +29,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -38,10 +39,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import de.neone.simbroker.R
+import de.neone.simbroker.data.remote.models.Coin
 import de.neone.simbroker.ui.SimBrokerViewModel
 import de.neone.simbroker.ui.theme.activity.ViewWallpaperImageBox
 import de.neone.simbroker.ui.theme.bottomBarColorDark
 import de.neone.simbroker.ui.theme.bottomBarColorLight
+import de.neone.simbroker.ui.views.coinDetailView.CoinDetailSheet
 import de.neone.simbroker.ui.views.portfolio.components.PortfolioCoinListPositionObject
 import kotlinx.coroutines.delay
 
@@ -54,6 +57,12 @@ fun PortfolioView(
         imageLightTheme = R.drawable.simbroker_light_clear,
         imageDarkTheme = R.drawable.simbroker_dark_clear
     )
+
+    var selectedCoin by remember { mutableStateOf<Coin?>(null) }
+    val selectedCoinDetails by viewModel.coinDetails.collectAsState()
+    val accountCreditState by viewModel.accountValueState.collectAsState()
+    val feeValue by viewModel.feeValueState.collectAsState()
+    var openCoinDetailSheet by rememberSaveable { mutableStateOf(false) }
 
     val coinList by viewModel.coinList.collectAsState()
     val allPortfolioPositions by viewModel.allPortfolioPositions.collectAsState()
@@ -150,6 +159,10 @@ fun PortfolioView(
                                         coinId = coinUuid,
                                         isFavorite = isFavorite
                                     )
+                                },
+                                isClicked = {
+                                    selectedCoin = coinList.find { it.uuid == position.first().coinUuid }
+                                    openCoinDetailSheet = true
                                 }
                             )
                         }
@@ -190,22 +203,50 @@ fun PortfolioView(
                     }
                 }
             }
+        }
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            itemsIndexed(allPortfolioGroupedList) { _, position ->
+                PortfolioCoinListPositionObject(
+                    coinList, allTransactionPositions, position,
+                    isFavorite = { coinUuid, isFavorite ->
+                        viewModel.updatePortfolio(
+                            coinId = coinUuid,
+                            isFavorite = isFavorite
+                        )
+                    },
+                    isClicked = {
+                        selectedCoin = coinList.find { it.uuid == position.first().coinUuid }
+                        openCoinDetailSheet = true
+                    }
+                )
+            }
+        }
+    }
 
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                itemsIndexed(allPortfolioGroupedList) { _, position ->
-                    PortfolioCoinListPositionObject(
-                        coinList, allTransactionPositions, position,
-                        isFavorite = { coinUuid, isFavorite ->
-                            viewModel.updatePortfolio(
-                                coinId = coinUuid,
-                                isFavorite = isFavorite
-                            )
-                        }
-                    )
-                }
+    if (openCoinDetailSheet) {
+        selectedCoin?.let { it ->
+            viewModel.getCoinDetails(it.uuid, "3h")
+            selectedCoinDetails?.let { coinDetails ->
+                CoinDetailSheet(
+                    selectedCoin = it,
+                    coinDetails = coinDetails,
+                    feeValue = feeValue,
+                    onDismiss = {
+                        openCoinDetailSheet = false
+                    },
+                    onBuyClicked = { transaction, portfolio ->
+                        viewModel.addTransaction(transaction)
+                        viewModel.addPortfolio(portfolio)
+                        viewModel.reduceAccountValue(portfolio.totalValue)
+                    },
+                    onSellClicked = {
+
+                    },
+                    accountCreditState = accountCreditState,
+                )
             }
         }
     }
