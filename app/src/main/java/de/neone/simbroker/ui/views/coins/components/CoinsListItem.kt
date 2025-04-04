@@ -50,7 +50,7 @@ fun CoinsListItem(
     Card(
         modifier = Modifier
             .clickable { onListSearchItemSelected() }
-            .padding(8.dp),
+            .padding(horizontal = 8.dp).padding(vertical = 3.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
         )
@@ -76,9 +76,9 @@ fun CoinsListItem(
                 AsyncImage(
                     modifier = Modifier
                         .padding(start = 5.dp)
-                        .padding(end = 13.dp)
-                        .width(70.dp)
-                        .height(70.dp)
+                        .padding(end = 10.dp)
+                        .width(50.dp)
+                        .height(50.dp)
                         .clip(shape = MaterialTheme.shapes.extraLarge),
                     model = imageRequest,
                     contentDescription = coin.name,
@@ -94,7 +94,7 @@ fun CoinsListItem(
                     Text(text = coin.symbol, style = MaterialTheme.typography.titleMedium)
                     Row {
                         Text(
-                            text = if(coin.name.length >= 25) coin.name.take(22) + " ..." else coin.name,
+                            text = if(coin.name.length >= 23) coin.name.take(23) + " ..." else coin.name,
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }

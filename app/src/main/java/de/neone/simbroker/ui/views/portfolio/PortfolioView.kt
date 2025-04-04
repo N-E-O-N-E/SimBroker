@@ -47,7 +47,7 @@ fun PortfolioView(
     val allPortfolioPositions by viewModel.allPortfolioPositions.collectAsState()
 
     val allPortfolioPositionsGrouped = allPortfolioPositions.groupBy { it.coinUuid }
-    val allPortfolioGroupedList = allPortfolioPositionsGrouped.values.toList()
+    val allPortfolioGroupedList = allPortfolioPositionsGrouped.values.toList().filter { !it.first().isFavorite }
 
     val allPortfolioPositionsGroupedByFavorite = allPortfolioPositions.groupBy { it.coinUuid }
     val allPortfolioGroupedFavorites =
@@ -92,7 +92,7 @@ fun PortfolioView(
 
         // Body --------------------------------------------------------------------------------
 
-        if (allPortfolioGroupedList.isEmpty()) {
+        if (allPortfolioGroupedList.isEmpty() && allPortfolioGroupedFavorites.isEmpty()) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,

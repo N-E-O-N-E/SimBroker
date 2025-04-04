@@ -59,7 +59,7 @@ fun CoinsChartPlotter(
     )
 
     BasicLinearStrategy.CustomLinearPlot(
-        modifier = Modifier.height(85.dp).fillMaxWidth().padding(10.dp),
+        modifier = Modifier.height(150.dp).fillMaxWidth().padding(10.dp),
         plot = LinePlotStrategy(
             lineStroke = 6.0f,
             circleRadius = 0.0f

@@ -68,7 +68,7 @@ fun PortfolioCoinListItem(
 
 
         Card(
-            modifier = Modifier.padding(8.dp).width(395.dp),
+            modifier = Modifier.padding(horizontal = 8.dp).padding(vertical = 3.dp).width(395.dp),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
             )
