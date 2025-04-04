@@ -44,6 +44,7 @@ fun PortfolioView(
     val allPortfolioPositionsGrouped = allPortfolioPositions.groupBy { it.coinUuid }
     val allPortfolioGroupedList = allPortfolioPositionsGrouped.values.toList()
     val allTransactionPositions by viewModel.allTransactionPositions.collectAsState()
+    val gameDifficult by viewModel.gameDifficultState.collectAsState()
 
     var showCoinSheet by remember { mutableStateOf(false) }
     val timer by viewModel.refreshTimer.collectAsState()
@@ -70,7 +71,7 @@ fun PortfolioView(
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
-                text = "Game Difficulty: ${viewModel.gameDifficultState.value.uppercase()}",
+                text = "Game Difficulty: $gameDifficult",
                 style = MaterialTheme.typography.bodyMedium
             )
         }

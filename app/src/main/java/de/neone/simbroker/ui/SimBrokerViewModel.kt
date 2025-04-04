@@ -122,14 +122,14 @@ class SimBrokerViewModel(
 
     private val gameDifficultFlow = dataStore.data
         .map {
-            it[DATASTORE_GAMEDIFFICULTY] ?: "Unknown"
+            it[DATASTORE_GAMEDIFFICULTY] ?: "-"
         }
 
     val gameDifficultState: StateFlow<String> = gameDifficultFlow
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
-            initialValue = "Unknown"
+            initialValue = "-"
         )
 
     fun setGameDifficult(value: String) {
