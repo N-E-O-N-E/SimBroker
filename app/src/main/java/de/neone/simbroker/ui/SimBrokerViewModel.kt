@@ -14,6 +14,7 @@ import de.neone.simbroker.data.remote.models.Coin
 import de.neone.simbroker.data.repository.SimBrokerRepositoryInterface
 import de.neone.simbroker.dataStore
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -38,6 +39,9 @@ class SimBrokerViewModel(
 
     private val repository: SimBrokerRepositoryInterface
         get() = if (mockDataState.value) realRepo else mockRepo
+
+
+    private val timerValue = MutableStateFlow(0)
 
 
     // Dialog States -------------------------------------------------------------------------------
@@ -298,18 +302,16 @@ class SimBrokerViewModel(
     }
 
 
-    // Pagination ------------------------------------------------------------------------------
+    // Timer -----------------------------------------------------------------------
 
-    private var isLoading = false
-    private var offset = 0
-    private val limit = 5
-    private var hasMoreData = true
+    private var timerJob: Job? = null
 
     private val _refreshTimer = MutableStateFlow(0)
     val refreshTimer: StateFlow<Int> = _refreshTimer
 
     private fun startTimer() {
-        viewModelScope.launch {
+        timerJob?.cancel()
+        timerJob = viewModelScope.launch {
             while (true) {
                 _refreshTimer.value = 90
                 for (i in _refreshTimer.value downTo 1) {
@@ -321,15 +323,14 @@ class SimBrokerViewModel(
         }
     }
 
-    // API Response -------------------------------------------------------------------------------
 
-    private val _coinList = MutableStateFlow<List<Coin>>(emptyList())
-    val coinList: StateFlow<List<Coin>> = _coinList
+    // Pagination ---------------------------------------------------------------------------------
 
-    private val _coinDetails: MutableStateFlow<Coin?> = MutableStateFlow(null)
-    val coinDetails: StateFlow<Coin?> = _coinDetails
+    private var isLoading = false
+    private var offset = 0
+    private val limit = 5
+    private var hasMoreData = true
 
-    // Für Pagination ----------------------------------
     fun loadMoreCoins() {
         if (isLoading || !hasMoreData) return
 
@@ -349,6 +350,15 @@ class SimBrokerViewModel(
             }
         }
     }
+
+
+    // API Response -------------------------------------------------------------------------------
+
+    private val _coinList = MutableStateFlow<List<Coin>>(emptyList())
+    val coinList: StateFlow<List<Coin>> = _coinList
+
+    private val _coinDetails: MutableStateFlow<Coin?> = MutableStateFlow(null)
+    val coinDetails: StateFlow<Coin?> = _coinDetails
 
     fun getCoinDetails(uuid: String, timePeriod: String) {
         viewModelScope.launch(Dispatchers.IO) {
