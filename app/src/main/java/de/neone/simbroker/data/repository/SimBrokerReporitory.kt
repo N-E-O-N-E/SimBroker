@@ -62,6 +62,13 @@ class SimBrokerRepositoryImpl(
         return simBrokerDAO.getAllTransactionPositions()
     }
 
+    override suspend fun deleteAllTransactions() {
+        simBrokerDAO.deleteAllTransactions()
+    }
+
+    override suspend fun deleteAllPortfolioPositions() {
+        simBrokerDAO.deleteAllPortfolio()
+    }
 
 
 }

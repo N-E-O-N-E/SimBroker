@@ -146,7 +146,7 @@ fun AccountView(
                                     viewModel.setFirstGameState(false)
                                     viewModel.setGameDifficult("Easy")
                                     viewModel.setFeeValue(4.0)
-                                    viewModel.setAccountValue(1500.0)
+                                    viewModel.setFirstGameAccountValue(1500.0)
                                     viewModel.setShowGameDifficultDialog(true)
                                 } else {
                                     viewModel.setShowFirstGameAccountValueDialog(true)
@@ -164,7 +164,7 @@ fun AccountView(
                                     viewModel.setFirstGameState(false)
                                     viewModel.setGameDifficult("Medium")
                                     viewModel.setFeeValue(8.0)
-                                    viewModel.setAccountValue(750.0)
+                                    viewModel.setFirstGameAccountValue(750.0)
                                     viewModel.setShowGameDifficultDialog(true)
                                 } else {
                                     viewModel.setShowFirstGameAccountValueDialog(true)
@@ -182,7 +182,7 @@ fun AccountView(
                                     viewModel.setFirstGameState(false)
                                     viewModel.setGameDifficult("Pro")
                                     viewModel.setFeeValue(16.0)
-                                    viewModel.setAccountValue(375.0)
+                                    viewModel.setFirstGameAccountValue(375.0)
                                     viewModel.setShowGameDifficultDialog(true)
                                 } else {
                                     viewModel.setShowFirstGameAccountValueDialog(true)
@@ -316,9 +316,12 @@ fun AccountView(
                     "\n" + "If you do not want this, click outside the message without confirming it!",
             onConfirm = {
                 viewModel.setFirstGameState(true)
-                viewModel.setGameDifficult("empty")
+                viewModel.setGameDifficult("Unknown")
                 viewModel.setFeeValue(0.0)
                 viewModel.resetAccountValue()
+                viewModel.resetInvestedValue()
+                viewModel.deleteAllTransactions()
+                viewModel.deleteAllPortfolioPositions()
 
                 //TODO Hier müssen weitere Resetparameter gesetzt werden! ( Löschen aller Roomdaten )
             },

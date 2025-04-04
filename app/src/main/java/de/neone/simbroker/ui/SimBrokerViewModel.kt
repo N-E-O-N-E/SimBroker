@@ -39,7 +39,10 @@ class SimBrokerViewModel(
     private val repository: SimBrokerRepositoryInterface
         get() = if (mockDataState.value) realRepo else mockRepo
 
-    // Dialog States
+
+    // Dialog States -------------------------------------------------------------------------------
+
+
     private var _showAccountMaxValueDialog = MutableStateFlow(false)
     var showAccountMaxValueDialog: StateFlow<Boolean> = _showAccountMaxValueDialog
 
@@ -85,7 +88,10 @@ class SimBrokerViewModel(
 
     // DataStore -----------------------------------------------------------------------------
 
+
     private val dataStore = application.dataStore
+
+    // Mockdata -----------------------------------------------------------------------------
 
     private val mockDataFlow = dataStore.data
         .map {
@@ -108,17 +114,18 @@ class SimBrokerViewModel(
         }
     }
 
+    // Game Difficulty -----------------------------------------------------------------------------
 
     private val gameDifficultFlow = dataStore.data
         .map {
-            it[DATASTORE_GAMEDIFFICULTY] ?: "empty"
+            it[DATASTORE_GAMEDIFFICULTY] ?: "Unknown"
         }
 
     val gameDifficultState: StateFlow<String> = gameDifficultFlow
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
-            initialValue = "empty"
+            initialValue = "Unknown"
         )
 
     fun setGameDifficult(value: String) {
@@ -129,6 +136,7 @@ class SimBrokerViewModel(
         }
     }
 
+    // Game Fee -----------------------------------------------------------------------------
 
     private val feeFlow = dataStore.data
         .map {
@@ -149,6 +157,8 @@ class SimBrokerViewModel(
             }
         }
     }
+
+    // Firstgame -----------------------------------------------------------------------------
 
     private val firstGame = dataStore.data
         .map {
@@ -185,6 +195,7 @@ class SimBrokerViewModel(
         }
     }
 
+    // Account Value -----------------------------------------------------------------------------
 
     private val accountValueFlow = dataStore.data
         .map {
@@ -241,6 +252,9 @@ class SimBrokerViewModel(
         }
     }
 
+    // Invested Value -----------------------------------------------------------------------------
+
+
     private val investedValueFlow = dataStore.data
         .map {
             it[DATASTORE_TOTALINVESTVALUE] ?: 0.0
@@ -253,8 +267,16 @@ class SimBrokerViewModel(
             initialValue = 0.0
         )
 
-    private fun setInvestedValue(value: Double) {
+    fun resetInvestedValue() {
+        viewModelScope.launch {
+            dataStore.edit {
+                it[DATASTORE_TOTALINVESTVALUE] = 0.0
+            }
+            Log.d("simDebug", "DataStore invested value increased. New Value: 0.0 €")
+        }
+    }
 
+    private fun setInvestedValue(value: Double) {
         val newValue = investedValueState.value + value
         viewModelScope.launch {
             dataStore.edit {
@@ -277,6 +299,7 @@ class SimBrokerViewModel(
 
 
     // Pagination ------------------------------------------------------------------------------
+
     private var isLoading = false
     private var offset = 0
     private val limit = 5
@@ -306,6 +329,7 @@ class SimBrokerViewModel(
     private val _coinDetails: MutableStateFlow<Coin?> = MutableStateFlow(null)
     val coinDetails: StateFlow<Coin?> = _coinDetails
 
+    // Für Pagination ----------------------------------
     fun loadMoreCoins() {
         if (isLoading || !hasMoreData) return
 
@@ -354,6 +378,21 @@ class SimBrokerViewModel(
 
     // Room Database -----------------------------------------------------------------------------
 
+    // Delete all Data -----------------------------------------------------------------------------
+    fun deleteAllTransactions() {
+        viewModelScope.launch {
+            repository.deleteAllTransactions()
+        }
+    }
+
+    fun deleteAllPortfolioPositions() {
+        viewModelScope.launch {
+            repository.deleteAllPortfolioPositions()
+        }
+    }
+
+    // Insert Data -----------------------------------------------------------------------------
+
     fun addTransaction(transaction: TransactionPositions) {
         Log.d("simDebug", "addTransaction over ViewModel started")
         viewModelScope.launch {
@@ -368,6 +407,7 @@ class SimBrokerViewModel(
         }
     }
 
+    // Get Data -----------------------------------------------------------------------------
 
     val allPortfolioPositions: StateFlow<List<PortfolioPositions>> =
         repository.getAllPortfolioPositions()
@@ -386,13 +426,15 @@ class SimBrokerViewModel(
             )
 
 
+    // Init -----------------------------------------------------------------------------
+
     init {
         viewModelScope.launch {
             mockDataState.collect {
                 Log.d("simDebug", "DataStore Mockdata value: $it")
+                startTimer()
                 refreshCoins()
                 loadMoreCoins()
-                startTimer()
             }
         }
     }

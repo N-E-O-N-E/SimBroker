@@ -17,6 +17,9 @@ interface SimBrokerRepositoryInterface {
     fun getAllPortfolioPositions(): Flow<List<PortfolioPositions>>
     fun getAllTransactionPositions(): Flow<List<TransactionPositions>>
 
+    suspend fun deleteAllTransactions()
+    suspend fun deleteAllPortfolioPositions()
+
 
 
 }

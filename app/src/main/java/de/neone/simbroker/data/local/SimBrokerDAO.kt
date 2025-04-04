@@ -23,6 +23,11 @@ fun getAllPortfolioPositions(): Flow<List<PortfolioPositions>>
 @Query("Select * From TBL_TRANSACTION")
 fun getAllTransactionPositions(): Flow<List<TransactionPositions>>
 
+@Query("Delete From TBL_TRANSACTION")
+suspend fun deleteAllTransactions()
+
+@Query("Delete From TBL_PORTFOLIO")
+suspend fun deleteAllPortfolio()
 
 
 
