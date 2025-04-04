@@ -13,6 +13,7 @@ interface SimBrokerRepositoryInterface {
 
     suspend fun insertTransaction(transaction: TransactionPositions)
     suspend fun insertPortfolio(portfolio: PortfolioPositions)
+    suspend fun updatePortfolioFavorite(coinId: String, isFavorite: Boolean)
 
     fun getAllPortfolioPositions(): Flow<List<PortfolioPositions>>
     fun getAllTransactionPositions(): Flow<List<TransactionPositions>>

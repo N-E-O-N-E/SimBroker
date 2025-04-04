@@ -35,6 +35,9 @@ class SimBrokerRepositoryMock(
     override suspend fun insertPortfolio(portfolio: PortfolioPositions) {
         simBrokerDAO.insertPortfolio(portfolio)
     }
+    override suspend fun updatePortfolioFavorite(coinId: String, isFavorite: Boolean) {
+        simBrokerDAO.updatePortfolioFavorite(coinId, isFavorite)
+    }
 
     override fun getAllPortfolioPositions(): Flow<List<PortfolioPositions>> {
         return simBrokerDAO.getAllPortfolioPositions()

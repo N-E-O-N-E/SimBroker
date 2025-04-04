@@ -17,6 +17,10 @@ suspend fun insertTransaction(transaction: TransactionPositions)
 @Insert(onConflict = OnConflictStrategy.REPLACE)
 suspend fun insertPortfolio(portfolio: PortfolioPositions)
 
+@Query("UPDATE TBL_PORTFOLIO SET isFavorite = :isFavorite WHERE coinUuid = :coinId")
+suspend fun updatePortfolioFavorite(coinId: String, isFavorite: Boolean)
+
+
 @Query("Select * From TBL_PORTFOLIO")
 fun getAllPortfolioPositions(): Flow<List<PortfolioPositions>>
 

@@ -39,6 +39,7 @@ data class PortfolioPositions(
     val amountRemaining: Double, // Verbleibende Menge nach Verkäufen
     val pricePerUnit: Double, // Preis pro Coin zum Zeitpunkt des Kaufs
     val totalValue: Double, // 	Gesamtwert der Position zum Kaufzeitpunkt"
+    val isFavorite: Boolean = false, // Favoriten-Status
 )
 
 @Entity(tableName = "tbl_closedTrades")

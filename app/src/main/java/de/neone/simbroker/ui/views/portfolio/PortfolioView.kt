@@ -2,7 +2,7 @@ package de.neone.simbroker.ui.views.portfolio
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,22 +11,26 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import de.neone.simbroker.R
 import de.neone.simbroker.ui.SimBrokerViewModel
 import de.neone.simbroker.ui.theme.activity.ViewWallpaperImageBox
+import de.neone.simbroker.ui.theme.bottomBarColorDark
+import de.neone.simbroker.ui.theme.bottomBarColorLight
 import de.neone.simbroker.ui.views.portfolio.components.PortfolioCoinListPositionObject
 
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -41,13 +45,20 @@ fun PortfolioView(
 
     val coinList by viewModel.coinList.collectAsState()
     val allPortfolioPositions by viewModel.allPortfolioPositions.collectAsState()
+
     val allPortfolioPositionsGrouped = allPortfolioPositions.groupBy { it.coinUuid }
     val allPortfolioGroupedList = allPortfolioPositionsGrouped.values.toList()
+
+    val allPortfolioPositionsGroupedByFavorite = allPortfolioPositions.groupBy { it.coinUuid }
+    val allPortfolioGroupedFavorites =
+        allPortfolioPositionsGroupedByFavorite.values.toList().filter { it.first().isFavorite }
+
     val allTransactionPositions by viewModel.allTransactionPositions.collectAsState()
     val gameDifficult by viewModel.gameDifficultState.collectAsState()
 
-    var showCoinSheet by remember { mutableStateOf(false) }
     val timer by viewModel.refreshTimer.collectAsState()
+
+    val scrollState = rememberScrollState()
 
     Column(
         modifier = Modifier
@@ -56,6 +67,9 @@ fun PortfolioView(
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.Top
     ) {
+
+        // Head ----------------------------------------------------------------------------------
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -76,6 +90,8 @@ fun PortfolioView(
             )
         }
 
+        // Body --------------------------------------------------------------------------------
+
         if (allPortfolioGroupedList.isEmpty()) {
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -90,11 +106,57 @@ fun PortfolioView(
                 )
             }
         } else {
-            LazyColumn(modifier = Modifier.clickable {
-                showCoinSheet = !showCoinSheet
-            }) {
+            // Favoriten Head
+
+            LazyRow(modifier = Modifier) {
+                itemsIndexed(allPortfolioGroupedFavorites) { _, position ->
+                    PortfolioCoinListPositionObject(
+                        coinList, allTransactionPositions, position,
+                        isFavorite = { coinUuid, isFavorite ->
+                            viewModel.updatePortfolio(
+                                coinId = coinUuid,
+                                isFavorite = isFavorite
+                            )
+                        }
+                    )
+                }
+            }
+            if (allPortfolioGroupedFavorites.isNotEmpty()) {
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(25.dp)
+                    ,
+                    color = if(isSystemInDarkTheme()) bottomBarColorDark.copy(alpha = 0.6f) else bottomBarColorLight.copy(alpha = 0.6f),
+                ) {
+                    Row(horizontalArrangement = Arrangement.Center) {
+                        Icon(painterResource(id = R.drawable.baseline_arrow_drop_up_24), contentDescription = null)
+
+                        Text(
+                            "Favorites",
+                            modifier = Modifier.padding(horizontal = 10.dp),
+                            style = MaterialTheme.typography.titleSmall,
+                        )
+                        Icon(painterResource(id = R.drawable.baseline_arrow_drop_up_24), contentDescription = null)
+
+                    }
+                }
+            }
+
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
                 itemsIndexed(allPortfolioGroupedList) { _, position ->
-                    PortfolioCoinListPositionObject(coinList, allTransactionPositions, position)
+                    PortfolioCoinListPositionObject(
+                        coinList, allTransactionPositions, position,
+                        isFavorite = { coinUuid, isFavorite ->
+                            viewModel.updatePortfolio(
+                                coinId = coinUuid,
+                                isFavorite = isFavorite
+                            )
+                        }
+                    )
                 }
             }
         }

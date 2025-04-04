@@ -417,6 +417,18 @@ class SimBrokerViewModel(
         }
     }
 
+    // Update Data -----------------------------------------------------------------------------
+
+    fun updatePortfolio(coinId: String, isFavorite: Boolean) {
+        Log.d("simDebug", "updatePosition over ViewModel started")
+        viewModelScope.launch {
+            repository.updatePortfolioFavorite(
+                coinId = coinId,
+                isFavorite = isFavorite
+            )
+        }
+    }
+
     // Get Data -----------------------------------------------------------------------------
 
     val allPortfolioPositions: StateFlow<List<PortfolioPositions>> =

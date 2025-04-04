@@ -11,6 +11,7 @@ fun PortfolioCoinListPositionObject(
     coinList: List<Coin>,
     transactionList: List<TransactionPositions>,
     portfolioPosition: List<PortfolioPositions>,
+    isFavorite: (String, Boolean) -> Unit
 ) {
 
     val coinUuid = portfolioPosition.first().coinUuid
@@ -41,7 +42,10 @@ fun PortfolioCoinListPositionObject(
         profit = profit,
         sparks = sparksForPosition,
         totalFee = totalFee,
-        totalInvested = totalInvestedWithFees
+        totalInvested = totalInvestedWithFees,
+        setFavorite = { coinUuid, isFavorite ->
+            isFavorite(coinUuid, isFavorite)
+        }
     )
 
     return result
