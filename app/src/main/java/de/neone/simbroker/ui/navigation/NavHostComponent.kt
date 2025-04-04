@@ -7,7 +7,6 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import de.neone.simbroker.MainActivity
 import de.neone.simbroker.ui.SimBrokerViewModel
 import de.neone.simbroker.ui.views.account.AccountView
 import de.neone.simbroker.ui.views.coins.CoinsView
@@ -25,19 +24,19 @@ fun NavHostComponent(
 
     NavHost(
         navController = navController,
-        startDestination = MainActivity.PortfolioRoute,
+        startDestination = Routes.PORTFOLIO,
         modifier = Modifier.padding(innerPadding)
     ) {
-        composable<MainActivity.PortfolioRoute> {
+        composable(Routes.PORTFOLIO) {
             PortfolioView(viewModel)
         }
-        composable<MainActivity.CoinRoute> {
+        composable(Routes.COINS) {
             CoinsView(viewModel)
         }
-        composable<MainActivity.AccountRoute> {
+        composable(Routes.ACCOUNT) {
             AccountView(viewModel)
         }
-        composable<MainActivity.LogoutRoute> {
+        composable(Routes.LOGOUT) {
             action()
         }
     }

@@ -26,7 +26,6 @@ import de.neone.simbroker.ui.theme.bottomBarColorDark
 import de.neone.simbroker.ui.theme.bottomBarColorLight
 import de.neone.simbroker.ui.theme.topBarColorDark
 import de.neone.simbroker.ui.theme.topBarColorLight
-import kotlinx.serialization.Serializable
 
 
 class MainActivity : ComponentActivity() {
@@ -76,15 +75,4 @@ class MainActivity : ComponentActivity() {
         finish()
     }
 
-    @Serializable
-    object PortfolioRoute
-
-    @Serializable
-    object CoinRoute
-
-    @Serializable
-    object AccountRoute
-
-    @Serializable
-    object LogoutRoute
 }
