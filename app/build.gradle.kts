@@ -26,6 +26,8 @@ android {
 
         android.buildFeatures.buildConfig = true
 
+        // Todo: API_KEY in die local.properties einfügen nicht vergessen!
+
         val properties = Properties().apply {
             load(FileInputStream(rootProject.file("local.properties")))
         }

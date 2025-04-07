@@ -301,7 +301,9 @@ fun PortfolioCoinListItem(
             }
 
             if (showTransactionsForCoinState) {
-                coinTransactions.forEach {
+                coinTransactions.sortedByDescending { sortedByDescending ->
+                    sortedByDescending.timestamp
+                }.forEach {
 
                     val anteilEUR = it.price.roundTo2() * it.amount
                     val gewVer =
@@ -335,7 +337,7 @@ fun PortfolioCoinListItem(
                                 )
                                 Spacer(modifier = Modifier.weight(1f))
                                 Text(
-                                    text = SBHelper.timestampToString(it.timestamp),
+                                    text = SBHelper.timestampToStringLong(it.timestamp),
                                     style = MaterialTheme.typography.labelMedium
                                 )
                             }

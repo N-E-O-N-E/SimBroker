@@ -15,6 +15,14 @@ object SBHelper {
         return format.format(date)
     }
 
+    @SuppressLint("SimpleDateFormat")
+    fun timestampToStringLong(timestamp: Long): String {
+        val date = java.util.Date(timestamp)
+        val format = java.text.SimpleDateFormat("dd.MM.yyyy, HH:mm:ss")
+        return format.format(date)
+    }
+
+
     fun Float.roundTo(decimals: Int): Float {
         val factor = 10.0.pow(decimals) // 10^x
         return (this * factor).roundToInt() / factor.toFloat() // Wert x mal Faktor und aufrunden / Faktor
