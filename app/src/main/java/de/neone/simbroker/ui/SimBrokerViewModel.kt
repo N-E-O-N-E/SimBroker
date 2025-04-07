@@ -444,8 +444,18 @@ class SimBrokerViewModel(
                 initialValue = emptyList()
             )
 
+    fun getAllOpenBuyTransactionsByCoin(coinUuid: String): MutableList<TransactionPositions> {
+        var result = mutableListOf<TransactionPositions>()
 
-    // Init -----------------------------------------------------------------------------
+        viewModelScope.launch(Dispatchers.IO) {
+            result = repository.getOpenBuyTransactionsByCoin(coinUuid).toMutableList()
+        }
+        return result
+    }
+
+
+
+// Init -----------------------------------------------------------------------------
 
     init {
         viewModelScope.launch {
@@ -457,5 +467,4 @@ class SimBrokerViewModel(
             }
         }
     }
-
 }

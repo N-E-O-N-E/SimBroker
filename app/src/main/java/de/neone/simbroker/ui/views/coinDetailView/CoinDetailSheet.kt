@@ -140,7 +140,7 @@ fun CoinDetailSheet(
                         style = MaterialTheme.typography.titleLarge
                     )
                     Text(
-                        text = if(selectedCoin.name.length > 23) selectedCoin.name.take(23) + "..." else selectedCoin.name,
+                        text = if (selectedCoin.name.length > 23) selectedCoin.name.take(23) + "..." else selectedCoin.name,
                         style = MaterialTheme.typography.titleSmall
                     )
                 }
@@ -250,15 +250,16 @@ fun CoinDetailSheet(
                         containerColor = buy,
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                     ), modifier = Modifier.weight(0.5f), onClick = {
+                        val amount =
+                            if (selectedOption == "amount") inputValue.toDouble() else inputValue.toDouble() / selectedCoin.price.toDouble()
+                        val totalValue =
+                            if (selectedOption == "amount") inputValue.toDouble() * selectedCoin.price.toDouble() + feeValue else inputValue.toDouble() + feeValue
+
                         if (inputValue.isEmpty()) {
                             Log.d("simDebug", "inputValue is empty")
                             showEmptyInputDialog.value = true
                             return@Button
                         } else {
-                            val amount =
-                                if (selectedOption == "amount") inputValue.toDouble() else inputValue.toDouble() / selectedCoin.price.toDouble()
-                            val totalValue =
-                                if (selectedOption == "amount") inputValue.toDouble() * selectedCoin.price.toDouble() + feeValue else inputValue.toDouble() + feeValue
 
                             if (accountCreditState >= totalValue) {
                                 Log.d("simDebug", "$accountCreditState")
@@ -307,15 +308,17 @@ fun CoinDetailSheet(
                         containerColor = sell,
                         contentColor = MaterialTheme.colorScheme.onErrorContainer
                     ), modifier = Modifier.weight(0.5f), onClick = {
+
                         if (inputValue.isEmpty()) {
-                            Log.d("simDebug", "inputValue is not empty")
+                            Log.d("simDebug", "inputValue is empty")
                             showEmptyInputDialog.value = true
                             return@Button
+                        } else {
+
+                            onSellClicked()
+
                         }
 
-                        onSellClicked(
-
-                        )
                         onDismiss()
 
                     }) {

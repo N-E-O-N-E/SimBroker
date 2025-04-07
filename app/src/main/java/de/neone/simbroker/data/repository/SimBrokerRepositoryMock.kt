@@ -54,5 +54,13 @@ class SimBrokerRepositoryMock(
         simBrokerDAO.deleteAllPortfolio()
     }
 
+    override suspend fun getOpenBuyTransactionsByCoin(coinUuid: String): List<TransactionPositions> {
+        return simBrokerDAO.getOpenBuysByCoinSortedByDate(coinUuid)
+    }
+
+    override suspend fun deletePortfolioById(entryId: Int) {
+        simBrokerDAO.deletePortfolioById(entryId)
+    }
+
 
 }

@@ -76,6 +76,7 @@ fun PortfolioView(
         allPortfolioPositionsGroupedByFavorite.values.toList().filter { it.first().isFavorite }
 
     val allTransactionPositions by viewModel.allTransactionPositions.collectAsState()
+
     val gameDifficult by viewModel.gameDifficultState.collectAsState()
 
     val timer by viewModel.refreshTimer.collectAsState()
@@ -161,7 +162,8 @@ fun PortfolioView(
                                     )
                                 },
                                 isClicked = {
-                                    selectedCoin = coinList.find { it.uuid == position.first().coinUuid }
+                                    selectedCoin =
+                                        coinList.find { it.uuid == position.first().coinUuid }
                                     openCoinDetailSheet = true
                                 }
                             )
@@ -243,6 +245,7 @@ fun PortfolioView(
                         viewModel.reduceAccountValue(portfolio.totalValue)
                     },
                     onSellClicked = {
+
 
                     },
                     accountCreditState = accountCreditState,

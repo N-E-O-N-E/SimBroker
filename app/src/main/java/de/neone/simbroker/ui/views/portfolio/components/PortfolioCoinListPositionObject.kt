@@ -17,16 +17,19 @@ fun PortfolioCoinListPositionObject(
 
     val coinUuid = portfolioPosition.first().coinUuid
 
-    val coinTransactions =
+    val coinBuyTransactions =
         transactionList.filter { it.coinUuid == coinUuid && it.type == TransactionType.BUY }
 
-    val totalFee = coinTransactions.sumOf { it.fee }
+    val coinSellTransactions =
+        transactionList.filter { it.coinUuid == coinUuid && it.type == TransactionType.SELL }
 
-    val totalInvested = coinTransactions.sumOf { it.amount * it.price }
+    val totalFee = coinBuyTransactions.sumOf { it.fee }
+
+    val totalInvested = coinBuyTransactions.sumOf { it.amount * it.price }
 
     val totalInvestedWithFees = totalInvested + totalFee
 
-    val totalAmount = coinTransactions.sumOf { it.amount }
+    val totalAmount = coinBuyTransactions.sumOf { it.amount }
 
     val currentPrice = coinList.find { it.uuid == coinUuid }?.price?.toDouble() ?: 0.0
 
@@ -39,7 +42,8 @@ fun PortfolioCoinListPositionObject(
     val result = PortfolioCoinListItem(
         coin = portfolioPosition.first(),
         currentPrice = currentPrice,
-        coinTransactions = coinTransactions,
+        coinBuyTransactions = coinBuyTransactions,
+        coinSellTransactions = coinSellTransactions,
         profit = profit,
         sparks = sparksForPosition,
         totalFee = totalFee,

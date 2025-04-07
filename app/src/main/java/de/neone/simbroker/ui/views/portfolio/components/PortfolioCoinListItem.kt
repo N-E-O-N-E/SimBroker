@@ -60,7 +60,8 @@ import kotlinx.coroutines.delay
 @Composable
 fun PortfolioCoinListItem(
     coin: PortfolioPositions,
-    coinTransactions: List<TransactionPositions>,
+    coinBuyTransactions: List<TransactionPositions>,
+    coinSellTransactions: List<TransactionPositions>,
     currentPrice: Double,
     profit: Double,
     sparks: List<String> = emptyList(),
@@ -301,7 +302,7 @@ fun PortfolioCoinListItem(
             }
 
             if (showTransactionsForCoinState) {
-                coinTransactions.sortedByDescending { sortedByDescending ->
+                coinBuyTransactions.sortedByDescending { sortedByDescending ->
                     sortedByDescending.timestamp
                 }.forEach {
 
@@ -376,7 +377,7 @@ fun PortfolioCoinListItem(
                                 )
                                 Spacer(modifier = Modifier.weight(1f))
                                 Text(
-                                    text = coinTransactions.first().fee.toEuroString(),
+                                    text = coinBuyTransactions.first().fee.toEuroString(),
                                     style = MaterialTheme.typography.labelMedium
                                 )
 
@@ -437,7 +438,8 @@ private fun PortfolioCoinListPreview() {
             totalValue = 7000.0
         ),
         currentPrice = 3680.0,
-        coinTransactions = emptyList(),
+        coinBuyTransactions = emptyList(),
+        coinSellTransactions = emptyList(),
         profit = 1200.0,
         setFavorite = { _, _ -> },
         isClicked = { }
