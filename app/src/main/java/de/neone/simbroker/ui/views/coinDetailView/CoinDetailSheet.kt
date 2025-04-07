@@ -40,9 +40,6 @@ import coil3.request.error
 import de.neone.simbroker.R
 import de.neone.simbroker.data.helper.SBHelper.toEuroString
 import de.neone.simbroker.data.helper.SBHelper.toPercentString
-import de.neone.simbroker.data.local.models.PortfolioPositions
-import de.neone.simbroker.data.local.models.TransactionPositions
-import de.neone.simbroker.data.local.models.TransactionType
 import de.neone.simbroker.data.remote.models.Coin
 import de.neone.simbroker.ui.theme.buy
 import de.neone.simbroker.ui.theme.colorDown
@@ -58,9 +55,9 @@ fun CoinDetailSheet(
     coinDetails: Coin,
     selectedCoin: Coin,
     accountCreditState: Double,
-    onBuyClicked: (TransactionPositions, PortfolioPositions) -> Unit,
-    onSellClicked: () -> Unit,
     feeValue: Double,
+    onBuyClick: (Coin, Double, Double, Double) -> Unit,
+    onSellClick: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     Log.d("simDebug", accountCreditState.toString())
@@ -265,29 +262,8 @@ fun CoinDetailSheet(
                                 Log.d("simDebug", "$accountCreditState")
                                 Log.d("simDebug", "${calculatedValue + feeValue}")
 
-                                onBuyClicked(
-                                    TransactionPositions(
-                                        fee = feeValue,
-                                        coinUuid = selectedCoin.uuid,
-                                        symbol = selectedCoin.symbol,
-                                        iconUrl = selectedCoin.iconUrl,
-                                        name = selectedCoin.name,
-                                        price = selectedCoin.price.toDouble(),
-                                        amount = amount,
-                                        type = TransactionType.BUY,
-                                        totalValue = totalValue
-                                    ),
-                                    PortfolioPositions(
-                                        coinUuid = selectedCoin.uuid,
-                                        symbol = selectedCoin.symbol,
-                                        iconUrl = selectedCoin.iconUrl,
-                                        name = selectedCoin.name,
-                                        amountBought = amount,
-                                        amountRemaining = amount,
-                                        pricePerUnit = selectedCoin.price.toDouble(),
-                                        totalValue = totalValue
-                                    )
-                                )
+                                onBuyClick(selectedCoin, amount, feeValue, totalValue)
+
                             } else {
                                 Log.d("simDebug", "Your Credit is $accountCreditState")
                                 showNotEnoughCreditDialog.value = true
@@ -315,7 +291,7 @@ fun CoinDetailSheet(
                             return@Button
                         } else {
 
-                            onSellClicked()
+                            onSellClick()
 
                         }
 

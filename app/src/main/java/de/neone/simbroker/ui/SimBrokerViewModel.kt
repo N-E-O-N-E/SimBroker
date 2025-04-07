@@ -10,6 +10,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import de.neone.simbroker.data.local.models.PortfolioPositions
 import de.neone.simbroker.data.local.models.TransactionPositions
+import de.neone.simbroker.data.local.models.TransactionType
 import de.neone.simbroker.data.remote.models.Coin
 import de.neone.simbroker.data.repository.SimBrokerRepositoryInterface
 import de.neone.simbroker.dataStore
@@ -234,7 +235,7 @@ class SimBrokerViewModel(
         }
     }
 
-    fun reduceAccountValue(value: Double) {
+    private fun reduceAccountValue(value: Double) {
         val newAccountValue = accountValueState.value - value
         if (accountValueState.value >= value) {
             viewModelScope.launch {
@@ -400,18 +401,47 @@ class SimBrokerViewModel(
 
     // Insert Data -----------------------------------------------------------------------------
 
-    fun addTransaction(transaction: TransactionPositions) {
+    private fun addTransaction(transaction: TransactionPositions) {
         Log.d("simDebug", "addTransaction over ViewModel started")
         viewModelScope.launch {
             repository.insertTransaction(transaction)
         }
     }
 
-    fun addPortfolio(portfolio: PortfolioPositions) {
+    private fun addPortfolio(portfolio: PortfolioPositions) {
         Log.d("simDebug", "addPosition over ViewModel started")
         viewModelScope.launch {
             repository.insertPortfolio(portfolio)
         }
+    }
+
+    fun buyCoin(selectedCoin: Coin, amount: Double, feeValue: Double, totalValue: Double) {
+        addTransaction(
+            TransactionPositions(
+                fee = feeValue,
+                coinUuid = selectedCoin.uuid,
+                symbol = selectedCoin.symbol,
+                iconUrl = selectedCoin.iconUrl,
+                name = selectedCoin.name,
+                price = selectedCoin.price.toDouble(),
+                amount = amount,
+                type = TransactionType.BUY,
+                totalValue = totalValue
+            )
+        )
+        addPortfolio(
+            PortfolioPositions(
+                coinUuid = selectedCoin.uuid,
+                symbol = selectedCoin.symbol,
+                iconUrl = selectedCoin.iconUrl,
+                name = selectedCoin.name,
+                amountBought = amount,
+                amountRemaining = amount,
+                pricePerUnit = selectedCoin.price.toDouble(),
+                totalValue = totalValue
+            )
+        )
+        reduceAccountValue(totalValue)
     }
 
     // Update Data -----------------------------------------------------------------------------
@@ -452,7 +482,6 @@ class SimBrokerViewModel(
         }
         return result
     }
-
 
 
 // Init -----------------------------------------------------------------------------

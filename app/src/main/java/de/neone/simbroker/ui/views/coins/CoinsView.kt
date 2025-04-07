@@ -156,15 +156,19 @@ fun CoinsView(
                     onDismiss = {
                         openCoinDetailSheet = false
                     },
-                    onBuyClicked = { transaction, portfolio ->
-                        viewModel.addTransaction(transaction)
-                        viewModel.addPortfolio(portfolio)
-                        viewModel.reduceAccountValue(portfolio.totalValue)
+                    onBuyClick = { coin, amount, feeValue, totalValue ->
+                        viewModel.buyCoin(
+                            selectedCoin = coin,
+                            amount = amount,
+                            feeValue = feeValue,
+                            totalValue = totalValue,
+                        )
                     },
-                    onSellClicked = {
+                    onSellClick = {
 
+                        
                     },
-                    accountCreditState = accountCreditState,
+                    accountCreditState = accountCreditState
                 )
             }
         }
