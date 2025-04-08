@@ -313,7 +313,7 @@ fun PortfolioCoinListItem(
                 allCoinTransactions.sortedByDescending { sortedByDescending ->
                     sortedByDescending.timestamp
                 }.forEach {
-                    if (!it.isClosed) {
+                    if (!it.isClosed ) {
 
                         val anteilEUR = it.price.roundTo2() * it.amount
                         val gewVer =
