@@ -67,6 +67,8 @@ fun CoinDetailSheet(
     val coinDetailSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val showEmptyInputDialog = remember { mutableStateOf(false) }
 
+
+
     val imageRequest =
         ImageRequest.Builder(LocalContext.current).data(selectedCoin.iconUrl).crossfade(true)
             .error(R.drawable.coinplaceholder).build()

@@ -277,13 +277,13 @@ fun PortfolioCoinListItem(
                             horizontalAlignment = Alignment.End
                         ) {
                             Text(
-                                text = "Profit/Loss",
+                                text = "Total Profit over all",
                                 style = MaterialTheme.typography.labelMedium,
                             )
                             Text(
                                 text = profit.toEuroString(),
                                 style = MaterialTheme.typography.titleLarge,
-                                color = if (profit.toString()
+                                color = if (profit.toEuroString()
                                         .contains("-")
                                 ) colorDown else colorUp
                             )

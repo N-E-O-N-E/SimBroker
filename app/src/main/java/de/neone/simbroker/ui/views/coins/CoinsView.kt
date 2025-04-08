@@ -152,6 +152,8 @@ fun CoinsView(
 
     if (openCoinDetailSheet) {
         selectedCoin?.let { it ->
+            val maxSellableAmount = viewModel.getRemainingCoinAmount(it.uuid)
+
             viewModel.getCoinDetails(it.uuid, "3h")
             selectedCoinDetails?.let { coinDetails ->
                 CoinDetailSheet(
@@ -170,13 +172,17 @@ fun CoinsView(
                         )
                     },
                     onSellClick = { amount, currentPrice ->
-                        viewModel.sellCoin(
-                            coinUuid = it.uuid,
-                            amountToSell = amount,
-                            currentPrice = currentPrice,
-                            fee = feeValue
-                        )
-                        viewModel.setAccountCashIn(true)
+                        if (amount > maxSellableAmount) {
+                            viewModel.setShowAccountNotEnoughMoney(true)
+                        } else {
+                            viewModel.sellCoin(
+                                coinUuid = it.uuid,
+                                amountToSell = amount,
+                                currentPrice = currentPrice,
+                                fee = feeValue
+                            )
+                            viewModel.setAccountCashIn(true)
+                        }
                     },
                     notEnoughCredit = {
                         viewModel.setShowAccountNotEnoughMoney(true)

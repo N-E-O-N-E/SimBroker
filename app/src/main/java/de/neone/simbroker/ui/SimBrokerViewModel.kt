@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import de.neone.simbroker.data.helper.SBHelper.roundTo6
 import de.neone.simbroker.data.local.models.PortfolioPositions
 import de.neone.simbroker.data.local.models.TransactionPositions
 import de.neone.simbroker.data.local.models.TransactionType
@@ -467,6 +468,14 @@ class SimBrokerViewModel(
         )
         reduceAccountValue(totalValue + feeValue)
         setInvestedValue(totalValue)
+    }
+
+    fun getRemainingCoinAmount(coinUuid: String): Double {
+        val positions = allPortfolioPositions.value
+        return positions
+            .filter { it.coinUuid == coinUuid }
+            .sumOf { it.amountRemaining }
+            .roundTo6()
     }
 
     fun sellCoin(coinUuid: String, amountToSell: Double, currentPrice: Double, fee: Double) {

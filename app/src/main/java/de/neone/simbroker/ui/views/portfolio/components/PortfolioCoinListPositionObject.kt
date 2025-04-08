@@ -42,9 +42,21 @@ fun PortfolioCoinListPositionObject(
 
     val currentValue = totalAmount * currentPrice
 
-    val totalRealizedProfit = totalSellsValue - (totalBuysValue - totalInvested) - totalFee
-    val totalUnrealizedProfit = currentValue - totalInvested
-    val profit = totalRealizedProfit + totalUnrealizedProfit
+
+    val realizedProfit = coinSellTransactions.sumOf { sellTx ->
+        val matchingBuy = coinBuyTransactions
+            .filter { it.timestamp <= sellTx.timestamp }
+            .minByOrNull { it.timestamp }
+
+        if (matchingBuy != null) {
+            val gainPerCoin = sellTx.price - matchingBuy.price
+            gainPerCoin * sellTx.amount
+        } else 0.0
+    }
+
+    val unrealizedProfit = currentValue - totalInvested
+
+    val profit = realizedProfit + unrealizedProfit
 
 
     val sparksForPosition = coinList.find { it.uuid == coinUuid }?.sparkline.orEmpty()
