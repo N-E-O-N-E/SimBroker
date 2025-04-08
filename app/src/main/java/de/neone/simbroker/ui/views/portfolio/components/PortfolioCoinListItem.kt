@@ -259,15 +259,15 @@ fun PortfolioCoinListItem(
                             }
 
                             Text(
-                                text = "Current: ${currentPrice.toEuroString()}",
+                                text = "Current Market-Price: ${currentPrice.toEuroString()}",
                                 style = MaterialTheme.typography.labelSmall
                             )
                             Text(
-                                text = "Invested: ${totalInvested.toEuroString()}",
+                                text = "Your investment: ${(totalInvested).toEuroString()}",
                                 style = MaterialTheme.typography.labelSmall
                             )
                             Text(
-                                text = "Fees: ${totalFee.toEuroString()}",
+                                text = "Sum of Fees: ${totalFee.toEuroString()}",
                                 style = MaterialTheme.typography.labelSmall
                             )
                         }
@@ -361,7 +361,7 @@ fun PortfolioCoinListItem(
                                     )
                                     Spacer(modifier = Modifier.weight(1f))
                                     Text(
-                                        text = (it.amount - amountSelled).roundTo6().toString(),
+                                        text = (it.amount).roundTo6().toString(),
                                         style = MaterialTheme.typography.labelMedium
                                     )
 
@@ -388,7 +388,7 @@ fun PortfolioCoinListItem(
                                     )
                                     Spacer(modifier = Modifier.weight(1f))
                                     Text(
-                                        text = coinBuyTransactions.first().fee.toEuroString(),
+                                        text = it.fee.toEuroString(),
                                         style = MaterialTheme.typography.labelMedium
                                     )
 

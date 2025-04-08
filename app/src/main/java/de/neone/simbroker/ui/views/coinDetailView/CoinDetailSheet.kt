@@ -54,6 +54,7 @@ fun CoinDetailSheet(
     modifier: Modifier = Modifier,
     coinDetails: Coin,
     selectedCoin: Coin,
+    coinAmount: Double,
     accountCreditState: Double,
     feeValue: Double,
     onBuyClick: (Double, Double) -> Unit,
@@ -99,11 +100,18 @@ fun CoinDetailSheet(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .padding(bottom = 20.dp)
+                    .padding(horizontal = 5.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+
+
             ) {
                 Text(
-                    text = "Accound Credit: ${accountCreditState.toEuroString()}",
+                    text = "Account Credit: ${accountCreditState.toEuroString()}",
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Text(
+                    text = "Coins: $coinAmount",
                     style = MaterialTheme.typography.titleMedium
                 )
             }

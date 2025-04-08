@@ -8,8 +8,6 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import de.neone.simbroker.data.helper.SBHelper.roundTo2
-import de.neone.simbroker.data.helper.SBHelper.roundTo6
 import de.neone.simbroker.data.local.models.PortfolioPositions
 import de.neone.simbroker.data.local.models.TransactionPositions
 import de.neone.simbroker.data.local.models.TransactionType
@@ -194,12 +192,13 @@ class SimBrokerViewModel(
 
     fun setFirstGameAccountValue(value: Double) {
         if (firstGameState.value) {
+            resetAccountValue()
             val newValue = accountValueState.value + value
             viewModelScope.launch {
                 dataStore.edit {
                     it[DATASTORE_ACCOUNTVALUE] = newValue
                 }
-                Log.d("simDebug", "DataStore First Account Credit increased")
+                Log.d("simDebug", "DataStore First Account Credit increased ${accountValueState}")
             }
             _showFirstGameAccountValueDialog.value = false
         } else {
@@ -251,7 +250,6 @@ class SimBrokerViewModel(
             dataStore.edit {
                 it[DATASTORE_ACCOUNTVALUE] = newAccountValue
             }
-            reduceInvestedValue(value)
         }
     }
 
@@ -444,15 +442,15 @@ class SimBrokerViewModel(
     fun buyCoin(selectedCoin: Coin, amount: Double, feeValue: Double, totalValue: Double) {
         addTransaction(
             TransactionPositions(
-                fee = feeValue.roundTo2(),
+                fee = feeValue,
                 coinUuid = selectedCoin.uuid,
                 symbol = selectedCoin.symbol,
                 iconUrl = selectedCoin.iconUrl,
                 name = selectedCoin.name,
-                price = selectedCoin.price.toDouble().roundTo6(),
-                amount = amount.roundTo6(),
+                price = selectedCoin.price.toDouble(),
+                amount = amount,
                 type = TransactionType.BUY,
-                totalValue = totalValue.roundTo2()
+                totalValue = totalValue
             )
         )
         addPortfolio(
@@ -461,10 +459,10 @@ class SimBrokerViewModel(
                 symbol = selectedCoin.symbol,
                 iconUrl = selectedCoin.iconUrl,
                 name = selectedCoin.name,
-                amountBought = amount.roundTo6(),
-                amountRemaining = amount.roundTo6(),
-                pricePerUnit = selectedCoin.price.toDouble().roundTo6(),
-                totalValue = totalValue.roundTo2()
+                amountBought = amount,
+                amountRemaining = amount,
+                pricePerUnit = selectedCoin.price.toDouble(),
+                totalValue = totalValue
             )
         )
         reduceAccountValue(totalValue + feeValue)
@@ -478,29 +476,38 @@ class SimBrokerViewModel(
 
             updateAccountValue(amountToSell * currentPrice)
 
+            var isFirstSell = true
+
             for (buy in openBuys) {
                 if (remainingToSell <= 0) break
 
                 val sellAmount = minOf(remainingToSell, buy.amount)
                 remainingToSell -= sellAmount
 
+                val onlyOneFee = if (isFirstSell) fee else 0.0
+                isFirstSell = false
+
                 val sellTransaction = TransactionPositions(
                     coinUuid = buy.coinUuid,
                     symbol = buy.symbol,
                     iconUrl = buy.iconUrl,
                     name = buy.name,
-                    price = currentPrice.roundTo6(),
-                    amount = sellAmount.roundTo6(),
-                    fee = fee.roundTo2(),
+                    price = currentPrice,
+                    amount = sellAmount,
+                    fee = fee,
                     type = TransactionType.SELL,
-                    totalValue = (sellAmount * currentPrice).roundTo2()
+                    totalValue = (sellAmount * currentPrice)
                 )
 
                 addTransaction(sellTransaction)
 
-                if(sellAmount * currentPrice <= 0.000000) {
+                val soldOut = sellAmount >= buy.amount
+                if (soldOut) {
                     updateTransactionClosed(coinId = buy.coinUuid, isClosed = true)
                 }
+
+                val investedPart = sellAmount * buy.price
+                reduceInvestedValue(investedPart)
 
                 val portfolioEntries = repository.getAllPortfolioPositions().first()
                     .filter { it.coinUuid == coinUuid && it.amountRemaining > 0 }
@@ -514,17 +521,16 @@ class SimBrokerViewModel(
                     val reduceAmount = minOf(localRemaining, entry.amountRemaining)
                     val newRemaining = entry.amountRemaining - reduceAmount
 
-                    val newTotalValue = (entry.pricePerUnit * newRemaining).roundTo2()
+                    val newTotalValue = (entry.pricePerUnit * newRemaining)
 
                     val updatedEntry = entry.copy(
                         amountRemaining = newRemaining,
                         totalValue = newTotalValue
                     )
 
-
                     addPortfolio(updatedEntry)
 
-                    if (newRemaining <= 0.000000) {
+                    if (newRemaining <= 0) {
                         deletePortfolioById(entry.id)
                     }
 

@@ -267,6 +267,7 @@ fun PortfolioView(
                     notEnoughCredit = {
                         viewModel.setShowAccountNotEnoughMoney(true)
                     },
+                    coinAmount = allPortfolioPositions.sumOf { it.amountRemaining },
                     accountCreditState = accountCreditState,
                 )
             }

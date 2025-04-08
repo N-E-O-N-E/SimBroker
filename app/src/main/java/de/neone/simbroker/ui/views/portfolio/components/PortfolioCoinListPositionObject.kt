@@ -18,24 +18,34 @@ fun PortfolioCoinListPositionObject(
     val coinUuid = portfolioPosition.first().coinUuid
 
     val coinBuyTransactions =
-        transactionList.filter { it.coinUuid == coinUuid && it.type == TransactionType.BUY }
+        transactionList.filter { it.coinUuid == coinUuid && it.type == TransactionType.BUY && !it.isClosed }
 
     val coinSellTransactions =
         transactionList.filter { it.coinUuid == coinUuid && it.type == TransactionType.SELL }
 
+    val totalBuysValue = coinBuyTransactions.sumOf { it.amount * it.price }
+    val totalSellsValue = coinSellTransactions.sumOf { it.amount * it.price }
+
     val totalFee = coinBuyTransactions.sumOf { it.fee }
 
-    val totalInvested = coinBuyTransactions.sumOf { it.amount * it.price }
+    val totalAmount = portfolioPosition.sumOf { it.amountRemaining }
+
+    val avgPricePerCoin = if (totalAmount > 0) {
+        portfolioPosition.sumOf { it.amountRemaining * it.pricePerUnit } / totalAmount
+    } else 0.0
+
+    val totalInvested = portfolioPosition.sumOf { it.amountRemaining * it.pricePerUnit }
 
     val totalInvestedWithFees = totalInvested + totalFee
-
-    val totalAmount = coinBuyTransactions.sumOf { it.amount }
 
     val currentPrice = coinList.find { it.uuid == coinUuid }?.price?.toDouble() ?: 0.0
 
     val currentValue = totalAmount * currentPrice
 
-    val profit = currentValue - totalInvestedWithFees
+    val totalRealizedProfit = totalSellsValue - (totalBuysValue - totalInvested) - totalFee
+    val totalUnrealizedProfit = currentValue - totalInvested
+    val profit = totalRealizedProfit + totalUnrealizedProfit
+
 
     val sparksForPosition = coinList.find { it.uuid == coinUuid }?.sparkline.orEmpty()
 

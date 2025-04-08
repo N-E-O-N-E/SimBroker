@@ -64,6 +64,8 @@ fun CoinsView(
     val showNotEnoughCreditDialog by viewModel.showAccountNotEnoughMoney.collectAsState()
     val showAccountCashInDialog by viewModel.showAccountCashIn.collectAsState()
 
+    val allPortfolioPositions by viewModel.allPortfolioPositions.collectAsState()
+
     LaunchedEffect(Unit) {
         viewModel.loadMoreCoins()
     }
@@ -179,6 +181,7 @@ fun CoinsView(
                     notEnoughCredit = {
                         viewModel.setShowAccountNotEnoughMoney(true)
                     },
+                    coinAmount = allPortfolioPositions.sumOf { it.amountRemaining },
                     accountCreditState = accountCreditState
                 )
             }
