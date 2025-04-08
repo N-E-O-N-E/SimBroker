@@ -14,6 +14,8 @@ interface SimBrokerDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTransaction(transaction: TransactionPositions)
 
+    @Query("UPDATE TBL_TRANSACTION SET isClosed = :isClosed WHERE coinUuid = :coinId AND type = 'BUY'")
+    suspend fun updateTransactionClosed(coinId: String, isClosed: Boolean)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPortfolio(portfolio: PortfolioPositions)
@@ -32,8 +34,7 @@ interface SimBrokerDAO {
     fun getAllTransactionPositions(): Flow<List<TransactionPositions>>
 
     @Query("SELECT * FROM tbl_transaction WHERE coinUuid = :coinUuid AND type = 'BUY' ORDER BY timestamp ASC")
-    suspend fun getOpenBuysByCoinSortedByDate(coinUuid: String): List<TransactionPositions>
-
+    fun getOpenBuysByCoinSortedByDate(coinUuid: String): List<TransactionPositions>
 
     @Query("Delete From TBL_TRANSACTION")
     suspend fun deleteAllTransactions()

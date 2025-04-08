@@ -41,20 +41,3 @@ data class PortfolioPositions(
     val totalValue: Double, // 	Gesamtwert der Position zum Kaufzeitpunkt"
     val isFavorite: Boolean = false, // Favoriten-Status
 )
-
-@Entity(tableName = "tbl_closedTrades")
-data class ClosedTradePositions(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
-    val coinUuid: String,
-    val symbol: String,
-    val iconUrl: String,
-    val name: String,
-    val amountSold: Double, // Menge der verkauften Coins
-    val totalProceeds: Double, // 	Gesamterlös (verkaufte Menge × Verkaufspreis)"
-    val totalCost: Double, // Gesamtkosten (Anschaffungskosten nach FIFO)
-    val totalFee: Double, // Summe der Gebühren (Kauf- & Verkaufsgebühren)
-    val profitLoss: Double, // Gewinn (+) oder Verlust (-) des Trades
-    val profitLossPercent: Double, // Gewinn/Verlust in Prozent
-    val closedAt: Long, // Zeitpunkt des Verkaufs/Trade-Abschlusses
-)

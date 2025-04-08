@@ -25,9 +25,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -62,11 +59,12 @@ fun AccountView(
     val accountCreditState by viewModel.accountValueState.collectAsState()
     val totalInvested by viewModel.investedValueState.collectAsState()
     val feeValue by viewModel.feeValueState.collectAsState()
+    val allFees by viewModel.allTransactionPositions.collectAsState()
+    val allFeesSum = allFees.sumOf { it.fee }
     val mockdataValue by viewModel.mockDataState.collectAsState()
     val selectedOption by viewModel.gameDifficultState.collectAsState()
 
     val firstGame by viewModel.firstGameState.collectAsState()
-    var radioEnable by remember { mutableStateOf(true) }
 
     Column(
         modifier = Modifier
@@ -233,10 +231,10 @@ fun AccountView(
 
                 AccountPieChartPlotter(
                     creditValue = accountCreditState,
-                    investedValue = totalInvested
+                    investedValue = totalInvested,
+                    fees = allFeesSum
                 )
             }
-
 
             Card(
                 modifier = Modifier
@@ -326,8 +324,6 @@ fun AccountView(
                 viewModel.resetInvestedValue()
                 viewModel.deleteAllTransactions()
                 viewModel.deleteAllPortfolioPositions()
-
-                //TODO Hier müssen weitere Resetparameter gesetzt werden! ( Löschen aller Roomdaten )
             },
             onDismiss = { viewModel.setShowEraseDialog(false) }
         )

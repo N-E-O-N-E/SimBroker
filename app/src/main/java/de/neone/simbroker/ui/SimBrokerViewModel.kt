@@ -8,6 +8,8 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import de.neone.simbroker.data.helper.SBHelper.roundTo2
+import de.neone.simbroker.data.helper.SBHelper.roundTo6
 import de.neone.simbroker.data.local.models.PortfolioPositions
 import de.neone.simbroker.data.local.models.TransactionPositions
 import de.neone.simbroker.data.local.models.TransactionType
@@ -20,6 +22,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -85,6 +88,13 @@ class SimBrokerViewModel(
 
     fun setShowEraseDialog(value: Boolean) {
         _showEraseDialog.value = value
+    }
+
+    private var _showAccountCashIn = MutableStateFlow(false)
+    var showAccountCashIn: StateFlow<Boolean> = _showAccountCashIn
+
+    fun setAccountCashIn(value: Boolean) {
+        _showAccountCashIn.value = value
     }
 
 
@@ -235,6 +245,16 @@ class SimBrokerViewModel(
         }
     }
 
+    private fun updateAccountValue(value: Double) {
+        val newAccountValue = accountValueState.value + value
+        viewModelScope.launch {
+            dataStore.edit {
+                it[DATASTORE_ACCOUNTVALUE] = newAccountValue
+            }
+            reduceInvestedValue(value)
+        }
+    }
+
     private fun reduceAccountValue(value: Double) {
         val newAccountValue = accountValueState.value - value
         if (accountValueState.value >= value) {
@@ -242,7 +262,6 @@ class SimBrokerViewModel(
                 dataStore.edit {
                     it[DATASTORE_ACCOUNTVALUE] = newAccountValue
                 }
-                setInvestedValue(value)
                 _showAccountNotEnoughMoney.value = false
                 Log.d(
                     "simDebug",
@@ -415,18 +434,25 @@ class SimBrokerViewModel(
         }
     }
 
+    private fun deletePortfolioById(entryId: Int) {
+        Log.d("simDebug", "deletePosition over ViewModel started")
+        viewModelScope.launch {
+            repository.deletePortfolioById(entryId)
+        }
+    }
+
     fun buyCoin(selectedCoin: Coin, amount: Double, feeValue: Double, totalValue: Double) {
         addTransaction(
             TransactionPositions(
-                fee = feeValue,
+                fee = feeValue.roundTo2(),
                 coinUuid = selectedCoin.uuid,
                 symbol = selectedCoin.symbol,
                 iconUrl = selectedCoin.iconUrl,
                 name = selectedCoin.name,
-                price = selectedCoin.price.toDouble(),
-                amount = amount,
+                price = selectedCoin.price.toDouble().roundTo6(),
+                amount = amount.roundTo6(),
                 type = TransactionType.BUY,
-                totalValue = totalValue
+                totalValue = totalValue.roundTo2()
             )
         )
         addPortfolio(
@@ -435,14 +461,80 @@ class SimBrokerViewModel(
                 symbol = selectedCoin.symbol,
                 iconUrl = selectedCoin.iconUrl,
                 name = selectedCoin.name,
-                amountBought = amount,
-                amountRemaining = amount,
-                pricePerUnit = selectedCoin.price.toDouble(),
-                totalValue = totalValue
+                amountBought = amount.roundTo6(),
+                amountRemaining = amount.roundTo6(),
+                pricePerUnit = selectedCoin.price.toDouble().roundTo6(),
+                totalValue = totalValue.roundTo2()
             )
         )
-        reduceAccountValue(totalValue)
+        reduceAccountValue(totalValue + feeValue)
+        setInvestedValue(totalValue)
     }
+
+    fun sellCoin(coinUuid: String, amountToSell: Double, currentPrice: Double, fee: Double) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val openBuys = repository.getOpenBuyTransactionsByCoin(coinUuid).filter { !it.isClosed }
+            var remainingToSell = amountToSell
+
+            updateAccountValue(amountToSell * currentPrice)
+
+            for (buy in openBuys) {
+                if (remainingToSell <= 0) break
+
+                val sellAmount = minOf(remainingToSell, buy.amount)
+                remainingToSell -= sellAmount
+
+                val sellTransaction = TransactionPositions(
+                    coinUuid = buy.coinUuid,
+                    symbol = buy.symbol,
+                    iconUrl = buy.iconUrl,
+                    name = buy.name,
+                    price = currentPrice.roundTo6(),
+                    amount = sellAmount.roundTo6(),
+                    fee = fee.roundTo2(),
+                    type = TransactionType.SELL,
+                    totalValue = (sellAmount * currentPrice).roundTo2()
+                )
+
+                addTransaction(sellTransaction)
+
+                if(sellAmount * currentPrice <= 0.000000) {
+                    updateTransactionClosed(coinId = buy.coinUuid, isClosed = true)
+                }
+
+                val portfolioEntries = repository.getAllPortfolioPositions().first()
+                    .filter { it.coinUuid == coinUuid && it.amountRemaining > 0 }
+                    .sortedBy { it.timestamp }
+
+                var localRemaining = sellAmount
+
+                for (entry in portfolioEntries) {
+                    if (localRemaining <= 0) break
+
+                    val reduceAmount = minOf(localRemaining, entry.amountRemaining)
+                    val newRemaining = entry.amountRemaining - reduceAmount
+
+                    val newTotalValue = (entry.pricePerUnit * newRemaining).roundTo2()
+
+                    val updatedEntry = entry.copy(
+                        amountRemaining = newRemaining,
+                        totalValue = newTotalValue
+                    )
+
+
+                    addPortfolio(updatedEntry)
+
+                    if (newRemaining <= 0.000000) {
+                        deletePortfolioById(entry.id)
+                    }
+
+                    localRemaining -= reduceAmount
+
+                }
+            }
+        }
+    }
+
 
     // Update Data -----------------------------------------------------------------------------
 
@@ -452,6 +544,16 @@ class SimBrokerViewModel(
             repository.updatePortfolioFavorite(
                 coinId = coinId,
                 isFavorite = isFavorite
+            )
+        }
+    }
+
+    fun updateTransactionClosed(coinId: String, isClosed: Boolean) {
+        Log.d("simDebug", "updateTransaction over ViewModel started")
+        viewModelScope.launch {
+            repository.updateTransactionClosed(
+                coinId = coinId,
+                isClosed = isClosed
             )
         }
     }

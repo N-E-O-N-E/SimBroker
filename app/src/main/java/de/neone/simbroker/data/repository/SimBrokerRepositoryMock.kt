@@ -39,11 +39,19 @@ class SimBrokerRepositoryMock(
         simBrokerDAO.updatePortfolioFavorite(coinId, isFavorite)
     }
 
+    override suspend fun updateTransactionClosed(coinId: String, isClosed: Boolean) {
+        simBrokerDAO.updateTransactionClosed(coinId, isClosed)
+    }
+
     override fun getAllPortfolioPositions(): Flow<List<PortfolioPositions>> {
         return simBrokerDAO.getAllPortfolioPositions()
     }
     override fun getAllTransactionPositions(): Flow<List<TransactionPositions>> {
         return simBrokerDAO.getAllTransactionPositions()
+    }
+
+    suspend fun getOpenBuysByCoinSortedByDate(coinUuid: String): List<TransactionPositions> {
+        return simBrokerDAO.getOpenBuysByCoinSortedByDate(coinUuid)
     }
 
     override suspend fun deleteAllTransactions() {
@@ -54,7 +62,7 @@ class SimBrokerRepositoryMock(
         simBrokerDAO.deleteAllPortfolio()
     }
 
-    override suspend fun getOpenBuyTransactionsByCoin(coinUuid: String): List<TransactionPositions> {
+    override fun getOpenBuyTransactionsByCoin(coinUuid: String): List<TransactionPositions> {
         return simBrokerDAO.getOpenBuysByCoinSortedByDate(coinUuid)
     }
 

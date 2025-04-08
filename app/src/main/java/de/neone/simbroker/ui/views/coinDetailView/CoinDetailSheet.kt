@@ -56,15 +56,15 @@ fun CoinDetailSheet(
     selectedCoin: Coin,
     accountCreditState: Double,
     feeValue: Double,
-    onBuyClick: (Coin, Double, Double, Double) -> Unit,
-    onSellClick: () -> Unit,
+    onBuyClick: (Double, Double) -> Unit,
+    onSellClick: (Double, Double ) -> Unit,
+    notEnoughCredit: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     Log.d("simDebug", accountCreditState.toString())
     val uriHandler = LocalUriHandler.current
     val coinDetailSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val showEmptyInputDialog = remember { mutableStateOf(false) }
-    val showNotEnoughCreditDialog = remember { mutableStateOf(false) }
 
     val imageRequest =
         ImageRequest.Builder(LocalContext.current).data(selectedCoin.iconUrl).crossfade(true)
@@ -250,7 +250,7 @@ fun CoinDetailSheet(
                         val amount =
                             if (selectedOption == "amount") inputValue.toDouble() else inputValue.toDouble() / selectedCoin.price.toDouble()
                         val totalValue =
-                            if (selectedOption == "amount") inputValue.toDouble() * selectedCoin.price.toDouble() + feeValue else inputValue.toDouble() + feeValue
+                            if (selectedOption == "amount") inputValue.toDouble() * selectedCoin.price.toDouble() else inputValue.toDouble()
 
                         if (inputValue.isEmpty()) {
                             Log.d("simDebug", "inputValue is empty")
@@ -258,15 +258,17 @@ fun CoinDetailSheet(
                             return@Button
                         } else {
 
-                            if (accountCreditState >= totalValue) {
+                            if (accountCreditState >= (totalValue + feeValue)) {
                                 Log.d("simDebug", "$accountCreditState")
                                 Log.d("simDebug", "${calculatedValue + feeValue}")
 
-                                onBuyClick(selectedCoin, amount, feeValue, totalValue)
+                                onBuyClick(amount, totalValue)
 
                             } else {
                                 Log.d("simDebug", "Your Credit is $accountCreditState")
-                                showNotEnoughCreditDialog.value = true
+
+                                notEnoughCredit()
+
                                 return@Button
                             }
                         }
@@ -285,13 +287,16 @@ fun CoinDetailSheet(
                         contentColor = MaterialTheme.colorScheme.onErrorContainer
                     ), modifier = Modifier.weight(0.5f), onClick = {
 
+                        val amount = if (selectedOption == "amount") inputValue.toDouble()
+                        else inputValue.toDouble() / selectedCoin.price.toDouble()
+
                         if (inputValue.isEmpty()) {
                             Log.d("simDebug", "inputValue is empty")
                             showEmptyInputDialog.value = true
                             return@Button
                         } else {
 
-                            onSellClick()
+                            onSellClick(amount, selectedCoin.price.toDouble())
 
                         }
 
@@ -306,10 +311,6 @@ fun CoinDetailSheet(
 
     if (showEmptyInputDialog.value) {
         AlertDialog("The Input must not be empty!") { showEmptyInputDialog.value = false }
-    }
-
-    if (showNotEnoughCreditDialog.value) {
-        AlertDialog("You have not enough Credit!") { showNotEnoughCreditDialog.value = false }
     }
 
 }

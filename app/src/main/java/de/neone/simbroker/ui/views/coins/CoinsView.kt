@@ -38,6 +38,7 @@ import de.neone.simbroker.ui.views.coinDetailView.CoinDetailSheet
 import de.neone.simbroker.ui.views.coins.components.CoinsListItem
 import de.neone.simbroker.ui.views.coins.components.CoinsSearchLoadIndicator
 import de.neone.simbroker.ui.views.coins.components.CoinsSearchSheet
+import de.neone.simbroker.ui.views.components.AlertDialog
 
 @SuppressLint("DefaultLocale")
 @Composable
@@ -52,7 +53,6 @@ fun CoinsView(
     val coinList by viewModel.coinList.collectAsState()
     val selectedCoinDetails by viewModel.coinDetails.collectAsState()
     val accountCreditState by viewModel.accountValueState.collectAsState()
-    val investedValueState by viewModel.investedValueState.collectAsState()
     val feeValue by viewModel.feeValueState.collectAsState()
 
     var selectedCoin by remember { mutableStateOf<Coin?>(null) }
@@ -60,6 +60,9 @@ fun CoinsView(
     var openCoinDetailSheet by rememberSaveable { mutableStateOf(false) }
 
     val timer by viewModel.refreshTimer.collectAsState()
+
+    val showNotEnoughCreditDialog by viewModel.showAccountNotEnoughMoney.collectAsState()
+    val showAccountCashInDialog by viewModel.showAccountCashIn.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.loadMoreCoins()
@@ -156,22 +159,40 @@ fun CoinsView(
                     onDismiss = {
                         openCoinDetailSheet = false
                     },
-                    onBuyClick = { coin, amount, feeValue, totalValue ->
+                    onBuyClick = { amount, totalValue ->
                         viewModel.buyCoin(
-                            selectedCoin = coin,
+                            selectedCoin = it,
                             amount = amount,
                             feeValue = feeValue,
                             totalValue = totalValue,
                         )
                     },
-                    onSellClick = {
-
-                        
+                    onSellClick = { amount, currentPrice ->
+                        viewModel.sellCoin(
+                            coinUuid = it.uuid,
+                            amountToSell = amount,
+                            currentPrice = currentPrice,
+                            fee = feeValue
+                        )
+                        viewModel.setAccountCashIn(true)
+                    },
+                    notEnoughCredit = {
+                        viewModel.setShowAccountNotEnoughMoney(true)
                     },
                     accountCreditState = accountCreditState
                 )
             }
         }
     }
+
+    if (showNotEnoughCreditDialog) {
+        AlertDialog("You have not enough Credit!") { viewModel.setShowAccountNotEnoughMoney(false) }
+    }
+
+    if (showAccountCashInDialog) {
+        AlertDialog("Your Credit is ${accountCreditState.roundTo2()} €") { viewModel.setAccountCashIn(false) }
+    }
+
+
 }
 

@@ -39,12 +39,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import de.neone.simbroker.R
+import de.neone.simbroker.data.helper.SBHelper.roundTo2
 import de.neone.simbroker.data.remote.models.Coin
 import de.neone.simbroker.ui.SimBrokerViewModel
 import de.neone.simbroker.ui.theme.activity.ViewWallpaperImageBox
 import de.neone.simbroker.ui.theme.bottomBarColorDark
 import de.neone.simbroker.ui.theme.bottomBarColorLight
 import de.neone.simbroker.ui.views.coinDetailView.CoinDetailSheet
+import de.neone.simbroker.ui.views.components.AlertDialog
 import de.neone.simbroker.ui.views.portfolio.components.PortfolioCoinListPositionObject
 import kotlinx.coroutines.delay
 
@@ -69,11 +71,14 @@ fun PortfolioView(
 
     val allPortfolioPositionsGrouped = allPortfolioPositions.groupBy { it.coinUuid }
     val allPortfolioGroupedList =
-        allPortfolioPositionsGrouped.values.toList().filter { !it.first().isFavorite }
+        allPortfolioPositionsGrouped.values
+            .toList()
+            .filter { it.sumOf { pos -> pos.amountRemaining } > 0 && !it.first().isFavorite }
 
     val allPortfolioPositionsGroupedByFavorite = allPortfolioPositions.groupBy { it.coinUuid }
     val allPortfolioGroupedFavorites =
-        allPortfolioPositionsGroupedByFavorite.values.toList().filter { it.first().isFavorite }
+        allPortfolioPositionsGroupedByFavorite.values.toList()
+            .filter { it.sumOf { pos -> pos.amountRemaining } > 0 && it.first().isFavorite }
 
     val allTransactionPositions by viewModel.allTransactionPositions.collectAsState()
 
@@ -83,6 +88,9 @@ fun PortfolioView(
 
     var showFavorites by rememberSaveable { mutableStateOf(true) }
     var favoriteTrigger by rememberSaveable { mutableStateOf(false) }
+
+    val showNotEnoughCreditDialog by viewModel.showAccountNotEnoughMoney.collectAsState()
+    val showAccountCashInDialog by viewModel.showAccountCashIn.collectAsState()
 
     val rotationAngle by animateFloatAsState(
         targetValue = if (showFavorites) 180f else 0f,
@@ -239,20 +247,37 @@ fun PortfolioView(
                     onDismiss = {
                         openCoinDetailSheet = false
                     },
-                    onBuyClick = { coin, amount, feeValue, totalValue ->
+                    onBuyClick = { amount, totalValue ->
                         viewModel.buyCoin(
-                            selectedCoin = coin,
+                            selectedCoin = it,
                             amount = amount,
                             feeValue = feeValue,
                             totalValue = totalValue,
                         )
                     },
-                    onSellClick = {
-
+                    onSellClick = { amount, currentPrice ->
+                        viewModel.sellCoin(
+                            coinUuid = it.uuid,
+                            amountToSell = amount,
+                            currentPrice = currentPrice,
+                            fee = feeValue
+                        )
+                        viewModel.setAccountCashIn(true)
+                    },
+                    notEnoughCredit = {
+                        viewModel.setShowAccountNotEnoughMoney(true)
                     },
                     accountCreditState = accountCreditState,
                 )
             }
         }
+    }
+
+    if (showNotEnoughCreditDialog) {
+        AlertDialog("You have not enough Credit!") { viewModel.setShowAccountNotEnoughMoney(false) }
+    }
+
+    if (showAccountCashInDialog) {
+        AlertDialog("Your Credit is: ${accountCreditState.roundTo2()} €") { viewModel.setAccountCashIn(false) }
     }
 }

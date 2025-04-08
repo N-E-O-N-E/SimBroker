@@ -1,9 +1,12 @@
 package de.neone.simbroker.ui.views.account.components
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -17,6 +20,7 @@ fun AccountPieChartPlotter(
     modifier: Modifier = Modifier,
     creditValue: Double,
     investedValue: Double,
+    fees: Double,
 ) {
 
     val dataSet1 = ListDataStrategy(
@@ -27,19 +31,30 @@ fun AccountPieChartPlotter(
         unit = "€" // Unit
     )
 
-    DonutRowPlotStrategy.DonutPlotRow(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 5.dp),
-        circularData = dataSet1,
-        circularForeground = DonutForegroundStrategy(
-            strokeWidth = 120f,
-            radiusMultiplier = 1.4f
-        ),
-        circularDecoration = CircularDecoration.donutChartDecorations(
-            textColor = MaterialTheme.colorScheme.onSurface,
-        ),
-    )
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.End
+    ) {
+        DonutRowPlotStrategy.DonutPlotRow(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(vertical = 5.dp),
+            circularData = dataSet1,
+            circularForeground = DonutForegroundStrategy(
+                strokeWidth = 120f,
+                radiusMultiplier = 1.4f
+            ),
+            circularDecoration = CircularDecoration.donutChartDecorations(
+                textColor = MaterialTheme.colorScheme.onSurface,
+            ),
+        )
+
+        Text(
+            "Fees over all time: ${fees.toInt()} €",
+            style = MaterialTheme.typography.labelMedium,
+            modifier = Modifier.padding(horizontal = 20.dp)
+        )
+    }
 }
 
 @Preview(showBackground = true, showSystemUi = true)
@@ -47,6 +62,7 @@ fun AccountPieChartPlotter(
 private fun PieChartPlotterPreview() {
     AccountPieChartPlotter(
         creditValue = 100.0,
-        investedValue = 80.0
+        investedValue = 80.0,
+        fees = 10.0
     )
 }

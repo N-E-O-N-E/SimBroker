@@ -46,14 +46,15 @@ import de.neone.simbroker.R
 import de.neone.simbroker.data.helper.SBHelper
 import de.neone.simbroker.data.helper.SBHelper.roundTo2
 import de.neone.simbroker.data.helper.SBHelper.roundTo6
-import de.neone.simbroker.data.helper.SBHelper.toCoinString
 import de.neone.simbroker.data.helper.SBHelper.toEuroString
 import de.neone.simbroker.data.helper.SBHelper.toPercentString
 import de.neone.simbroker.data.local.mockdata.coins_Mockdata
 import de.neone.simbroker.data.local.models.PortfolioPositions
 import de.neone.simbroker.data.local.models.TransactionPositions
+import de.neone.simbroker.data.local.models.TransactionType
 import de.neone.simbroker.ui.theme.colorDown
 import de.neone.simbroker.ui.theme.colorUp
+import de.neone.simbroker.ui.theme.sell
 import kotlinx.coroutines.delay
 
 @SuppressLint("SuspiciousIndentation")
@@ -62,14 +63,19 @@ fun PortfolioCoinListItem(
     coin: PortfolioPositions,
     coinBuyTransactions: List<TransactionPositions>,
     coinSellTransactions: List<TransactionPositions>,
+    allCoinTransactions: List<TransactionPositions>,
     currentPrice: Double,
     profit: Double,
     sparks: List<String> = emptyList(),
     totalFee: Double = 0.0,
     totalInvested: Double = 0.0,
     setFavorite: (String, Boolean) -> Unit,
-    isClicked: () -> Unit
+    isClicked: () -> Unit,
 ) {
+
+    val amountSelled = coinSellTransactions.sumOf { it.amount }
+    val amountBuyed = coinBuyTransactions.sumOf { it.amount }
+
     var slideInChart by remember { mutableStateOf(false) }
     var showTransactionsForCoinState by remember { mutableStateOf(false) }
 
@@ -137,9 +143,10 @@ fun PortfolioCoinListItem(
 
 
     Card(
-        modifier = Modifier.clickable {
-            isClicked()
-        }
+        modifier = Modifier
+            .clickable {
+                isClicked()
+            }
             .padding(horizontal = 8.dp)
             .padding(vertical = 3.dp)
             .width(395.dp)
@@ -246,13 +253,13 @@ fun PortfolioCoinListItem(
                             )
                             Row() {
                                 Text(
-                                    text = "${coin.name.take(20) + "..."}  ",
+                                    text = "${coin.name.take(21) + "..."}  ",
                                     style = MaterialTheme.typography.bodyLarge
                                 )
                             }
 
                             Text(
-                                text = "Current price: ${currentPrice.toEuroString()}",
+                                text = "Current: ${currentPrice.toEuroString()}",
                                 style = MaterialTheme.typography.labelSmall
                             )
                             Text(
@@ -260,7 +267,7 @@ fun PortfolioCoinListItem(
                                 style = MaterialTheme.typography.labelSmall
                             )
                             Text(
-                                text = "incl. Fees: ${totalFee.toEuroString()}",
+                                text = "Fees: ${totalFee.toEuroString()}",
                                 style = MaterialTheme.typography.labelSmall
                             )
                         }
@@ -302,118 +309,134 @@ fun PortfolioCoinListItem(
             }
 
             if (showTransactionsForCoinState) {
-                coinBuyTransactions.sortedByDescending { sortedByDescending ->
+
+                allCoinTransactions.sortedByDescending { sortedByDescending ->
                     sortedByDescending.timestamp
                 }.forEach {
+                    if (!it.isClosed) {
 
-                    val anteilEUR = it.price.roundTo2() * it.amount
-                    val gewVer =
-                        (currentPrice.roundTo2() - it.price.roundTo2()) * it.amount.roundTo6()
-                    val gvProzent =
-                        (((currentPrice.roundTo2() / it.price.roundTo2()) - 1) * 100)
+                        val anteilEUR = it.price.roundTo2() * it.amount
+                        val gewVer =
+                            (currentPrice.roundTo2() - it.price.roundTo2()) * it.amount.roundTo6()
+                        val gvProzent =
+                            (((currentPrice.roundTo2() / it.price.roundTo2()) - 1) * 100)
 
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(5.dp)
-                            .animateContentSize(
-                                animationSpec = tween(
-                                    durationMillis = 100,
-                                    easing = FastOutSlowInEasing
-                                )
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(5.dp)
+                                .animateContentSize(
+                                    animationSpec = tween(
+                                        durationMillis = 100,
+                                        easing = FastOutSlowInEasing
+                                    )
+                                ),
+                            colors = CardDefaults.cardColors(
+                                containerColor =
+                                    if (it.type == TransactionType.BUY) {
+                                        MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f)
+                                    } else {
+                                        sell.copy(alpha = 0.6f)
+                                    }
                             )
-                        ,
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(
-                                alpha = 0.6f
-                            )
-                        )
-                    ) {
-                        Column(modifier = Modifier.padding(15.dp)) {
+                        ) {
+                            Column(modifier = Modifier.padding(15.dp)) {
 
-                            Row() {
-                                Text(
-                                    text = "Date",
-                                    style = MaterialTheme.typography.labelMedium
-                                )
-                                Spacer(modifier = Modifier.weight(1f))
-                                Text(
-                                    text = SBHelper.timestampToStringLong(it.timestamp),
-                                    style = MaterialTheme.typography.labelMedium
-                                )
-                            }
+                                Row() {
+                                    Text(
+                                        text = "Date",
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                    Spacer(modifier = Modifier.weight(1f))
+                                    Text(
+                                        text = SBHelper.timestampToStringLong(it.timestamp),
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                }
 
-                            Row() {
-                                Text(
-                                    text = "Amount",
-                                    style = MaterialTheme.typography.labelMedium
-                                )
-                                Spacer(modifier = Modifier.weight(1f))
-                                Text(
-                                    text = it.amount.toCoinString(),
-                                    style = MaterialTheme.typography.labelMedium
-                                )
+                                Row() {
+                                    Text(
+                                        text = "Amount",
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                    Spacer(modifier = Modifier.weight(1f))
+                                    Text(
+                                        text = (it.amount - amountSelled).roundTo6().toString(),
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
 
-                            }
-                            Row() {
-                                Text(
-                                    text = "Price p. Coin",
-                                    style = MaterialTheme.typography.labelMedium
-                                )
-                                Spacer(modifier = Modifier.weight(1f))
-                                Text(
-                                    text = it.price.toEuroString(),
-                                    style = MaterialTheme.typography.labelMedium
-                                )
+                                }
+                                Row() {
+                                    Text(
+                                        text = "Price p. Coin",
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                    Spacer(modifier = Modifier.weight(1f))
+                                    Text(
+                                        text = it.price.toEuroString(),
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
 
-                            }
+                                }
 
-                            HorizontalDivider(color = MaterialTheme.colorScheme.onSurface)
+                                HorizontalDivider(color = MaterialTheme.colorScheme.onSurface)
 
-                            Row() {
-                                Text(
-                                    text = "Fee",
-                                    style = MaterialTheme.typography.labelMedium
-                                )
-                                Spacer(modifier = Modifier.weight(1f))
-                                Text(
-                                    text = coinBuyTransactions.first().fee.toEuroString(),
-                                    style = MaterialTheme.typography.labelMedium
-                                )
+                                Row() {
+                                    Text(
+                                        text = "Fee",
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                    Spacer(modifier = Modifier.weight(1f))
+                                    Text(
+                                        text = coinBuyTransactions.first().fee.toEuroString(),
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
 
-                            }
+                                }
 
-                            Row() {
-                                Text(
-                                    text = "Invested (excl.Fee)",
-                                    style = MaterialTheme.typography.labelMedium
-                                )
-                                Spacer(modifier = Modifier.weight(1f))
-                                Text(
-                                    text = anteilEUR.toEuroString(),
-                                    style = MaterialTheme.typography.labelMedium
-                                )
-                            }
+                                Row() {
+                                    Text(
+                                        text = "Value",
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                    Spacer(modifier = Modifier.weight(1f))
+                                    Text(
+                                        text = anteilEUR.toEuroString(),
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                }
 
-                            HorizontalDivider(color = MaterialTheme.colorScheme.onSurface)
+                                Row() {
+                                    Text(
+                                        text = "Transaction",
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                    Spacer(modifier = Modifier.weight(1f))
+                                    Text(
+                                        text = it.type.toString(),
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                }
 
-                            Row() {
-                                Text(
-                                    text = "Profit/Loss",
-                                    style = MaterialTheme.typography.labelMedium
-                                )
-                                Spacer(modifier = Modifier.weight(1f))
+                                HorizontalDivider(color = MaterialTheme.colorScheme.onSurface)
 
-                                Text(
-                                    text = gewVer.toEuroString(),
-                                    style = MaterialTheme.typography.labelMedium
-                                )
-                                Spacer(modifier = Modifier.weight(0.05f))
-                                Text(
-                                    text = gvProzent.toPercentString(),
-                                    style = MaterialTheme.typography.labelMedium
-                                )
+                                Row() {
+                                    Text(
+                                        text = "Profit/Loss",
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                    Spacer(modifier = Modifier.weight(1f))
 
+                                    Text(
+                                        text = gewVer.toEuroString(),
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                    Spacer(modifier = Modifier.weight(0.05f))
+                                    Text(
+                                        text = gvProzent.toPercentString(),
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                }
                             }
                         }
                     }
@@ -440,6 +463,7 @@ private fun PortfolioCoinListPreview() {
         currentPrice = 3680.0,
         coinBuyTransactions = emptyList(),
         coinSellTransactions = emptyList(),
+        allCoinTransactions = emptyList(),
         profit = 1200.0,
         setFavorite = { _, _ -> },
         isClicked = { }

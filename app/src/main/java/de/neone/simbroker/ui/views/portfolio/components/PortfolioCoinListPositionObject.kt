@@ -44,10 +44,11 @@ fun PortfolioCoinListPositionObject(
         currentPrice = currentPrice,
         coinBuyTransactions = coinBuyTransactions,
         coinSellTransactions = coinSellTransactions,
+        allCoinTransactions = transactionList,
         profit = profit,
         sparks = sparksForPosition,
         totalFee = totalFee,
-        totalInvested = totalInvestedWithFees,
+        totalInvested = totalInvested,
         setFavorite = { coinUuid, isFavorite ->
             isFavorite(coinUuid, isFavorite)
         },
