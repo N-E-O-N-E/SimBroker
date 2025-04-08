@@ -545,6 +545,9 @@ class SimBrokerViewModel(
 
                     localRemaining -= reduceAmount
 
+                    if (investedValueState.value <= 0.0) {
+                        reduceInvestedValue(investedValueState.value)
+                    }
                 }
             }
         }

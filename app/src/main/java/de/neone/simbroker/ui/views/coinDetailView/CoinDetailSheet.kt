@@ -113,6 +113,10 @@ fun CoinDetailSheet(
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(
+                    modifier = Modifier.clickable {
+                        inputValue = coinAmount.toString()
+
+                    },
                     text = "Coins: $coinAmount",
                     style = MaterialTheme.typography.titleMedium
                 )
