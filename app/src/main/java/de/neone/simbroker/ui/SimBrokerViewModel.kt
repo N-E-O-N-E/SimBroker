@@ -230,7 +230,7 @@ class SimBrokerViewModel(
             val currentValue = dataStore.data.first()[DATASTORE_ACCOUNTVALUE] ?: 0.0
             val newValue = currentValue.plus(value).coerceAtLeast(0.0)
 
-            if (currentValue!! in 0.0..450.0) {
+            if (currentValue in 0.0..450.0) {
                 dataStore.edit {
                     it[DATASTORE_ACCOUNTVALUE] = newValue ?: 0.0
                 }

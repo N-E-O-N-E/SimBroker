@@ -1,6 +1,7 @@
 package de.neone.simbroker.ui.views.coinDetailView
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -72,6 +73,8 @@ fun CoinDetailSheet(
     val coinDetailSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val showEmptyInputDialog = remember { mutableStateOf(false) }
 
+    val context = LocalContext.current
+
     val imageRequest =
         ImageRequest.Builder(LocalContext.current).data(selectedCoin.iconUrl).crossfade(true)
             .error(R.drawable.coinplaceholder).build()
@@ -129,7 +132,10 @@ fun CoinDetailSheet(
                         modifier = Modifier
                             .padding(start = 5.dp)
                             .scale(0.8f),
-                        onClick = { inputValue = coinAmount.toString() },
+                        onClick = {
+                            inputValue = coinAmount.toString()
+                            Toast.makeText(context, "Value copied", Toast.LENGTH_SHORT).show()
+                        },
                     ) {
                         Icon(
                             painterResource(id = R.drawable.baseline_content_copy_24),

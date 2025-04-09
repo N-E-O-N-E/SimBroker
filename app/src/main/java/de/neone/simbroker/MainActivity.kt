@@ -8,14 +8,22 @@ package de.neone.simbroker
     ╚═╝  ╚═══╝    ╚══════╝     ╚═════╝     ╚═╝  ╚═══╝    ╚══════╝
 */
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import de.neone.simbroker.ui.navigation.MainActivityBottomBar
@@ -29,10 +37,41 @@ import de.neone.simbroker.ui.theme.topBarColorLight
 
 
 class MainActivity : ComponentActivity() {
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted -> Log.i("MainActivity", if (isGranted) "Granted" else "Denied") }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun requestNotificationPermission(showExplanation: () -> Unit) {
+        when {
+            ContextCompat.checkSelfPermission(
+                this, android.Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED ->
+                Log.i("MainActivity", "Permission granted")
+
+            shouldShowRequestPermissionRationale(android.Manifest.permission.POST_NOTIFICATIONS) ->
+                showExplanation()
+
+            else -> requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+
+            val context = LocalContext.current
+
+            LaunchedEffect(Unit) {
+                requestNotificationPermission {
+                    Toast.makeText(context, "Permission denied", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+
             SimBrokerTheme {
                 val navController = rememberNavController()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
