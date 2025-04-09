@@ -23,8 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import de.neone.simbroker.ui.SimBrokerViewModel
-import org.koin.androidx.compose.koinViewModel
 
 /**
  * Ui der StartActivity welche ein Wallpaper beinhaltet
@@ -45,7 +43,6 @@ fun StartActivityImageBox(
     buttonText: String,
     imageLightTheme: Int,
     imageDarkTheme: Int,
-    viewModel: SimBrokerViewModel = koinViewModel()
 ) {
 
     var checked by remember { mutableStateOf(false) }

@@ -60,6 +60,9 @@ fun PortfolioView(
         imageDarkTheme = R.drawable.simbroker_dark_clear
     )
 
+    val timer by viewModel.refreshTimer.collectAsState()
+    val gameDifficult by viewModel.gameDifficultState.collectAsState()
+
     var selectedCoin by remember { mutableStateOf<Coin?>(null) }
     val selectedCoinDetails by viewModel.coinDetails.collectAsState()
     val accountCreditState by viewModel.accountValueState.collectAsState()
@@ -81,10 +84,6 @@ fun PortfolioView(
             .filter { it.sumOf { pos -> pos.amountRemaining } > 0 && it.first().isFavorite }
 
     val allTransactionPositions by viewModel.allTransactionPositions.collectAsState()
-
-    val gameDifficult by viewModel.gameDifficultState.collectAsState()
-
-    val timer by viewModel.refreshTimer.collectAsState()
 
     var showFavorites by rememberSaveable { mutableStateOf(true) }
     var favoriteTrigger by rememberSaveable { mutableStateOf(false) }

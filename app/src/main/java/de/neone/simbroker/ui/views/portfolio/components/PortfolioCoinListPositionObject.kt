@@ -19,28 +19,20 @@ fun PortfolioCoinListPositionObject(
 
     val coinBuyTransactions =
         transactionList.filter { it.coinUuid == coinUuid && it.type == TransactionType.BUY && !it.isClosed }
-
     val coinSellTransactions =
         transactionList.filter { it.coinUuid == coinUuid && it.type == TransactionType.SELL }
-
     val transactionFilterd = transactionList.filter { it.coinUuid == coinUuid}
 
-    val totalFee = coinBuyTransactions.sumOf { it.fee }
-
     val totalAmount = portfolioPosition.sumOf { it.amountRemaining }
-
-
     val totalInvested = portfolioPosition.sumOf { it.amountRemaining * it.pricePerUnit }
-
+    val totalFee = coinBuyTransactions.sumOf { it.fee }
     val currentPrice = coinList.find { it.uuid == coinUuid }?.price?.toDouble() ?: 0.0
-
     val currentValue = totalAmount * currentPrice
-
 
     val realizedProfit = coinSellTransactions.sumOf { sellTx ->
         val matchingBuy = coinBuyTransactions
-            .filter { it.timestamp <= sellTx.timestamp }
-            .minByOrNull { it.timestamp }
+            .filter { it.timestamp <= sellTx.timestamp } // Transaktionen die zeitlich vor oder gleich dem Verkaufszeitpunkt liegen
+            .minByOrNull { it.timestamp } // Aus den gefilterten Käufen wird die früheste Transaktion ausgewählt. (Fifo)
 
         if (matchingBuy != null) {
             val gainPerCoin = sellTx.price - matchingBuy.price
@@ -58,8 +50,6 @@ fun PortfolioCoinListPositionObject(
     val result = PortfolioCoinListItem(
         coin = portfolioPosition.first(),
         currentPrice = currentPrice,
-        coinBuyTransactions = coinBuyTransactions,
-        coinSellTransactions = coinSellTransactions,
         allCoinTransactions = transactionFilterd,
         profit = profit,
         sparks = sparksForPosition,

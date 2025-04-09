@@ -61,8 +61,6 @@ import kotlinx.coroutines.delay
 @Composable
 fun PortfolioCoinListItem(
     coin: PortfolioPositions,
-    coinBuyTransactions: List<TransactionPositions>,
-    coinSellTransactions: List<TransactionPositions>,
     allCoinTransactions: List<TransactionPositions>,
     currentPrice: Double,
     profit: Double,
@@ -72,9 +70,6 @@ fun PortfolioCoinListItem(
     setFavorite: (String, Boolean) -> Unit,
     isClicked: () -> Unit,
 ) {
-
-    val amountSelled = coinSellTransactions.sumOf { it.amount }
-    val amountBuyed = coinBuyTransactions.sumOf { it.amount }
 
     var slideInChart by remember { mutableStateOf(false) }
     var showTransactionsForCoinState by remember { mutableStateOf(false) }
@@ -461,8 +456,6 @@ private fun PortfolioCoinListPreview() {
             totalValue = 7000.0
         ),
         currentPrice = 3680.0,
-        coinBuyTransactions = emptyList(),
-        coinSellTransactions = emptyList(),
         allCoinTransactions = emptyList(),
         profit = 1200.0,
         setFavorite = { _, _ -> },

@@ -50,21 +50,20 @@ fun CoinsView(
         imageDarkTheme = R.drawable.simbroker_dark_clear
     )
 
+    val timer by viewModel.refreshTimer.collectAsState()
+
     val coinList by viewModel.coinList.collectAsState()
+    var selectedCoin by remember { mutableStateOf<Coin?>(null) }
     val selectedCoinDetails by viewModel.coinDetails.collectAsState()
     val accountCreditState by viewModel.accountValueState.collectAsState()
     val feeValue by viewModel.feeValueState.collectAsState()
+    val allPortfolioPositions by viewModel.allPortfolioPositions.collectAsState()
 
-    var selectedCoin by remember { mutableStateOf<Coin?>(null) }
     var openSucheSheet by rememberSaveable { mutableStateOf(false) }
     var openCoinDetailSheet by rememberSaveable { mutableStateOf(false) }
 
-    val timer by viewModel.refreshTimer.collectAsState()
-
     val showNotEnoughCreditDialog by viewModel.showAccountNotEnoughMoney.collectAsState()
     val showAccountCashInDialog by viewModel.showAccountCashIn.collectAsState()
-
-    val allPortfolioPositions by viewModel.allPortfolioPositions.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.loadMoreCoins()
@@ -106,7 +105,6 @@ fun CoinsView(
         }
 
 
-
         LazyColumn() {
             items(coinList) { coin ->
                 CoinsListItem(
@@ -118,6 +116,7 @@ fun CoinsView(
                     },
                 )
             }
+
             // Pagination zeigt den Loader, wenn die Liste nicht leer ist
 
             item {

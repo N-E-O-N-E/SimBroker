@@ -61,9 +61,9 @@ fun AccountView(
     val feeValue by viewModel.feeValueState.collectAsState()
     val allFees by viewModel.allTransactionPositions.collectAsState()
     val allFeesSum = allFees.sumOf { it.fee }
+
     val mockdataValue by viewModel.mockDataState.collectAsState()
     val selectedOption by viewModel.gameDifficultState.collectAsState()
-
     val firstGame by viewModel.firstGameState.collectAsState()
 
     Column(
@@ -85,7 +85,7 @@ fun AccountView(
 
             // Head -----------------------------------------------------------------
 
-            Text("Fill your demo account to a maximum of 500", style = typography.bodyLarge)
+            Text("Fill your account to a maximum of 500", style = typography.bodyLarge)
 
             IconButton(onClick = {
                 if (!showAccountMaxValueDialog) {
