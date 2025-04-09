@@ -209,83 +209,77 @@ class SimBrokerViewModel(
 
     // Account Value -----------------------------------------------------------------------------
 
-    private val accountValueFlow = dataStore.data
-        .map {
-            it[DATASTORE_ACCOUNTVALUE] ?: 0.0
-        }
-
-    val accountValueState: StateFlow<Double> = accountValueFlow
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = 0.0
-        )
+    val accountValueState: StateFlow<Double> = dataStore.data
+        .map { it[DATASTORE_ACCOUNTVALUE] ?: 0.0 }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 0.0)
 
     fun resetAccountValue() {
         viewModelScope.launch {
             dataStore.edit {
                 it[DATASTORE_ACCOUNTVALUE] = 0.0
             }
+
             Log.d("simDebug", "DataStore Account Credit reset done")
         }
     }
 
     fun setAccountValue(value: Double) {
-        if (accountValueState.value in 0.0..450.0) {
-            val newValue = accountValueState.value + value
-            viewModelScope.launch {
+        viewModelScope.launch {
+            val currentValue = dataStore.data.first()[DATASTORE_ACCOUNTVALUE]
+            val newValue = currentValue?.plus(value)
+
+            if (currentValue!! in 0.0..450.0) {
                 dataStore.edit {
-                    it[DATASTORE_ACCOUNTVALUE] = newValue
+                    it[DATASTORE_ACCOUNTVALUE] = newValue ?: 0.0
                 }
                 Log.d("simDebug", "DataStore Account Credit increased")
+
+                _showAccountMaxValueDialog.value = false
+            } else {
+                _showAccountMaxValueDialog.value = true
             }
-            _showAccountMaxValueDialog.value = false
-        } else {
-            _showAccountMaxValueDialog.value = true
         }
     }
 
     private fun updateAccountValue(value: Double) {
-        val newAccountValue = accountValueState.value + value
         viewModelScope.launch {
+            val currentValue = dataStore.data.first()[DATASTORE_ACCOUNTVALUE]
+            val newAccountValue = currentValue?.plus(value)
             dataStore.edit {
-                it[DATASTORE_ACCOUNTVALUE] = newAccountValue
+                it[DATASTORE_ACCOUNTVALUE] = newAccountValue ?: 0.0
             }
+            Log.d("simDebug", "DataStore Account Credit increased $accountValueState")
         }
     }
 
     private fun reduceAccountValue(value: Double) {
-        val newAccountValue = accountValueState.value - value
-        if (accountValueState.value >= value) {
-            viewModelScope.launch {
-                dataStore.edit {
-                    it[DATASTORE_ACCOUNTVALUE] = newAccountValue
+        viewModelScope.launch {
+            val currentValue = dataStore.data.first()[DATASTORE_ACCOUNTVALUE]
+            if (currentValue != null) {
+                if (currentValue >= value) {
+                    val newAccountValue = currentValue - value
+                    dataStore.edit {
+                        it[DATASTORE_ACCOUNTVALUE] = newAccountValue
+                    }
+                    _showAccountNotEnoughMoney.value = false
+                    Log.d(
+                        "simDebug",
+                        "DataStore Account Credit reduce. Current Credit: ${accountValueState.value}. InputValue: $value. Save Value: $newAccountValue"
+                    )
                 }
-                _showAccountNotEnoughMoney.value = false
-                Log.d(
-                    "simDebug",
-                    "DataStore Account Credit reduce. Current Credit: ${accountValueState.value}. InputValue: $value. Save Value: $newAccountValue"
-                )
+            } else {
+                _showAccountNotEnoughMoney.value = true
             }
-        } else {
-            _showAccountNotEnoughMoney.value = true
         }
     }
 
     // Invested Value -----------------------------------------------------------------------------
 
 
-    private val investedValueFlow = dataStore.data
-        .map {
-            it[DATASTORE_TOTALINVESTVALUE] ?: 0.0
-        }
+    val investedValueState: StateFlow<Double> = dataStore.data
+        .map { it[DATASTORE_TOTALINVESTVALUE] ?: 0.0 }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 0.0)
 
-    val investedValueState: StateFlow<Double> = investedValueFlow
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = 0.0
-        )
 
     fun resetInvestedValue() {
         viewModelScope.launch {
@@ -297,19 +291,22 @@ class SimBrokerViewModel(
     }
 
     private fun setInvestedValue(value: Double) {
-        val newValue = investedValueState.value + value
         viewModelScope.launch {
+            val currentValue = dataStore.data.first()[DATASTORE_TOTALINVESTVALUE] ?: 0.0
+            val newValue = (currentValue + value).coerceAtLeast(0.0)
+
             dataStore.edit {
                 it[DATASTORE_TOTALINVESTVALUE] = newValue
             }
+
             Log.d("simDebug", "DataStore invested value increased. New Value: $newValue")
         }
-
     }
 
     private fun reduceInvestedValue(value: Double) {
-        val newValue = investedValueState.value - value
         viewModelScope.launch {
+            val currentValue = dataStore.data.first()[DATASTORE_TOTALINVESTVALUE] ?: 0.0
+            val newValue = currentValue - value
             dataStore.edit {
                 it[DATASTORE_TOTALINVESTVALUE] = newValue
             }
@@ -441,33 +438,41 @@ class SimBrokerViewModel(
     }
 
     fun buyCoin(selectedCoin: Coin, amount: Double, feeValue: Double, totalValue: Double) {
-        addTransaction(
-            TransactionPositions(
-                fee = feeValue,
-                coinUuid = selectedCoin.uuid,
-                symbol = selectedCoin.symbol,
-                iconUrl = selectedCoin.iconUrl,
-                name = selectedCoin.name,
-                price = selectedCoin.price.toDouble(),
-                amount = amount,
-                type = TransactionType.BUY,
-                totalValue = totalValue
+        viewModelScope.launch(Dispatchers.IO) {
+
+            val newAmount = amount
+            val newFeeValue = feeValue
+            val newTotalValue = totalValue
+
+            setInvestedValue(newTotalValue)
+            setAccountValue(-newTotalValue - newFeeValue)
+
+            addTransaction(
+                TransactionPositions(
+                    fee = newFeeValue,
+                    coinUuid = selectedCoin.uuid,
+                    symbol = selectedCoin.symbol,
+                    iconUrl = selectedCoin.iconUrl,
+                    name = selectedCoin.name,
+                    price = selectedCoin.price.toDouble(),
+                    amount = newAmount,
+                    type = TransactionType.BUY,
+                    totalValue = newTotalValue
+                )
             )
-        )
-        addPortfolio(
-            PortfolioPositions(
-                coinUuid = selectedCoin.uuid,
-                symbol = selectedCoin.symbol,
-                iconUrl = selectedCoin.iconUrl,
-                name = selectedCoin.name,
-                amountBought = amount,
-                amountRemaining = amount,
-                pricePerUnit = selectedCoin.price.toDouble(),
-                totalValue = totalValue
+            addPortfolio(
+                PortfolioPositions(
+                    coinUuid = selectedCoin.uuid,
+                    symbol = selectedCoin.symbol,
+                    iconUrl = selectedCoin.iconUrl,
+                    name = selectedCoin.name,
+                    amountBought = newAmount,
+                    amountRemaining = newAmount,
+                    pricePerUnit = selectedCoin.price.toDouble(),
+                    totalValue = newTotalValue
+                )
             )
-        )
-        reduceAccountValue(totalValue + feeValue)
-        setInvestedValue(totalValue)
+        }
     }
 
     fun getRemainingCoinAmount(coinUuid: String): Double {
@@ -483,7 +488,7 @@ class SimBrokerViewModel(
             val openBuys = repository.getOpenBuyTransactionsByCoin(coinUuid).filter { !it.isClosed }
             var remainingToSell = amountToSell
 
-            updateAccountValue(amountToSell * currentPrice)
+            updateAccountValue(remainingToSell * currentPrice)
 
             var isFirstSell = true
 
@@ -503,7 +508,7 @@ class SimBrokerViewModel(
                     name = buy.name,
                     price = currentPrice,
                     amount = sellAmount,
-                    fee = fee,
+                    fee = onlyOneFee,
                     type = TransactionType.SELL,
                     totalValue = (sellAmount * currentPrice)
                 )
@@ -512,11 +517,11 @@ class SimBrokerViewModel(
 
                 val soldOut = sellAmount >= buy.amount
                 if (soldOut) {
-                    updateTransactionClosed(coinId = buy.coinUuid, isClosed = true)
+                    updateTransactionClosed(transactionId = buy.id, isClosed = true)
                 }
 
                 val investedPart = sellAmount * buy.price
-                reduceInvestedValue(investedPart)
+                setInvestedValue(-investedPart)
 
                 val portfolioEntries = repository.getAllPortfolioPositions().first()
                     .filter { it.coinUuid == coinUuid && it.amountRemaining > 0 }
@@ -537,17 +542,16 @@ class SimBrokerViewModel(
                         totalValue = newTotalValue
                     )
 
-                    addPortfolio(updatedEntry)
-
                     if (newRemaining <= 0) {
                         deletePortfolioById(entry.id)
                     }
 
+                    addPortfolio(updatedEntry)
+
+
+
                     localRemaining -= reduceAmount
 
-                    if (investedValueState.value <= 0.0) {
-                        reduceInvestedValue(investedValueState.value)
-                    }
                 }
             }
         }
@@ -566,11 +570,11 @@ class SimBrokerViewModel(
         }
     }
 
-    fun updateTransactionClosed(coinId: String, isClosed: Boolean) {
+    fun updateTransactionClosed(transactionId: Int, isClosed: Boolean) {
         Log.d("simDebug", "updateTransaction over ViewModel started")
         viewModelScope.launch {
             repository.updateTransactionClosed(
-                coinId = coinId,
+                transactionId = transactionId,
                 isClosed = isClosed
             )
         }
@@ -607,7 +611,7 @@ class SimBrokerViewModel(
 // Init -----------------------------------------------------------------------------
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             mockDataState.collect {
                 Log.d("simDebug", "DataStore Mockdata value: $it")
                 startTimer()

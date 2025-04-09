@@ -56,8 +56,8 @@ class SimBrokerRepositoryImpl(
     override suspend fun updatePortfolioFavorite(coinId: String, isFavorite: Boolean) {
         simBrokerDAO.updatePortfolioFavorite(coinId, isFavorite)
     }
-    override suspend fun updateTransactionClosed(coinId: String, isClosed: Boolean) {
-        simBrokerDAO.updateTransactionClosed(coinId, isClosed)
+    override suspend fun updateTransactionClosed(transactionId: Int, isClosed: Boolean) {
+        simBrokerDAO.updateTransactionClosed(transactionId, isClosed)
     }
 
     override fun getAllPortfolioPositions(): Flow<List<PortfolioPositions>> {
