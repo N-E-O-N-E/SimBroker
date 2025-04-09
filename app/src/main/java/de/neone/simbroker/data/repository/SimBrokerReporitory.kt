@@ -88,6 +88,10 @@ class SimBrokerRepositoryImpl(
         simBrokerDAO.deletePortfolioById(entryId)
     }
 
+    override suspend fun deleteTransactionByCoinId(coinUuid: String) {
+        simBrokerDAO.deleteTransactionByCoinId(coinUuid)
+    }
+
 
 }
 

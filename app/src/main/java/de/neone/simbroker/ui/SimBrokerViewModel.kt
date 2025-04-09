@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import de.neone.simbroker.data.helper.SBHelper.roundTo2
 import de.neone.simbroker.data.helper.SBHelper.roundTo6
 import de.neone.simbroker.data.local.models.PortfolioPositions
 import de.neone.simbroker.data.local.models.TransactionPositions
@@ -427,6 +428,13 @@ class SimBrokerViewModel(
         }
     }
 
+    private fun deleteTransactionbyCoinId(coinUuid: String) {
+        Log.d("simDebug", "deleteTransaction over ViewModel started")
+        viewModelScope.launch {
+            repository.deleteTransactionByCoinId(coinUuid)
+        }
+    }
+
     private fun addPortfolio(portfolio: PortfolioPositions) {
         Log.d("simDebug", "addPosition over ViewModel started")
         viewModelScope.launch {
@@ -454,29 +462,34 @@ class SimBrokerViewModel(
             Log.d("simDebug", "setInvestedValue: $newTotalValue")
             Log.d("simDebug", "setAccountValue: ${(-newTotalValue - newFeeValue)}")
 
-            addTransaction(
-                TransactionPositions(
-                    fee = newFeeValue,
-                    coinUuid = selectedCoin.uuid,
-                    symbol = selectedCoin.symbol,
-                    iconUrl = selectedCoin.iconUrl,
-                    name = selectedCoin.name,
-                    price = selectedCoin.price.toDouble(),
-                    amount = newAmount,
-                    type = TransactionType.BUY,
-                    totalValue = newTotalValue
-                )
-            )
+
             addPortfolio(
                 PortfolioPositions(
                     coinUuid = selectedCoin.uuid,
                     symbol = selectedCoin.symbol,
                     iconUrl = selectedCoin.iconUrl,
                     name = selectedCoin.name,
-                    amountBought = newAmount,
-                    amountRemaining = newAmount,
-                    pricePerUnit = selectedCoin.price.toDouble(),
-                    totalValue = newTotalValue
+                    amountBought = newAmount.roundTo6(),
+                    amountRemaining = newAmount.roundTo6(),
+                    pricePerUnit = selectedCoin.price.toDouble().roundTo2(),
+                    totalValue = newTotalValue.roundTo2()
+                )
+            )
+
+            delay(1000)
+
+            addTransaction(
+                TransactionPositions(
+                    fee = newFeeValue.roundTo2(),
+                    coinUuid = selectedCoin.uuid,
+                    symbol = selectedCoin.symbol,
+                    iconUrl = selectedCoin.iconUrl,
+                    name = selectedCoin.name,
+                    price = selectedCoin.price.toDouble().roundTo2(),
+                    amount = newAmount.roundTo6(),
+                    type = TransactionType.BUY,
+                    totalValue = newTotalValue.roundTo2(),
+                    portfolioCoinID = allPortfolioPositions.value.last().id
                 )
             )
         }
@@ -519,11 +532,12 @@ class SimBrokerViewModel(
                         symbol = buy.symbol,
                         iconUrl = buy.iconUrl,
                         name = buy.name,
-                        price = currentPrice,
-                        amount = sellAmount,
+                        price = currentPrice.roundTo2(),
+                        amount = sellAmount.roundTo6(),
                         fee = usedFee,
                         type = TransactionType.SELL,
-                        totalValue = value
+                        totalValue = value.roundTo2(),
+                        portfolioCoinID = buy.portfolioCoinID
                     )
                 )
 
@@ -549,6 +563,7 @@ class SimBrokerViewModel(
 
                 if (newRemaining <= 0.0000001) {
                     deletePortfolioById(entry.id)
+
                 } else {
                     addPortfolio(entry.copy(
                         amountRemaining = newRemaining,
