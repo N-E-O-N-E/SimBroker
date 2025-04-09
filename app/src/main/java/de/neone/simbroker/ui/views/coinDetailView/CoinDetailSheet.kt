@@ -42,6 +42,7 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.request.error
 import de.neone.simbroker.R
+import de.neone.simbroker.data.helper.SBHelper.roundTo6
 import de.neone.simbroker.data.helper.SBHelper.toEuroString
 import de.neone.simbroker.data.helper.SBHelper.toPercentString
 import de.neone.simbroker.data.remote.models.Coin
@@ -62,7 +63,7 @@ fun CoinDetailSheet(
     accountCreditState: Double,
     feeValue: Double,
     onBuyClick: (Double, Double) -> Unit,
-    onSellClick: (Double, Double ) -> Unit,
+    onSellClick: (Double, Double) -> Unit,
     notEnoughCredit: () -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -70,8 +71,6 @@ fun CoinDetailSheet(
     val uriHandler = LocalUriHandler.current
     val coinDetailSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val showEmptyInputDialog = remember { mutableStateOf(false) }
-
-
 
     val imageRequest =
         ImageRequest.Builder(LocalContext.current).data(selectedCoin.iconUrl).crossfade(true)
@@ -106,26 +105,36 @@ fun CoinDetailSheet(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 20.dp)
+                    .padding(bottom = 10.dp)
                     .padding(horizontal = 5.dp),
                 horizontalAlignment = Alignment.Start,
 
 
-            ) {
+                ) {
                 Text(
-                    text = "Account Credit: ${accountCreditState.toEuroString()}",
+                    text = "Your account credit: ${accountCreditState.toEuroString()}",
                     style = MaterialTheme.typography.titleMedium
                 )
-                Row (verticalAlignment = Alignment.CenterVertically){
+                Text(
+                    text = "Coin in wallet: ${(selectedCoin.price.toDouble() * coinAmount).toEuroString()}",
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+
                     Text(
-                        text = "Coins: $coinAmount",
+                        text = "Amount in wallet: ${coinAmount.roundTo6()}",
                         style = MaterialTheme.typography.titleMedium
                     )
                     IconButton(
-                        modifier = Modifier.padding(start = 5.dp).scale(0.8f),
+                        modifier = Modifier
+                            .padding(start = 5.dp)
+                            .scale(0.8f),
                         onClick = { inputValue = coinAmount.toString() },
                     ) {
-                        Icon(painterResource(id = R.drawable.baseline_content_copy_24), contentDescription = "Copy value")
+                        Icon(
+                            painterResource(id = R.drawable.baseline_content_copy_24),
+                            contentDescription = "Copy value"
+                        )
                     }
                     Text("Copy Coinvalue", style = MaterialTheme.typography.labelMedium)
                 }
@@ -270,31 +279,35 @@ fun CoinDetailSheet(
                         containerColor = buy,
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                     ), modifier = Modifier.weight(0.5f), onClick = {
+                        val parsedInput = inputValue.toDoubleOrNull()
+
+                        if (parsedInput == null || parsedInput <= 0.0) {
+                            showEmptyInputDialog.value = true
+                            return@Button
+                        }
+
                         val amount =
                             if (selectedOption == "amount") inputValue.toDouble() else inputValue.toDouble() / selectedCoin.price.toDouble()
                         val totalValue =
                             if (selectedOption == "amount") inputValue.toDouble() * selectedCoin.price.toDouble() else inputValue.toDouble()
 
-                        if (inputValue.isEmpty()) {
-                            Log.d("simDebug", "inputValue is empty")
-                            showEmptyInputDialog.value = true
-                            return@Button
+                        if (accountCreditState >= (totalValue + feeValue)) {
+                            Log.d("simDebug", "Credit: $accountCreditState")
+                            Log.d(
+                                "simDebug",
+                                "CalcValue + Fee: ${accountCreditState >= (totalValue + feeValue)}"
+                            )
+
+                            onBuyClick(amount, totalValue)
+
                         } else {
+                            Log.d("simDebug", "Your Credit is $accountCreditState")
 
-                            if (accountCreditState >= (totalValue + feeValue)) {
-                                Log.d("simDebug", "$accountCreditState")
-                                Log.d("simDebug", "${calculatedValue + feeValue}")
+                            notEnoughCredit()
 
-                                onBuyClick(amount, totalValue)
-
-                            } else {
-                                Log.d("simDebug", "Your Credit is $accountCreditState")
-
-                                notEnoughCredit()
-
-                                return@Button
-                            }
+                            return@Button
                         }
+
                         onDismiss()
 
                     }) {
@@ -309,19 +322,21 @@ fun CoinDetailSheet(
                         containerColor = sell,
                         contentColor = MaterialTheme.colorScheme.onErrorContainer
                     ), modifier = Modifier.weight(0.5f), onClick = {
+                        val parsedInput = inputValue.toDoubleOrNull()
+
+                        if (parsedInput == null || parsedInput <= 0.0) {
+                            showEmptyInputDialog.value = true
+                            return@Button
+                        }
 
                         val amount = if (selectedOption == "amount") inputValue.toDouble()
                         else inputValue.toDouble() / selectedCoin.price.toDouble()
 
-                        if (inputValue.isEmpty()) {
-                            Log.d("simDebug", "inputValue is empty")
-                            showEmptyInputDialog.value = true
-                            return@Button
-                        } else {
 
-                            onSellClick(amount, selectedCoin.price.toDouble())
 
-                        }
+                        onSellClick(amount, selectedCoin.price.toDouble())
+
+
 
                         onDismiss()
 

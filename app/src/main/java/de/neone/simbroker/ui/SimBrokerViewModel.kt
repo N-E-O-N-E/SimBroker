@@ -117,7 +117,7 @@ class SimBrokerViewModel(
         )
 
     fun setMockData(value: Boolean) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             dataStore.edit {
                 it[DATASTORE_MOCKDATA] = value
             }
@@ -140,7 +140,7 @@ class SimBrokerViewModel(
         )
 
     fun setGameDifficult(value: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             dataStore.edit {
                 it[DATASTORE_GAMEDIFFICULTY] = value
             }
@@ -162,7 +162,7 @@ class SimBrokerViewModel(
         )
 
     fun setFeeValue(value: Double) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             dataStore.edit {
                 it[DATASTORE_FEE] = value
             }
@@ -184,7 +184,7 @@ class SimBrokerViewModel(
         )
 
     fun setFirstGameState(value: Boolean) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             dataStore.edit {
                 it[DATASTORE_FIRSTGAME] = value
             }
@@ -194,12 +194,13 @@ class SimBrokerViewModel(
     fun setFirstGameAccountValue(value: Double) {
         if (firstGameState.value) {
             resetAccountValue()
+            setInvestedValue(0.0)
             val newValue = accountValueState.value + value
-            viewModelScope.launch {
+            viewModelScope.launch(Dispatchers.IO) {
                 dataStore.edit {
                     it[DATASTORE_ACCOUNTVALUE] = newValue
                 }
-                Log.d("simDebug", "DataStore First Account Credit increased ${accountValueState}")
+                Log.d("simDebug", "DataStore First Account Credit increased $newValue")
             }
             _showFirstGameAccountValueDialog.value = false
         } else {
@@ -214,7 +215,7 @@ class SimBrokerViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 0.0)
 
     fun resetAccountValue() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             dataStore.edit {
                 it[DATASTORE_ACCOUNTVALUE] = 0.0
             }
@@ -224,15 +225,15 @@ class SimBrokerViewModel(
     }
 
     fun setAccountValue(value: Double) {
-        viewModelScope.launch {
-            val currentValue = dataStore.data.first()[DATASTORE_ACCOUNTVALUE]
-            val newValue = currentValue?.plus(value)
+        viewModelScope.launch(Dispatchers.IO) {
+            val currentValue = dataStore.data.first()[DATASTORE_ACCOUNTVALUE] ?: 0.0
+            val newValue = currentValue.plus(value).coerceAtLeast(0.0)
 
             if (currentValue!! in 0.0..450.0) {
                 dataStore.edit {
                     it[DATASTORE_ACCOUNTVALUE] = newValue ?: 0.0
                 }
-                Log.d("simDebug", "DataStore Account Credit increased")
+                Log.d("simDebug", "DataStore Account Credit manual increased")
 
                 _showAccountMaxValueDialog.value = false
             } else {
@@ -242,18 +243,19 @@ class SimBrokerViewModel(
     }
 
     private fun updateAccountValue(value: Double) {
-        viewModelScope.launch {
-            val currentValue = dataStore.data.first()[DATASTORE_ACCOUNTVALUE]
-            val newAccountValue = currentValue?.plus(value)
+        viewModelScope.launch(Dispatchers.IO) {
+            val currentValue = dataStore.data.first()[DATASTORE_ACCOUNTVALUE] ?: 0.0
+            val newValue = currentValue.plus(value).coerceAtLeast(0.0)
+
             dataStore.edit {
-                it[DATASTORE_ACCOUNTVALUE] = newAccountValue ?: 0.0
+                it[DATASTORE_ACCOUNTVALUE] = newValue ?: 0.0
             }
-            Log.d("simDebug", "DataStore Account Credit increased $accountValueState")
+            Log.d("simDebug", "DataStore Account Credit increased $newValue")
         }
     }
 
     private fun reduceAccountValue(value: Double) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val currentValue = dataStore.data.first()[DATASTORE_ACCOUNTVALUE]
             if (currentValue != null) {
                 if (currentValue >= value) {
@@ -286,12 +288,12 @@ class SimBrokerViewModel(
             dataStore.edit {
                 it[DATASTORE_TOTALINVESTVALUE] = 0.0
             }
-            Log.d("simDebug", "DataStore invested value increased. New Value: 0.0 €")
+            Log.d("simDebug", "DataStore invested value reset. New Value: 0.0 €")
         }
     }
 
     private fun setInvestedValue(value: Double) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val currentValue = dataStore.data.first()[DATASTORE_TOTALINVESTVALUE] ?: 0.0
             val newValue = (currentValue + value).coerceAtLeast(0.0)
 
@@ -304,9 +306,11 @@ class SimBrokerViewModel(
     }
 
     private fun reduceInvestedValue(value: Double) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
+            Log.d("simDebug", "Called reduceInvestedValue with: $value")
             val currentValue = dataStore.data.first()[DATASTORE_TOTALINVESTVALUE] ?: 0.0
-            val newValue = currentValue - value
+            val newValue = (currentValue - value).coerceAtLeast(0.0)
+
             dataStore.edit {
                 it[DATASTORE_TOTALINVESTVALUE] = newValue
             }
@@ -445,7 +449,10 @@ class SimBrokerViewModel(
             val newTotalValue = totalValue
 
             setInvestedValue(newTotalValue)
-            setAccountValue(-newTotalValue - newFeeValue)
+            updateAccountValue(-newTotalValue - newFeeValue)
+
+            Log.d("simDebug", "setInvestedValue: $newTotalValue")
+            Log.d("simDebug", "setAccountValue: ${(-newTotalValue - newFeeValue)}")
 
             addTransaction(
                 TransactionPositions(
@@ -485,77 +492,86 @@ class SimBrokerViewModel(
 
     fun sellCoin(coinUuid: String, amountToSell: Double, currentPrice: Double, fee: Double) {
         viewModelScope.launch(Dispatchers.IO) {
-            val openBuys = repository.getOpenBuyTransactionsByCoin(coinUuid).filter { !it.isClosed }
+            val openBuys = repository.getOpenBuyTransactionsByCoin(coinUuid)
+                .filter { !it.isClosed }
+                .sortedBy { it.timestamp }
+
             var remainingToSell = amountToSell
-
-            updateAccountValue(remainingToSell * currentPrice)
-
             var isFirstSell = true
+            var totalCashIn = 0.0
+            var totalInvestReduction = 0.0
+
 
             for (buy in openBuys) {
                 if (remainingToSell <= 0) break
 
                 val sellAmount = minOf(remainingToSell, buy.amount)
-                remainingToSell -= sellAmount
+                val usedFee = if (isFirstSell) fee else 0.0
+                val value = sellAmount * currentPrice
 
-                val onlyOneFee = if (isFirstSell) fee else 0.0
+                totalCashIn += value
+                remainingToSell -= sellAmount
                 isFirstSell = false
 
-                val sellTransaction = TransactionPositions(
-                    coinUuid = buy.coinUuid,
-                    symbol = buy.symbol,
-                    iconUrl = buy.iconUrl,
-                    name = buy.name,
-                    price = currentPrice,
-                    amount = sellAmount,
-                    fee = onlyOneFee,
-                    type = TransactionType.SELL,
-                    totalValue = (sellAmount * currentPrice)
+                addTransaction(
+                    TransactionPositions(
+                        coinUuid = buy.coinUuid,
+                        symbol = buy.symbol,
+                        iconUrl = buy.iconUrl,
+                        name = buy.name,
+                        price = currentPrice,
+                        amount = sellAmount,
+                        fee = usedFee,
+                        type = TransactionType.SELL,
+                        totalValue = value
+                    )
                 )
 
-                addTransaction(sellTransaction)
-
-                val soldOut = sellAmount >= buy.amount
-                if (soldOut) {
-                    updateTransactionClosed(transactionId = buy.id, isClosed = true)
+                if (sellAmount == buy.amount) {
+                    updateTransactionClosed(buy.id, true)
                 }
+            }
 
-                val investedPart = sellAmount * buy.price
-                setInvestedValue(-investedPart)
+            val portfolioEntries = repository.getAllPortfolioPositions().first()
+                .filter { it.coinUuid == coinUuid && it.amountRemaining > 0 }
+                .sortedBy { it.timestamp }
 
-                val portfolioEntries = repository.getAllPortfolioPositions().first()
-                    .filter { it.coinUuid == coinUuid && it.amountRemaining > 0 }
-                    .sortedBy { it.timestamp }
+            var localRemaining = amountToSell
 
-                var localRemaining = sellAmount
+            for (entry in portfolioEntries) {
+                if (localRemaining <= 0) break
 
-                for (entry in portfolioEntries) {
-                    if (localRemaining <= 0) break
+                val reduceAmount = minOf(localRemaining, entry.amountRemaining)
+                val newRemaining = entry.amountRemaining - reduceAmount
+                val valueReduction = reduceAmount * entry.pricePerUnit
 
-                    val reduceAmount = minOf(localRemaining, entry.amountRemaining)
-                    val newRemaining = entry.amountRemaining - reduceAmount
+                totalInvestReduction += valueReduction
 
-                    val newTotalValue = (entry.pricePerUnit * newRemaining)
-
-                    val updatedEntry = entry.copy(
+                if (newRemaining <= 0.0000001) {
+                    deletePortfolioById(entry.id)
+                } else {
+                    addPortfolio(entry.copy(
                         amountRemaining = newRemaining,
-                        totalValue = newTotalValue
-                    )
-
-                    if (newRemaining <= 0) {
-                        deletePortfolioById(entry.id)
-                    }
-
-                    addPortfolio(updatedEntry)
-
-
-
-                    localRemaining -= reduceAmount
-
+                        totalValue = newRemaining * entry.pricePerUnit
+                    ))
                 }
+
+                localRemaining -= reduceAmount
+            }
+
+            val currentAccount = dataStore.data.first()[DATASTORE_ACCOUNTVALUE] ?: 0.0
+            val currentInvested = dataStore.data.first()[DATASTORE_TOTALINVESTVALUE] ?: 0.0
+
+            val updatedAccount = (currentAccount + totalCashIn - fee).coerceAtLeast(0.0)
+            val updatedInvested = (currentInvested - totalInvestReduction).coerceAtLeast(0.0)
+
+            dataStore.edit {
+                it[DATASTORE_ACCOUNTVALUE] = updatedAccount
+                it[DATASTORE_TOTALINVESTVALUE] = updatedInvested
             }
         }
     }
+
 
 
     // Update Data -----------------------------------------------------------------------------

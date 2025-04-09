@@ -135,8 +135,7 @@ fun AccountView(
 
                     Row(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(10.dp),
+                            .fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -148,7 +147,7 @@ fun AccountView(
                                     viewModel.setFirstGameState(false)
                                     viewModel.setGameDifficult("Easy")
                                     viewModel.setFeeValue(4.0)
-                                    viewModel.setFirstGameAccountValue(1500.0)
+                                    viewModel.setFirstGameAccountValue(1600.0)
                                     viewModel.setShowGameDifficultDialog(true)
                                 } else {
                                     viewModel.setShowFirstGameAccountValueDialog(true)
@@ -156,7 +155,7 @@ fun AccountView(
                             }
                         )
                         Text(
-                            text = "Easy    ",
+                            text = "Easy",
                             style = typography.titleMedium
                         )
                         RadioButton(
@@ -166,7 +165,7 @@ fun AccountView(
                                     viewModel.setFirstGameState(false)
                                     viewModel.setGameDifficult("Medium")
                                     viewModel.setFeeValue(8.0)
-                                    viewModel.setFirstGameAccountValue(750.0)
+                                    viewModel.setFirstGameAccountValue(800.0)
                                     viewModel.setShowGameDifficultDialog(true)
                                 } else {
                                     viewModel.setShowFirstGameAccountValueDialog(true)
@@ -174,7 +173,7 @@ fun AccountView(
                             }
                         )
                         Text(
-                            text = "Medium    ",
+                            text = "Medium",
                             style = typography.titleMedium
                         )
                         RadioButton(
@@ -184,7 +183,7 @@ fun AccountView(
                                     viewModel.setFirstGameState(false)
                                     viewModel.setGameDifficult("Pro")
                                     viewModel.setFeeValue(16.0)
-                                    viewModel.setFirstGameAccountValue(375.0)
+                                    viewModel.setFirstGameAccountValue(400.0)
                                     viewModel.setShowGameDifficultDialog(true)
                                 } else {
                                     viewModel.setShowFirstGameAccountValueDialog(true)
@@ -192,7 +191,26 @@ fun AccountView(
                             }
                         )
                         Text(
-                            text = "Pro    ",
+                            text = "Pro",
+                            style = typography.titleMedium
+                        )
+
+                        RadioButton(
+                            selected = selectedOption == "Custom",
+                            onClick = {
+                                if (firstGame) {
+                                    viewModel.setFirstGameState(false)
+                                    viewModel.setGameDifficult("Custom")
+                                    viewModel.setFeeValue(0.0)
+                                    viewModel.setFirstGameAccountValue(0.0)
+                                    viewModel.setShowGameDifficultDialog(true)
+                                } else {
+                                    viewModel.setShowFirstGameAccountValueDialog(true)
+                                }
+                            }
+                        )
+                        Text(
+                            text = "Custom",
                             style = typography.titleMedium
                         )
 
