@@ -15,6 +15,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
@@ -28,9 +30,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -104,7 +108,7 @@ fun CoinDetailSheet(
                     .fillMaxWidth()
                     .padding(bottom = 20.dp)
                     .padding(horizontal = 5.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
+                horizontalAlignment = Alignment.Start,
 
 
             ) {
@@ -112,14 +116,19 @@ fun CoinDetailSheet(
                     text = "Account Credit: ${accountCreditState.toEuroString()}",
                     style = MaterialTheme.typography.titleMedium
                 )
-                Text(
-                    modifier = Modifier.clickable {
-                        inputValue = coinAmount.toString()
-
-                    },
-                    text = "Coins: $coinAmount",
-                    style = MaterialTheme.typography.titleMedium
-                )
+                Row (verticalAlignment = Alignment.CenterVertically){
+                    Text(
+                        text = "Coins: $coinAmount",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    IconButton(
+                        modifier = Modifier.padding(start = 5.dp).scale(0.8f),
+                        onClick = { inputValue = coinAmount.toString() },
+                    ) {
+                        Icon(painterResource(id = R.drawable.baseline_content_copy_24), contentDescription = "Copy value")
+                    }
+                    Text("Copy Coinvalue", style = MaterialTheme.typography.labelMedium)
+                }
             }
 
             CoinDetailChartPlotter(coinSparklineData = selectedCoin.sparkline)
