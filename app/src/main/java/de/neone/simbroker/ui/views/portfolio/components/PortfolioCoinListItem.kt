@@ -45,7 +45,7 @@ import coil3.request.error
 import de.neone.simbroker.R
 import de.neone.simbroker.data.helper.SBHelper
 import de.neone.simbroker.data.helper.SBHelper.roundTo2
-import de.neone.simbroker.data.helper.SBHelper.roundTo6
+import de.neone.simbroker.data.helper.SBHelper.roundTo8
 import de.neone.simbroker.data.helper.SBHelper.toEuroString
 import de.neone.simbroker.data.helper.SBHelper.toPercentString
 import de.neone.simbroker.data.local.mockdata.coins_Mockdata
@@ -340,7 +340,7 @@ fun PortfolioCoinListItem(
 
                     val anteilEUR = it.price.roundTo2() * it.amount
                     val gewVer =
-                        (currentPrice.roundTo2() - it.price.roundTo2()) * it.amount.roundTo6()
+                        (currentPrice.roundTo2() - it.price.roundTo2()) * it.amount.roundTo8()
                     val gvProzent =
                         (((currentPrice.roundTo2() / it.price.roundTo2()) - 1) * 100)
 
@@ -387,7 +387,7 @@ fun PortfolioCoinListItem(
                                     )
                                     Spacer(modifier = Modifier.weight(1f))
                                     Text(
-                                        text = (it.amount).roundTo6().toString(),
+                                        text = (it.amount).roundTo8().toString(),
                                         style = MaterialTheme.typography.labelMedium
                                     )
 

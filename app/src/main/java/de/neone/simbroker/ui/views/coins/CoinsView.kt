@@ -62,6 +62,7 @@ fun CoinsView(
     var openSucheSheet by rememberSaveable { mutableStateOf(false) }
     var openCoinDetailSheet by rememberSaveable { mutableStateOf(false) }
 
+    val showNotEnoughCoinstDialog by viewModel.showAccountNotEnoughCoins.collectAsState()
     val showNotEnoughCreditDialog by viewModel.showAccountNotEnoughMoney.collectAsState()
     val showAccountCashInDialog by viewModel.showAccountCashIn.collectAsState()
 
@@ -186,6 +187,9 @@ fun CoinsView(
                     notEnoughCredit = {
                         viewModel.setShowAccountNotEnoughMoney(true)
                     },
+                    notEnoughCoins = {
+                        viewModel.setAccountNotEnoughCoins(true)
+                    },
                     coinAmount = allPortfolioPositions.sumOf { it.amountRemaining },
                     accountCreditState = accountCreditState
                 )
@@ -194,7 +198,11 @@ fun CoinsView(
     }
 
     if (showNotEnoughCreditDialog) {
-        AlertDialog("You have not enough Credit!") { viewModel.setShowAccountNotEnoughMoney(false) }
+        AlertDialog("You cant buy this Coin! Check your Credit.") { viewModel.setShowAccountNotEnoughMoney(false) }
+    }
+
+    if (showNotEnoughCoinstDialog) {
+        AlertDialog("You can't sell more than you have. Check your account balance.") { viewModel.setAccountNotEnoughCoins(false) }
     }
 
     if (showAccountCashInDialog) {

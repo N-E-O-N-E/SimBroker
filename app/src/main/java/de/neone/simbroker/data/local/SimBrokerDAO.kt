@@ -14,7 +14,7 @@ interface SimBrokerDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTransaction(transaction: TransactionPositions)
 
-    @Query("UPDATE TBL_TRANSACTION SET isClosed = :isClosed WHERE id = :transactionId AND type = 'BUY'")
+    @Query("UPDATE TBL_TRANSACTION SET isClosed = :isClosed WHERE id = :transactionId")
     suspend fun updateTransactionClosed(transactionId: Int, isClosed: Boolean)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

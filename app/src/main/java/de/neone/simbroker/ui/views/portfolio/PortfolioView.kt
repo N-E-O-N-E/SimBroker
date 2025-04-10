@@ -88,6 +88,7 @@ fun PortfolioView(
     var showFavorites by rememberSaveable { mutableStateOf(true) }
     var favoriteTrigger by rememberSaveable { mutableStateOf(false) }
 
+    val showNotEnoughCoinstDialog by viewModel.showAccountNotEnoughCoins.collectAsState()
     val showNotEnoughCreditDialog by viewModel.showAccountNotEnoughMoney.collectAsState()
     val showAccountCashInDialog by viewModel.showAccountCashIn.collectAsState()
 
@@ -266,6 +267,9 @@ fun PortfolioView(
                     notEnoughCredit = {
                         viewModel.setShowAccountNotEnoughMoney(true)
                     },
+                    notEnoughCoins = {
+                        viewModel.setAccountNotEnoughCoins(true)
+                    },
                     coinAmount = allPortfolioPositions.sumOf { it.amountRemaining },
                     accountCreditState = accountCreditState,
                 )
@@ -274,7 +278,11 @@ fun PortfolioView(
     }
 
     if (showNotEnoughCreditDialog) {
-        AlertDialog("You have not enough Credit!") { viewModel.setShowAccountNotEnoughMoney(false) }
+        AlertDialog("You cant buy this Coin! Check your Credit.") { viewModel.setShowAccountNotEnoughMoney(false) }
+    }
+
+    if (showNotEnoughCoinstDialog) {
+        AlertDialog("You can't sell more than you have. Check your account balance.") { viewModel.setAccountNotEnoughCoins(false) }
     }
 
     if (showAccountCashInDialog) {

@@ -43,7 +43,7 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.request.error
 import de.neone.simbroker.R
-import de.neone.simbroker.data.helper.SBHelper.roundTo6
+import de.neone.simbroker.data.helper.SBHelper.roundTo8
 import de.neone.simbroker.data.helper.SBHelper.toEuroString
 import de.neone.simbroker.data.helper.SBHelper.toPercentString
 import de.neone.simbroker.data.remote.models.Coin
@@ -66,6 +66,7 @@ fun CoinDetailSheet(
     onBuyClick: (Double, Double) -> Unit,
     onSellClick: (Double, Double) -> Unit,
     notEnoughCredit: () -> Unit,
+    notEnoughCoins: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     Log.d("simDebug", accountCreditState.toString())
@@ -125,7 +126,7 @@ fun CoinDetailSheet(
                 Row(verticalAlignment = Alignment.CenterVertically) {
 
                     Text(
-                        text = "Amount in wallet: ${coinAmount.roundTo6()}",
+                        text = "Amount in wallet: ${coinAmount.roundTo8()}",
                         style = MaterialTheme.typography.titleMedium
                     )
                     IconButton(
@@ -134,7 +135,7 @@ fun CoinDetailSheet(
                             .scale(0.8f),
                         onClick = {
                             selectedOption = "amount"
-                            inputValue = coinAmount.roundTo6().toString()
+                            inputValue = coinAmount.toString()
                             Toast.makeText(context, "Value copied", Toast.LENGTH_SHORT).show()
                         },
                     ) {
@@ -340,6 +341,10 @@ fun CoinDetailSheet(
                         else inputValue.toDouble() / selectedCoin.price.toDouble()
 
 
+                        if (coinAmount < amount) {
+                            notEnoughCoins()
+                            return@Button
+                        }
 
                         onSellClick(amount, selectedCoin.price.toDouble())
 
