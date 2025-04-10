@@ -88,7 +88,7 @@ fun CoinDetailSheet(
 
         ) {
 
-        var selectedOption by remember { mutableStateOf("amount") } // "amount" oder "price"
+        var selectedOption by remember { mutableStateOf("price") } // "amount" oder "price"
         var inputValue by remember { mutableStateOf("") }
         val currentCoinPrice = selectedCoin.price.toDouble() // Aktueller aus API
 
@@ -133,7 +133,8 @@ fun CoinDetailSheet(
                             .padding(start = 5.dp)
                             .scale(0.8f),
                         onClick = {
-                            inputValue = coinAmount.toString()
+                            selectedOption = "amount"
+                            inputValue = coinAmount.roundTo6().toString()
                             Toast.makeText(context, "Value copied", Toast.LENGTH_SHORT).show()
                         },
                     ) {
@@ -238,14 +239,14 @@ fun CoinDetailSheet(
             ) {
 
                 RadioButton(
-                    selected = selectedOption == "amount",
-                    onClick = { selectedOption = "amount"; inputValue = "" })
-                Text("Amount (Coin)")
-
-                RadioButton(
                     selected = selectedOption == "price",
                     onClick = { selectedOption = "price"; inputValue = "" })
                 Text("Price (EUR)")
+
+                RadioButton(
+                    selected = selectedOption == "amount",
+                    onClick = { selectedOption = "amount"; inputValue = "" })
+                Text("Amount (Coin)")
             }
 
             Column(

@@ -452,9 +452,10 @@ class SimBrokerViewModel(
     fun buyCoin(selectedCoin: Coin, amount: Double, feeValue: Double, totalValue: Double) {
         viewModelScope.launch(Dispatchers.IO) {
 
-            val newAmount = amount
-            val newFeeValue = feeValue
-            val newTotalValue = totalValue
+            val newAmount = amount.roundTo6()
+            val newFeeValue = feeValue.roundTo2()
+            val newTotalValue = totalValue.roundTo2()
+            val coinPrice = selectedCoin.price.toDouble().roundTo2()
 
             setInvestedValue(newTotalValue)
             updateAccountValue(-newTotalValue - newFeeValue)
@@ -469,10 +470,10 @@ class SimBrokerViewModel(
                     symbol = selectedCoin.symbol,
                     iconUrl = selectedCoin.iconUrl,
                     name = selectedCoin.name,
-                    amountBought = newAmount.roundTo6(),
-                    amountRemaining = newAmount.roundTo6(),
-                    pricePerUnit = selectedCoin.price.toDouble().roundTo2(),
-                    totalValue = newTotalValue.roundTo2()
+                    amountBought = newAmount,
+                    amountRemaining = newAmount,
+                    pricePerUnit = coinPrice ,
+                    totalValue = newTotalValue
                 )
             )
 
@@ -480,15 +481,15 @@ class SimBrokerViewModel(
 
             addTransaction(
                 TransactionPositions(
-                    fee = newFeeValue.roundTo2(),
+                    fee = newFeeValue,
                     coinUuid = selectedCoin.uuid,
                     symbol = selectedCoin.symbol,
                     iconUrl = selectedCoin.iconUrl,
                     name = selectedCoin.name,
-                    price = selectedCoin.price.toDouble().roundTo2(),
-                    amount = newAmount.roundTo6(),
+                    price = coinPrice,
+                    amount = newAmount,
                     type = TransactionType.BUY,
-                    totalValue = newTotalValue.roundTo2(),
+                    totalValue = newTotalValue,
                     portfolioCoinID = allPortfolioPositions.value.last().id
                 )
             )
@@ -509,7 +510,11 @@ class SimBrokerViewModel(
                 .filter { !it.isClosed }
                 .sortedBy { it.timestamp }
 
-            var remainingToSell = amountToSell
+            val newFee = fee.roundTo2()
+            val newAmountToSell = amountToSell.roundTo6()
+            val newCurrentPrice = currentPrice.roundTo2()
+
+            var remainingToSell = newAmountToSell
             var isFirstSell = true
             var totalCashIn = 0.0
             var totalInvestReduction = 0.0
@@ -518,9 +523,9 @@ class SimBrokerViewModel(
             for (buy in openBuys) {
                 if (remainingToSell <= 0) break
 
-                val sellAmount = minOf(remainingToSell, buy.amount)
-                val usedFee = if (isFirstSell) fee else 0.0
-                val value = sellAmount * currentPrice
+                val sellAmount = minOf(remainingToSell, buy.amount).roundTo6()
+                val usedFee = if (isFirstSell) newFee else 0.00
+                val value = (sellAmount * newCurrentPrice)
 
                 totalCashIn += value
                 remainingToSell -= sellAmount
@@ -532,8 +537,8 @@ class SimBrokerViewModel(
                         symbol = buy.symbol,
                         iconUrl = buy.iconUrl,
                         name = buy.name,
-                        price = currentPrice.roundTo2(),
-                        amount = sellAmount.roundTo6(),
+                        price = newCurrentPrice,
+                        amount = sellAmount,
                         fee = usedFee,
                         type = TransactionType.SELL,
                         totalValue = value.roundTo2(),
@@ -555,19 +560,19 @@ class SimBrokerViewModel(
             for (entry in portfolioEntries) {
                 if (localRemaining <= 0) break
 
-                val reduceAmount = minOf(localRemaining, entry.amountRemaining)
-                val newRemaining = entry.amountRemaining - reduceAmount
-                val valueReduction = reduceAmount * entry.pricePerUnit
+                val reduceAmount = minOf(localRemaining, entry.amountRemaining).roundTo6()
+                val newRemaining = (entry.amountRemaining - reduceAmount).roundTo6()
+                val valueReduction = (reduceAmount * entry.pricePerUnit).roundTo2()
 
                 totalInvestReduction += valueReduction
 
-                if (newRemaining <= 0.0000001) {
+                if (newRemaining <= 0.000001) {
                     deletePortfolioById(entry.id)
 
                 } else {
                     addPortfolio(entry.copy(
                         amountRemaining = newRemaining,
-                        totalValue = newRemaining * entry.pricePerUnit
+                        totalValue = (newRemaining * entry.pricePerUnit).roundTo2()
                     ))
                 }
 
