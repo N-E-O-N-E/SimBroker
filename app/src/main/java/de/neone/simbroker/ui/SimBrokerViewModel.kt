@@ -238,7 +238,7 @@ class SimBrokerViewModel(
             val newValue = currentValue.plus(value).coerceAtLeast(0.0)
             if (currentValue in 0.0..450.0) {
                 dataStore.edit {
-                    it[DATASTORE_ACCOUNTVALUE] = newValue ?: 0.0
+                    it[DATASTORE_ACCOUNTVALUE] = newValue
                 }
                 Log.d("simDebug", "DataStore Account Credit manual increased")
 
@@ -254,32 +254,12 @@ class SimBrokerViewModel(
             val currentValue = dataStore.data.first()[DATASTORE_ACCOUNTVALUE] ?: 0.0
             val newValue = currentValue.plus(value).coerceAtLeast(0.0)
             dataStore.edit {
-                it[DATASTORE_ACCOUNTVALUE] = newValue ?: 0.0
+                it[DATASTORE_ACCOUNTVALUE] = newValue
             }
             Log.d("simDebug", "DataStore Account Credit increased $newValue")
         }
     }
 
-    private fun reduceAccountValue(value: Double) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val currentValue = dataStore.data.first()[DATASTORE_ACCOUNTVALUE]
-            if (currentValue != null) {
-                if (currentValue >= value) {
-                    val newAccountValue = currentValue - value
-                    dataStore.edit {
-                        it[DATASTORE_ACCOUNTVALUE] = newAccountValue
-                    }
-                    _showAccountNotEnoughMoney.value = false
-                    Log.d(
-                        "simDebug",
-                        "DataStore Account Credit reduce. Current Credit: ${accountValueState.value}. InputValue: $value. Save Value: $newAccountValue"
-                    )
-                }
-            } else {
-                _showAccountNotEnoughMoney.value = true
-            }
-        }
-    }
 
     // Invested Value -----------------------------------------------------------------------------
 
@@ -308,19 +288,6 @@ class SimBrokerViewModel(
             }
 
             Log.d("simDebug", "DataStore invested value increased. New Value: $newValue")
-        }
-    }
-
-    private fun reduceInvestedValue(value: Double) {
-        viewModelScope.launch(Dispatchers.IO) {
-            Log.d("simDebug", "Called reduceInvestedValue with: $value")
-            val currentValue = dataStore.data.first()[DATASTORE_TOTALINVESTVALUE] ?: 0.0
-            val newValue = (currentValue - value).coerceAtLeast(0.0)
-
-            dataStore.edit {
-                it[DATASTORE_TOTALINVESTVALUE] = newValue
-            }
-            Log.d("simDebug", "DataStore invested value reduce. New Value: $newValue")
         }
     }
 
@@ -361,12 +328,11 @@ class SimBrokerViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val newCoins = repository.getCoins(offset = offset, limit = limit)
-                _coinList.value =
-                    _coinList.value + newCoins // nicht mit += da sich die Referenz nicht mitändert!
-                offset = offset + limit
+                _coinList.value += newCoins
+                offset += limit
                 hasMoreData = newCoins.isNotEmpty()
             } catch (e: Exception) {
-                Log.e("SimBrokerViewModel", "Fehler beim Laden der Coins", e)
+                Log.e("simBroker", "Error loading more coins", e)
             } finally {
                 isLoading = false
 
@@ -389,7 +355,7 @@ class SimBrokerViewModel(
                 val coinDetails = repository.getCoin(uuid, timePeriod)
                 _coinDetails.value = coinDetails
             } catch (e: Exception) {
-                Log.e("SimBrokerViewModel", "Fehler beim Laden der CoinDetails", e)
+                Log.e("SimBrokerViewModel", "Error loading coin details", e)
             }
         }
     }
@@ -402,9 +368,9 @@ class SimBrokerViewModel(
                     _coinList.value = refreshedCoins
                     offset = refreshedCoins.size
                 }
-                Log.d("simDebug", "Coins aktualisiert: ${refreshedCoins.size}")
+                Log.d("simDebug", "Coins refreshed: ${refreshedCoins.size}")
             } catch (e: Exception) {
-                Log.e("simDebug", "Fehler beim Aktualisieren der Coins", e)
+                Log.e("simDebug", "Error refreshing coins", e)
             }
         }
     }
@@ -433,13 +399,6 @@ class SimBrokerViewModel(
         }
     }
 
-    private fun deleteTransactionbyCoinId(coinUuid: String) {
-        Log.d("simDebug", "deleteTransaction over ViewModel started")
-        viewModelScope.launch {
-            repository.deleteTransactionByCoinId(coinUuid)
-        }
-    }
-
     private fun addPortfolio(portfolio: PortfolioPositions) {
         Log.d("simDebug", "addPosition over ViewModel started")
         viewModelScope.launch {
@@ -457,15 +416,11 @@ class SimBrokerViewModel(
     fun buyCoin(selectedCoin: Coin, amount: Double, feeValue: Double, totalValue: Double) {
         viewModelScope.launch(Dispatchers.IO) {
 
-            val newAmount = amount
-            val newFeeValue = feeValue
-            val newTotalValue = totalValue
+            setInvestedValue(totalValue)
+            updateAccountValue(-totalValue - feeValue)
 
-            setInvestedValue(newTotalValue)
-            updateAccountValue(-newTotalValue - newFeeValue)
-
-            Log.d("simDebug", "setInvestedValue: $newTotalValue")
-            Log.d("simDebug", "setAccountValue: ${(-newTotalValue - newFeeValue)}")
+            Log.d("simDebug", "setInvestedValue: $totalValue")
+            Log.d("simDebug", "setAccountValue: ${(-totalValue - feeValue)}")
 
 
             addPortfolio(
@@ -474,10 +429,10 @@ class SimBrokerViewModel(
                     symbol = selectedCoin.symbol,
                     iconUrl = selectedCoin.iconUrl,
                     name = selectedCoin.name,
-                    amountBought = newAmount,
-                    amountRemaining = newAmount,
+                    amountBought = amount,
+                    amountRemaining = amount,
                     pricePerUnit = selectedCoin.price.toDouble().roundTo2(),
-                    totalValue = newTotalValue.roundTo2()
+                    totalValue = totalValue.roundTo2()
                 )
             )
 
@@ -485,15 +440,15 @@ class SimBrokerViewModel(
 
             addTransaction(
                 TransactionPositions(
-                    fee = newFeeValue.roundTo2(),
+                    fee = feeValue.roundTo2(),
                     coinUuid = selectedCoin.uuid,
                     symbol = selectedCoin.symbol,
                     iconUrl = selectedCoin.iconUrl,
                     name = selectedCoin.name,
                     price = selectedCoin.price.toDouble().roundTo2(),
-                    amount = newAmount,
+                    amount = amount,
                     type = TransactionType.BUY,
-                    totalValue = newTotalValue.roundTo2(),
+                    totalValue = totalValue.roundTo2(),
                     portfolioCoinID = allPortfolioPositions.value.last().id
                 )
             )
@@ -546,7 +501,7 @@ class SimBrokerViewModel(
                 )
 
                 if (sellAmount == buy.amount) {
-                    updateTransactionClosed(buy.id, true)
+                    updateTransactionClosed(buy.id)
                 }
             }
 
@@ -605,12 +560,12 @@ class SimBrokerViewModel(
         }
     }
 
-    fun updateTransactionClosed(transactionId: Int, isClosed: Boolean) {
+    private fun updateTransactionClosed(transactionId: Int) {
         Log.d("simDebug", "updateTransaction over ViewModel started")
         viewModelScope.launch {
             repository.updateTransactionClosed(
                 transactionId = transactionId,
-                isClosed = isClosed
+                isClosed = true
             )
         }
     }
@@ -632,15 +587,6 @@ class SimBrokerViewModel(
                 started = SharingStarted.WhileSubscribed(),
                 initialValue = emptyList()
             )
-
-    fun getAllOpenBuyTransactionsByCoin(coinUuid: String): MutableList<TransactionPositions> {
-        var result = mutableListOf<TransactionPositions>()
-
-        viewModelScope.launch(Dispatchers.IO) {
-            result = repository.getOpenBuyTransactionsByCoin(coinUuid).toMutableList()
-        }
-        return result
-    }
 
 
 // Init -----------------------------------------------------------------------------
