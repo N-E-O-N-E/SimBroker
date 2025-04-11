@@ -659,10 +659,10 @@ class SimBrokerViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             mockDataState.collect {
                 Log.d("simDebug", "DataStore Mockdata value: $it")
-                loadAllPortfolioCoins()
                 startTimer()
-                refreshCoins()
+                //refreshCoins()
                 loadMoreCoins()
+                loadAllPortfolioCoins()
             }
         }
     }

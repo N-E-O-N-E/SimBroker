@@ -172,7 +172,7 @@ fun AccountView(
                         )
                         Text(
                             text = "Easy",
-                            style = typography.titleMedium
+                            style = typography.titleSmall
                         )
                         RadioButton(
                             selected = selectedOption == "Medium",
@@ -191,7 +191,7 @@ fun AccountView(
                         )
                         Text(
                             text = "Medium",
-                            style = typography.titleMedium
+                            style = typography.titleSmall
                         )
                         RadioButton(
                             selected = selectedOption == "Pro",
@@ -210,7 +210,7 @@ fun AccountView(
                         )
                         Text(
                             text = "Pro",
-                            style = typography.titleMedium
+                            style = typography.titleSmall
                         )
 
                         RadioButton(
@@ -230,7 +230,7 @@ fun AccountView(
                         )
                         Text(
                             text = "Custom",
-                            style = typography.titleMedium
+                            style = typography.titleSmall
                         )
 
                     }

@@ -110,9 +110,9 @@ fun PortfolioView(
         }
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.loadAllPortfolioCoins()
-    }
+//    LaunchedEffect(Unit) {
+//        viewModel.loadAllPortfolioCoins()
+//    }
 
     Column(
         modifier = Modifier
