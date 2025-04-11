@@ -8,7 +8,6 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import de.neone.simbroker.data.helper.SBHelper.roundTo2
 import de.neone.simbroker.data.local.models.PortfolioPositions
 import de.neone.simbroker.data.local.models.TransactionPositions
 import de.neone.simbroker.data.local.models.TransactionType
@@ -467,8 +466,8 @@ class SimBrokerViewModel(
                     name = selectedCoin.name,
                     amountBought = amount,
                     amountRemaining = amount,
-                    pricePerUnit = selectedCoin.price.toDouble().roundTo2(),
-                    totalValue = totalValue.roundTo2()
+                    pricePerUnit = selectedCoin.price.toDouble(),
+                    totalValue = totalValue
                 )
             )
 
@@ -476,15 +475,15 @@ class SimBrokerViewModel(
 
             addTransaction(
                 TransactionPositions(
-                    fee = feeValue.roundTo2(),
+                    fee = feeValue,
                     coinUuid = selectedCoin.uuid,
                     symbol = selectedCoin.symbol,
                     iconUrl = selectedCoin.iconUrl,
                     name = selectedCoin.name,
-                    price = selectedCoin.price.toDouble().roundTo2(),
+                    price = selectedCoin.price.toDouble(),
                     amount = amount,
                     type = TransactionType.BUY,
-                    totalValue = totalValue.roundTo2(),
+                    totalValue = totalValue,
                     portfolioCoinID = allPortfolioPositions.value.last().id
                 )
             )
@@ -551,6 +550,7 @@ class SimBrokerViewModel(
 
             // Passende SELL-Transaktionen aus offenen Käufen
             for (buy in openBuys) {
+                Log.d("simDebug", "openBuy: $remainingToSell")
                 if (remainingToSell <= 0.0000001) break
 
                 val sellAmount = minOf(remainingToSell, buy.amount) // wie viel vom Kauf verwendet wird
@@ -567,11 +567,11 @@ class SimBrokerViewModel(
                         symbol = buy.symbol,
                         iconUrl = buy.iconUrl,
                         name = buy.name,
-                        price = currentPrice.roundTo2(),
+                        price = currentPrice,
                         amount = sellAmount,
                         fee = usedFee,
                         type = TransactionType.SELL,
-                        totalValue = value.roundTo2(),
+                        totalValue = value,
                         portfolioCoinID = buy.portfolioCoinID
                     )
                 )
@@ -589,7 +589,7 @@ class SimBrokerViewModel(
             var localRemaining = amountToSell
 
             for (entry in portfolioEntries) {
-                if (localRemaining <= 0) break
+                if (localRemaining <= 0.0000001) break
 
                 val reduceAmount = minOf(localRemaining, entry.amountRemaining)
                 val newRemaining = entry.amountRemaining - reduceAmount

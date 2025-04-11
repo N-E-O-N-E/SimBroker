@@ -59,6 +59,14 @@ fun CoinsView(
     val feeValue by viewModel.feeValueState.collectAsState()
     val allPortfolioPositions by viewModel.allPortfolioPositions.collectAsState()
 
+    val allPortfolioPositionsGrouped = allPortfolioPositions
+        .filter { !it.isClosed }
+        .groupBy { it.coinUuid }
+    val allPortfolioGroupedList =
+        allPortfolioPositionsGrouped.values
+            .toList()
+            .filter { it.sumOf { pos -> pos.amountRemaining } > 0 && !it.first().isFavorite }
+
     var openSucheSheet by rememberSaveable { mutableStateOf(false) }
     var openCoinDetailSheet by rememberSaveable { mutableStateOf(false) }
 
@@ -190,7 +198,7 @@ fun CoinsView(
                     notEnoughCoins = {
                         viewModel.setAccountNotEnoughCoins(true)
                     },
-                    coinAmount = allPortfolioPositions.filter { it.coinUuid == selectedCoin!!.uuid  }.sumOf { it.amountRemaining },
+                    coinAmount = allPortfolioGroupedList.sumOf { it.sumOf { pos -> pos.amountRemaining } },
                     accountCreditState = accountCreditState
                 )
             }

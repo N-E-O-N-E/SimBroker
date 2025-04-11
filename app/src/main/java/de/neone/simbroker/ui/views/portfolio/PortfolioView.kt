@@ -279,7 +279,7 @@ fun PortfolioView(
                     notEnoughCoins = {
                         viewModel.setAccountNotEnoughCoins(true)
                     },
-                    coinAmount = allPortfolioPositions.filter { it.coinUuid == selectedCoin!!.uuid}.sumOf { it.amountRemaining },
+                    coinAmount = allPortfolioGroupedList.sumOf { it.sumOf { pos -> pos.amountRemaining } },
                     accountCreditState = accountCreditState,
                 )
             }

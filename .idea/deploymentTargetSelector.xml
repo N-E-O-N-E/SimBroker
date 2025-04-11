@@ -4,7 +4,7 @@
     <selectionStates>
       <SelectionState runConfigName="SimBroker">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-04-09T12:00:18.208963Z">
+        <DropdownSelection timestamp="2025-04-11T21:18:56.712006400Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\wirtz\.android\avd\Pixel_7_Pro_Edited_API_35.avd" />
@@ -15,12 +15,12 @@
           <targets>
             <Target type="DEFAULT_BOOT">
               <handle>
-                <DeviceId pluginId="PhysicalDevice" identifier="serial=wc79y58ljbtklvwc" />
+                <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\wirtz\.android\avd\Pixel_7_Pro_Edited_API_35.avd" />
               </handle>
             </Target>
             <Target type="DEFAULT_BOOT">
               <handle>
-                <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\wirtz\.android\avd\Pixel_7_Pro_Edited_API_35.avd" />
+                <DeviceId pluginId="PhysicalDevice" identifier="serial=wc79y58ljbtklvwc" />
               </handle>
             </Target>
           </targets>
