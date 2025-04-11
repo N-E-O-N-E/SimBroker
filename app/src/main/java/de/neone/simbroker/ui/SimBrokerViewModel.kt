@@ -330,7 +330,7 @@ class SimBrokerViewModel(
 
     private var isLoading = false
     private var offset = 0
-    private val limit = 5
+    private val limit = 50
     private var hasMoreData = true
 
     fun loadMoreCoins() {
