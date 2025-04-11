@@ -80,7 +80,9 @@ fun PortfolioView(
             .toList()
             .filter { it.sumOf { pos -> pos.amountRemaining } > 0 && !it.first().isFavorite }
 
-    val allPortfolioPositionsGroupedByFavorite = allPortfolioPositions.groupBy { it.coinUuid }
+    val allPortfolioPositionsGroupedByFavorite = allPortfolioPositions
+        .filter { !it.isClosed }
+        .groupBy { it.coinUuid }
     val allPortfolioGroupedFavorites =
         allPortfolioPositionsGroupedByFavorite.values.toList()
             .filter { it.sumOf { pos -> pos.amountRemaining } > 0 && it.first().isFavorite }
