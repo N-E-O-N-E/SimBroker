@@ -80,6 +80,7 @@ fun PortfolioView(
             .toList()
             .filter { it.sumOf { pos -> pos.amountRemaining } > 0 && !it.first().isFavorite }
 
+
     val allPortfolioPositionsGroupedByFavorite = allPortfolioPositions
         .filter { !it.isClosed }
         .groupBy { it.coinUuid }
@@ -107,6 +108,10 @@ fun PortfolioView(
             showFavorites = !showFavorites
             favoriteTrigger = false
         }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.loadAllPortfolioCoins()
     }
 
     Column(

@@ -330,7 +330,7 @@ class SimBrokerViewModel(
 
     private var isLoading = false
     private var offset = 0
-    private val limit = 50
+    private val limit = 100
     private var hasMoreData = true
 
     fun loadMoreCoins() {
@@ -386,6 +386,26 @@ class SimBrokerViewModel(
             }
         }
     }
+
+    fun loadAllPortfolioCoins() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val portfolioUuids = allPortfolioPositions.value.map { it.coinUuid }.distinct()
+            val existingUuids = _coinList.value.map { it.uuid }
+
+            val missingUuids = portfolioUuids.filter { it !in existingUuids }
+
+            val loadedPortfolioCoins = missingUuids.mapNotNull { uuid ->
+                try {
+                    repository.getCoin(uuid, timePeriod = "3h")
+                } catch (e: Exception) {
+                    Log.e("simDebug", "Error loading portfolio coin $uuid", e)
+                    null
+                }
+            }
+            _coinList.value = (_coinList.value + loadedPortfolioCoins).distinctBy { it.uuid }
+        }
+    }
+
 
     // Room Database -----------------------------------------------------------------------------
 
@@ -639,6 +659,7 @@ class SimBrokerViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             mockDataState.collect {
                 Log.d("simDebug", "DataStore Mockdata value: $it")
+                loadAllPortfolioCoins()
                 startTimer()
                 refreshCoins()
                 loadMoreCoins()
