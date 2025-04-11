@@ -373,6 +373,8 @@ fun AccountView(
                 viewModel.resetInvestedValue()
                 viewModel.deleteAllTransactions()
                 viewModel.deleteAllPortfolioPositions()
+                viewModel.setMockData(false)
+                developerMode = false
                 Toast.makeText(context, "New Game started...", Toast.LENGTH_SHORT).show()
             },
             onDismiss = { viewModel.setShowEraseDialog(false) }
