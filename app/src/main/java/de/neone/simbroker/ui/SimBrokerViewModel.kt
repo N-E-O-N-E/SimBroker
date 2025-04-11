@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 /**
  * ViewModel für die SimBroker Krypto-Trading-App.
@@ -214,15 +215,12 @@ class SimBrokerViewModel(
 
     // SETZE KONTOSTAND
     fun setFirstGameAccountValue(value: Double) {
-        resetAccountValue()
         viewModelScope.launch(Dispatchers.IO) {
-            setInvestedValue(0.0)
-            val newValue = accountValueState.value + value
             if (firstGameState.value) {
                 dataStore.edit {
-                    it[DATASTORE_ACCOUNTVALUE] = newValue
+                    it[DATASTORE_ACCOUNTVALUE] = value
                 }
-                Log.d("simDebug", "DataStore First Account Credit increased $newValue")
+                Log.d("simDebug", "DataStore First Account Credit increased $value")
 
                 _showFirstGameAccountValueDialog.value = false
             } else {
@@ -473,7 +471,7 @@ class SimBrokerViewModel(
 
     fun updatePortfolio(coinId: String, isFavorite: Boolean) {
         Log.d("simDebug", "updatePosition over ViewModel started")
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             repository.updatePortfolioFavorite(
                 coinId = coinId,
                 isFavorite = isFavorite
@@ -483,9 +481,19 @@ class SimBrokerViewModel(
 
     private fun updateTransactionClosed(transactionId: Int) {
         Log.d("simDebug", "updateTransaction over ViewModel started")
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             repository.updateTransactionClosed(
                 transactionId = transactionId,
+                isClosed = true
+            )
+        }
+    }
+
+    private fun updatePortfolioClosed(portfolioId: Int) {
+        Log.d("simDebug", "updatePortfolio over ViewModel started")
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updatePortfolioClosed(
+                portfolioId = portfolioId,
                 isClosed = true
             )
         }
@@ -544,7 +552,7 @@ class SimBrokerViewModel(
                     )
                 )
 
-                if (sellAmount == buy.amount) {
+                if (abs(sellAmount - buy.amount) < 0.0000001) {
                     updateTransactionClosed(buy.id)
                 }
             }
@@ -566,8 +574,10 @@ class SimBrokerViewModel(
                 totalInvestReduction += valueReduction
 
                 if (newRemaining <= 0.0000001) {
-                    deletePortfolioById(entry.id)
-                    // Position leer dann löschen
+//                    deletePortfolioById(entry.id)
+//                    // Position leer dann löschen
+                    Log.d("simDebug", "portfolioPosition ${entry.id} set isClosed over ViewModel started")
+                    updatePortfolioClosed(entry.id)
 
                 } else {
                     // Restmenge aktualisieren

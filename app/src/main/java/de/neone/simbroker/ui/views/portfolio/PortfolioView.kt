@@ -72,7 +72,9 @@ fun PortfolioView(
     val coinList by viewModel.coinList.collectAsState()
     val allPortfolioPositions by viewModel.allPortfolioPositions.collectAsState()
 
-    val allPortfolioPositionsGrouped = allPortfolioPositions.groupBy { it.coinUuid }
+    val allPortfolioPositionsGrouped = allPortfolioPositions
+        .filter { !it.isClosed }
+        .groupBy { it.coinUuid }
     val allPortfolioGroupedList =
         allPortfolioPositionsGrouped.values
             .toList()
@@ -218,9 +220,9 @@ fun PortfolioView(
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            itemsIndexed(allPortfolioGroupedList) { _, position ->
+            itemsIndexed(allPortfolioGroupedList) { _, positions ->
                 PortfolioCoinListPositionObject(
-                    coinList, allTransactionPositions, position,
+                    coinList, allTransactionPositions, positions,
                     isFavorite = { coinUuid, isFavorite ->
                         viewModel.updatePortfolio(
                             coinId = coinUuid,
@@ -228,7 +230,7 @@ fun PortfolioView(
                         )
                     },
                     isClicked = {
-                        selectedCoin = coinList.find { it.uuid == position.first().coinUuid }
+                        selectedCoin = coinList.find { it.uuid == positions.first().coinUuid }
                         openCoinDetailSheet = true
                     }
                 )
@@ -278,14 +280,26 @@ fun PortfolioView(
     }
 
     if (showNotEnoughCreditDialog) {
-        AlertDialog("You cant buy this Coin! Check your Credit.") { viewModel.setShowAccountNotEnoughMoney(false) }
+        AlertDialog("You cant buy this Coin! Check your Credit.") {
+            viewModel.setShowAccountNotEnoughMoney(
+                false
+            )
+        }
     }
 
     if (showNotEnoughCoinstDialog) {
-        AlertDialog("You can't sell more than you have. Check your account balance.") { viewModel.setAccountNotEnoughCoins(false) }
+        AlertDialog("You can't sell more than you have. Check your account balance.") {
+            viewModel.setAccountNotEnoughCoins(
+                false
+            )
+        }
     }
 
     if (showAccountCashInDialog) {
-        AlertDialog("Your Credit is: ${accountCreditState.roundTo2()} €") { viewModel.setAccountCashIn(false) }
+        AlertDialog("Your Credit is: ${accountCreditState.roundTo2()} €") {
+            viewModel.setAccountCashIn(
+                false
+            )
+        }
     }
 }

@@ -17,6 +17,9 @@ interface SimBrokerDAO {
     @Query("UPDATE TBL_TRANSACTION SET isClosed = :isClosed WHERE id = :transactionId")
     suspend fun updateTransactionClosed(transactionId: Int, isClosed: Boolean)
 
+    @Query("UPDATE TBL_PORTFOLIO SET isClosed = :isClosed WHERE id = :portfolioId")
+    suspend fun updatePortfolioClosed(portfolioId: Int, isClosed: Boolean)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPortfolio(portfolio: PortfolioPositions)
 

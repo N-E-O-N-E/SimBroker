@@ -21,6 +21,7 @@ data class PortfolioPositions(
     val pricePerUnit: Double, // Preis pro Coin zum Zeitpunkt des Kaufs
     val totalValue: Double, // 	Gesamtwert der Position zum Kaufzeitpunkt"
     val isFavorite: Boolean = false, // Favoriten-Status
+    val isClosed: Boolean = false, // Abgeschlossen
 )
 
 @Entity(tableName = "tbl_transaction")

@@ -23,7 +23,7 @@ fun PortfolioCoinListPositionObject(
     val coinSellTransactions =
         transactionList.filter { it.coinUuid == coinUuid && it.type == TransactionType.SELL }
 
-    val portfolioIdsForThisCoin = portfolioPosition.map { it.id }
+    val portfolioIdsForThisCoin = portfolioPosition.filter{ !it.isClosed }.map { it.id }
 
     val transactionFiltered = transactionList.filter {
         it.coinUuid == coinUuid && it.portfolioCoinID in portfolioIdsForThisCoin
