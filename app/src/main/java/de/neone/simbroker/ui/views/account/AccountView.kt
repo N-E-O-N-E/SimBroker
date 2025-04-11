@@ -159,11 +159,11 @@ fun AccountView(
                             selected = selectedOption == "Easy",
                             onClick = {
                                 if (firstGame) {
-                                    viewModel.setFirstGameState(false)
                                     viewModel.setGameDifficult("Easy")
-                                    viewModel.setFeeValue(4.0)
-                                    viewModel.setFirstGameAccountValue(1600.0)
+                                    viewModel.setFirstGameState(false)
                                     viewModel.setShowGameDifficultDialog(true)
+                                    viewModel.setFirstGameAccountValue(1600.0)
+                                    viewModel.setFeeValue(4.0)
                                     Toast.makeText(context, "Game Difficulty is now: Easy", Toast.LENGTH_SHORT).show()
                                 } else {
                                     viewModel.setShowFirstGameAccountValueDialog(true)
@@ -178,11 +178,11 @@ fun AccountView(
                             selected = selectedOption == "Medium",
                             onClick = {
                                 if (firstGame) {
-                                    viewModel.setFirstGameState(false)
                                     viewModel.setGameDifficult("Medium")
-                                    viewModel.setFeeValue(8.0)
-                                    viewModel.setFirstGameAccountValue(800.0)
+                                    viewModel.setFirstGameState(false)
                                     viewModel.setShowGameDifficultDialog(true)
+                                    viewModel.setFirstGameAccountValue(800.0)
+                                    viewModel.setFeeValue(8.0)
                                     Toast.makeText(context, "Game Difficulty is now: Medium", Toast.LENGTH_SHORT).show()
                                 } else {
                                     viewModel.setShowFirstGameAccountValueDialog(true)
@@ -197,11 +197,11 @@ fun AccountView(
                             selected = selectedOption == "Pro",
                             onClick = {
                                 if (firstGame) {
-                                    viewModel.setFirstGameState(false)
                                     viewModel.setGameDifficult("Pro")
-                                    viewModel.setFeeValue(16.0)
-                                    viewModel.setFirstGameAccountValue(400.0)
+                                    viewModel.setFirstGameState(false)
                                     viewModel.setShowGameDifficultDialog(true)
+                                    viewModel.setFirstGameAccountValue(400.0)
+                                    viewModel.setFeeValue(16.0)
                                     Toast.makeText(context, "Game Difficulty is now: Pro", Toast.LENGTH_SHORT).show()
                                 } else {
                                     viewModel.setShowFirstGameAccountValueDialog(true)
@@ -217,11 +217,11 @@ fun AccountView(
                             selected = selectedOption == "Custom",
                             onClick = {
                                 if (firstGame) {
-                                    viewModel.setFirstGameState(false)
                                     viewModel.setGameDifficult("Custom")
-                                    viewModel.setFeeValue(0.0)
-                                    viewModel.setFirstGameAccountValue(0.0)
+                                    viewModel.setFirstGameState(false)
                                     viewModel.setShowGameDifficultDialog(true)
+                                    viewModel.setFirstGameAccountValue(0.0)
+                                    viewModel.setFeeValue(0.0)
                                     Toast.makeText(context, "Game Difficulty is now: Custom", Toast.LENGTH_SHORT).show()
                                 } else {
                                     viewModel.setShowFirstGameAccountValueDialog(true)

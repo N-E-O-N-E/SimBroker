@@ -199,19 +199,20 @@ class SimBrokerViewModel(
     }
 
     fun setFirstGameAccountValue(value: Double) {
-        if (firstGameState.value) {
-            resetAccountValue()
+        resetAccountValue()
+        viewModelScope.launch(Dispatchers.IO) {
             setInvestedValue(0.0)
             val newValue = accountValueState.value + value
-            viewModelScope.launch(Dispatchers.IO) {
+            if (firstGameState.value) {
                 dataStore.edit {
                     it[DATASTORE_ACCOUNTVALUE] = newValue
                 }
                 Log.d("simDebug", "DataStore First Account Credit increased $newValue")
+
+                _showFirstGameAccountValueDialog.value = false
+            } else {
+                _showFirstGameAccountValueDialog.value = true
             }
-            _showFirstGameAccountValueDialog.value = false
-        } else {
-            _showFirstGameAccountValueDialog.value = true
         }
     }
 
@@ -235,7 +236,6 @@ class SimBrokerViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             val currentValue = dataStore.data.first()[DATASTORE_ACCOUNTVALUE] ?: 0.0
             val newValue = currentValue.plus(value).coerceAtLeast(0.0)
-
             if (currentValue in 0.0..450.0) {
                 dataStore.edit {
                     it[DATASTORE_ACCOUNTVALUE] = newValue ?: 0.0
@@ -253,7 +253,6 @@ class SimBrokerViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             val currentValue = dataStore.data.first()[DATASTORE_ACCOUNTVALUE] ?: 0.0
             val newValue = currentValue.plus(value).coerceAtLeast(0.0)
-
             dataStore.edit {
                 it[DATASTORE_ACCOUNTVALUE] = newValue ?: 0.0
             }
