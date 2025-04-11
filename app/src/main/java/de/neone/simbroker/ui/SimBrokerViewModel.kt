@@ -26,6 +26,23 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel für die SimBroker Krypto-Trading-App.
+ *
+ * Steuert zentrale Spiellogik, hält UI-State über StateFlows bereit und koordiniert:
+ * - Account- und Investitionswerte via DataStore
+ * - Transaktionen und Portfolio über Repository
+ * - API-Aufrufe für Coins und deren Details
+ * - Benutzerinteraktionen wie Kaufen/Verkaufen/Favorisieren
+ * - Dialogzustände (Alerts, Hinweise)
+ * - Timer für automatische Preisupdates
+ *
+ * Die Repository-Auswahl (Mock vs. Echt) wird zur Laufzeit via DataStore geregelt.
+ *
+ * @property realRepo Echtzeit-Repository (z.B. mit Retrofit)
+ * @property mockRepo Offline-/Mock-Repository für Testdaten
+ */
+
 private val DATASTORE_MOCKDATA = booleanPreferencesKey("mockData")
 private val DATASTORE_FIRSTGAME = booleanPreferencesKey("firstGame")
 private val DATASTORE_ACCOUNTVALUE = doublePreferencesKey("accountValue")
@@ -40,13 +57,12 @@ class SimBrokerViewModel(
 
     ) : AndroidViewModel(application) {
 
+    // Zugriff auf aktives Repository basierend auf DataStore-Flag
     private val repository: SimBrokerRepositoryInterface
         get() = if (mockDataState.value) realRepo else mockRepo
 
 
     // Dialog States -------------------------------------------------------------------------------
-
-
     private var _showAccountMaxValueDialog = MutableStateFlow(false)
     var showAccountMaxValueDialog: StateFlow<Boolean> = _showAccountMaxValueDialog
 
@@ -105,12 +121,10 @@ class SimBrokerViewModel(
 
 
     // DataStore -----------------------------------------------------------------------------
-
-
     private val dataStore = application.dataStore
 
     // Mockdata -----------------------------------------------------------------------------
-
+    // MOCKDATEN AKTIV (true/false)
     private val mockDataFlow = dataStore.data
         .map {
             it[DATASTORE_MOCKDATA] ?: false
@@ -133,7 +147,7 @@ class SimBrokerViewModel(
     }
 
     // Game Difficulty -----------------------------------------------------------------------------
-
+    // SCHWIERIGKEIT: Easy / Medium / Pro / Custom
     private val gameDifficultFlow = dataStore.data
         .map {
             it[DATASTORE_GAMEDIFFICULTY] ?: "-"
@@ -155,7 +169,7 @@ class SimBrokerViewModel(
     }
 
     // Game Fee -----------------------------------------------------------------------------
-
+    // FEE-WERT in EUR
     private val feeFlow = dataStore.data
         .map {
             it[DATASTORE_FEE] ?: 0.0
@@ -177,7 +191,7 @@ class SimBrokerViewModel(
     }
 
     // Firstgame -----------------------------------------------------------------------------
-
+    // ERSTES SPIEL? (true wenn Schwierigkeitswahl erlaubt)
     private val firstGame = dataStore.data
         .map {
             it[DATASTORE_FIRSTGAME] ?: true
@@ -198,6 +212,7 @@ class SimBrokerViewModel(
         }
     }
 
+    // SETZE KONTOSTAND
     fun setFirstGameAccountValue(value: Double) {
         resetAccountValue()
         viewModelScope.launch(Dispatchers.IO) {
@@ -217,7 +232,7 @@ class SimBrokerViewModel(
     }
 
     // Account Value -----------------------------------------------------------------------------
-
+    // KONTOSTAND
     val accountValueState: StateFlow<Double> = dataStore.data
         .map { it[DATASTORE_ACCOUNTVALUE] ?: 0.0 }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 0.0)
@@ -262,8 +277,7 @@ class SimBrokerViewModel(
 
 
     // Invested Value -----------------------------------------------------------------------------
-
-
+    // GESAMT INVESTIERT
     val investedValueState: StateFlow<Double> = dataStore.data
         .map { it[DATASTORE_TOTALINVESTVALUE] ?: 0.0 }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 0.0)
@@ -455,29 +469,59 @@ class SimBrokerViewModel(
         }
     }
 
-    fun getRemainingCoinAmount(coinUuid: String): Double {
-        val positions = allPortfolioPositions.value
-        return positions
-            .filter { it.coinUuid == coinUuid }
-            .sumOf { it.amountRemaining }
+    // Update Data -----------------------------------------------------------------------------
+
+    fun updatePortfolio(coinId: String, isFavorite: Boolean) {
+        Log.d("simDebug", "updatePosition over ViewModel started")
+        viewModelScope.launch {
+            repository.updatePortfolioFavorite(
+                coinId = coinId,
+                isFavorite = isFavorite
+            )
+        }
     }
+
+    private fun updateTransactionClosed(transactionId: Int) {
+        Log.d("simDebug", "updateTransaction over ViewModel started")
+        viewModelScope.launch {
+            repository.updateTransactionClosed(
+                transactionId = transactionId,
+                isClosed = true
+            )
+        }
+    }
+
+
+
+    // Kaufen und Verkaufen -----------------------------------------------------------------------------
 
     fun sellCoin(coinUuid: String, amountToSell: Double, currentPrice: Double, fee: Double) {
         viewModelScope.launch(Dispatchers.IO) {
-            val openBuys = repository.getOpenBuyTransactionsByCoin(coinUuid)
+
+            // Alle offenen Kauf-Transaktionen
+            val openBuysRaw = repository.getOpenBuyTransactionsByCoin(coinUuid)
                 .filter { !it.isClosed }
-                .sortedBy { it.timestamp }
+
+            // Alle Portfolio-Positionen zum Coin > 0
+            val portfolioPositions = repository.getAllPortfolioPositions().first()
+                .filter { it.coinUuid == coinUuid && it.amountRemaining > 0.0000001 }
+                .associateBy { it.id } // zum späteren schnellen Zugriff via portfolioCoinID
+
+            // Offene Käufe, die tatsächlich noch Restmenge haben
+            val openBuys = openBuysRaw.filter {
+                (portfolioPositions[it.portfolioCoinID]?.amountRemaining ?: 0.0) > 0.0000001
+            }.sortedBy { it.timestamp }
 
             var remainingToSell = amountToSell
             var isFirstSell = true
             var totalCashIn = 0.0
             var totalInvestReduction = 0.0
 
-
+            // Passende SELL-Transaktionen aus offenen Käufen
             for (buy in openBuys) {
-                if (remainingToSell <= 0) break
+                if (remainingToSell <= 0.0000001) break
 
-                val sellAmount = minOf(remainingToSell, buy.amount)
+                val sellAmount = minOf(remainingToSell, buy.amount) // wie viel vom Kauf verwendet wird
                 val usedFee = if (isFirstSell) fee else 0.0
                 val value = sellAmount * currentPrice
 
@@ -505,6 +549,7 @@ class SimBrokerViewModel(
                 }
             }
 
+            // Portfolio-Positionen nochmal zum Reduzieren der Restmenge
             val portfolioEntries = repository.getAllPortfolioPositions().first()
                 .filter { it.coinUuid == coinUuid && it.amountRemaining > 0 }
                 .sortedBy { it.timestamp }
@@ -522,17 +567,22 @@ class SimBrokerViewModel(
 
                 if (newRemaining <= 0.0000001) {
                     deletePortfolioById(entry.id)
+                    // Position leer dann löschen
 
                 } else {
-                    addPortfolio(entry.copy(
-                        amountRemaining = newRemaining,
-                        totalValue = newRemaining * entry.pricePerUnit
-                    ))
+                    // Restmenge aktualisieren
+                    addPortfolio(
+                        entry.copy(
+                            amountRemaining = newRemaining,
+                            totalValue = newRemaining * entry.pricePerUnit
+                        )
+                    )
                 }
 
                 localRemaining -= reduceAmount
             }
 
+            // Account- und Investitionswerte im DataStore updaten
             val currentAccount = dataStore.data.first()[DATASTORE_ACCOUNTVALUE] ?: 0.0
             val currentInvested = dataStore.data.first()[DATASTORE_TOTALINVESTVALUE] ?: 0.0
 
@@ -543,30 +593,6 @@ class SimBrokerViewModel(
                 it[DATASTORE_ACCOUNTVALUE] = updatedAccount
                 it[DATASTORE_TOTALINVESTVALUE] = updatedInvested
             }
-        }
-    }
-
-
-
-    // Update Data -----------------------------------------------------------------------------
-
-    fun updatePortfolio(coinId: String, isFavorite: Boolean) {
-        Log.d("simDebug", "updatePosition over ViewModel started")
-        viewModelScope.launch {
-            repository.updatePortfolioFavorite(
-                coinId = coinId,
-                isFavorite = isFavorite
-            )
-        }
-    }
-
-    private fun updateTransactionClosed(transactionId: Int) {
-        Log.d("simDebug", "updateTransaction over ViewModel started")
-        viewModelScope.launch {
-            repository.updateTransactionClosed(
-                transactionId = transactionId,
-                isClosed = true
-            )
         }
     }
 
@@ -587,6 +613,14 @@ class SimBrokerViewModel(
                 started = SharingStarted.WhileSubscribed(),
                 initialValue = emptyList()
             )
+
+
+    fun getRemainingCoinAmount(coinUuid: String): Double {
+        val positions = allPortfolioPositions.value
+        return positions
+            .filter { it.coinUuid == coinUuid }
+            .sumOf { it.amountRemaining }
+    }
 
 
 // Init -----------------------------------------------------------------------------

@@ -36,7 +36,7 @@ interface SimBrokerDAO {
     @Query("Select * From TBL_TRANSACTION")
     fun getAllTransactionPositions(): Flow<List<TransactionPositions>>
 
-    @Query("SELECT * FROM tbl_transaction WHERE coinUuid = :coinUuid AND type = 'BUY' ORDER BY timestamp ASC")
+    @Query("SELECT * FROM tbl_transaction WHERE coinUuid = :coinUuid AND type = 'BUY' AND isClosed = 0 ORDER BY timestamp ASC")
     fun getOpenBuysByCoinSortedByDate(coinUuid: String): List<TransactionPositions>
 
     @Query("Delete From TBL_TRANSACTION")

@@ -60,7 +60,7 @@ import kotlinx.coroutines.delay
 @SuppressLint("SuspiciousIndentation")
 @Composable
 fun PortfolioCoinListItem(
-    coin: PortfolioPositions,
+    coins: List<PortfolioPositions>,
     allCoinTransactions: List<TransactionPositions>,
     currentPrice: Double,
     profit: Double,
@@ -71,6 +71,7 @@ fun PortfolioCoinListItem(
     isClicked: () -> Unit,
 ) {
 
+    val coin = coins.first()
     var slideInChart by remember { mutableStateOf(false) }
     var showTransactionsForCoinState by remember { mutableStateOf(false) }
 
@@ -328,7 +329,7 @@ fun PortfolioCoinListItem(
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = "History of transactions with unchanged values",
+                            text = ">>> History over all active transactions <<<",
                             style = MaterialTheme.typography.labelMedium
                         )
                     }
@@ -344,7 +345,13 @@ fun PortfolioCoinListItem(
                     val gvProzent =
                         (((currentPrice.roundTo2() / it.price.roundTo2()) - 1) * 100)
 
-                    if ( it.portfolioCoinID == coin.id ) {
+                    // Zeige alle Trans deren PortfolioID in der Liste aller Coins des portfolios stehen
+
+
+
+
+                        Text("Trans(Coin) ID:  ${it.portfolioCoinID}")
+                        Text("Trans ID: ${it.id}")
 
                         Card(
                             modifier = Modifier
@@ -478,7 +485,7 @@ fun PortfolioCoinListItem(
                                 }
                             }
                         }
-                    }
+
                 }
             }
         }
@@ -489,15 +496,17 @@ fun PortfolioCoinListItem(
 @Composable
 private fun PortfolioCoinListPreview() {
     PortfolioCoinListItem(
-        coin = PortfolioPositions(
-            coinUuid = coins_Mockdata[2].uuid,
-            symbol = coins_Mockdata[2].symbol,
-            iconUrl = coins_Mockdata[2].iconUrl,
-            name = coins_Mockdata[2].name,
-            amountBought = 2.0,
-            amountRemaining = 0.0,
-            pricePerUnit = 3500.0,
-            totalValue = 7000.0
+        coins = listOf(
+            PortfolioPositions(
+                coinUuid = coins_Mockdata[2].uuid,
+                symbol = coins_Mockdata[2].symbol,
+                iconUrl = coins_Mockdata[2].iconUrl,
+                name = coins_Mockdata[2].name,
+                amountBought = 2.0,
+                amountRemaining = 0.0,
+                pricePerUnit = 3500.0,
+                totalValue = 7000.0
+            )
         ),
         currentPrice = 3680.0,
         allCoinTransactions = emptyList(),

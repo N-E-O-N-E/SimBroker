@@ -23,7 +23,13 @@ fun PortfolioCoinListPositionObject(
     val coinSellTransactions =
         transactionList.filter { it.coinUuid == coinUuid && it.type == TransactionType.SELL }
 
-        val totalFee = coinBuyTransactions.sumOf { it.fee }
+    val portfolioIdsForThisCoin = portfolioPosition.map { it.id }
+
+    val transactionFiltered = transactionList.filter {
+        it.coinUuid == coinUuid && it.portfolioCoinID in portfolioIdsForThisCoin
+    }
+
+    val totalFee = transactionFiltered.sumOf { it.fee }
 
     val totalAmount = portfolioPosition.sumOf { it.amountRemaining }
 
@@ -55,9 +61,9 @@ fun PortfolioCoinListPositionObject(
     val sparksForPosition = coinList.find { it.uuid == coinUuid }?.sparkline.orEmpty()
 
     val result = PortfolioCoinListItem(
-        coin = portfolioPosition.first(),
+        coins = portfolioPosition,
         currentPrice = currentPrice,
-        allCoinTransactions = transactionList,
+        allCoinTransactions = transactionFiltered,
         profit = profit,
         sparks = sparksForPosition,
         totalFee = totalFee,
