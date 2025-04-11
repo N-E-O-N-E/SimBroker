@@ -334,6 +334,13 @@ fun AccountView(
                         Switch(
                             checked = mockdataValue,
                             onCheckedChange = {
+                                viewModel.setFirstGameState(true)
+                                viewModel.setGameDifficult("Unknown")
+                                viewModel.setFeeValue(0.0)
+                                viewModel.resetAccountValue()
+                                viewModel.resetInvestedValue()
+                                viewModel.deleteAllTransactions()
+                                viewModel.deleteAllPortfolioPositions()
                                 viewModel.setMockData(it)
                                 viewModel.setShowMockOrRealdataDialog(true)
                             }

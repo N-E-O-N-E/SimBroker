@@ -60,7 +60,11 @@ class SimBrokerViewModel(
 
     // Zugriff auf aktives Repository basierend auf DataStore-Flag
     private val repository: SimBrokerRepositoryInterface
-        get() = if (mockDataState.value) realRepo else mockRepo
+        get() = if (mockDataState.value) {
+            realRepo
+        } else {
+            mockRepo
+        }
 
 
     // Dialog States -------------------------------------------------------------------------------
@@ -660,7 +664,7 @@ class SimBrokerViewModel(
             mockDataState.collect {
                 Log.d("simDebug", "DataStore Mockdata value: $it")
                 startTimer()
-                //refreshCoins()
+                refreshCoins()
                 loadMoreCoins()
                 loadAllPortfolioCoins()
             }
