@@ -15,6 +15,8 @@ interface SimBrokerRepositoryInterface {
     suspend fun updateTransactionClosed(transactionId: Int, isClosed: Boolean)
     suspend fun deleteTransactionByCoinId(coinUuid: String)
 
+    suspend fun updatePortfolio(portfolio: PortfolioPositions)
+
     suspend fun insertPortfolio(portfolio: PortfolioPositions)
     suspend fun updatePortfolioFavorite(coinId: String, isFavorite: Boolean)
     suspend fun updatePortfolioClosed(portfolioId: Int, isClosed: Boolean)

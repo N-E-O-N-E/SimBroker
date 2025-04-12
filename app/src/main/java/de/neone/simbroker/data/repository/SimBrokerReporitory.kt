@@ -68,6 +68,10 @@ class SimBrokerRepositoryImpl(
         return simBrokerDAO.getAllPortfolioPositions()
     }
 
+    override suspend fun updatePortfolio(portfolio: PortfolioPositions) {
+        simBrokerDAO.updatePortfolio(portfolio)
+    }
+
     override fun getAllTransactionPositions(): Flow<List<TransactionPositions>> {
         return simBrokerDAO.getAllTransactionPositions()
     }

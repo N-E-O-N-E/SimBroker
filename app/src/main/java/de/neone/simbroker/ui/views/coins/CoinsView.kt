@@ -39,6 +39,7 @@ import de.neone.simbroker.ui.views.coins.components.CoinsListItem
 import de.neone.simbroker.ui.views.coins.components.CoinsSearchLoadIndicator
 import de.neone.simbroker.ui.views.coins.components.CoinsSearchSheet
 import de.neone.simbroker.ui.views.components.AlertDialog
+import kotlin.math.abs
 
 @SuppressLint("DefaultLocale")
 @Composable
@@ -49,6 +50,9 @@ fun CoinsView(
         imageLightTheme = R.drawable.simbroker_light_clear,
         imageDarkTheme = R.drawable.simbroker_dark_clear
     )
+
+    val proofValue = 0.000001
+    fun isEffectivelyZero(value: Double): Boolean = abs(value) < proofValue
 
     val timer by viewModel.refreshTimer.collectAsState()
 
@@ -198,7 +202,9 @@ fun CoinsView(
                     notEnoughCoins = {
                         viewModel.setAccountNotEnoughCoins(true)
                     },
-                    coinAmount = allPortfolioGroupedList.sumOf { it.sumOf { pos -> pos.amountRemaining } },
+                    coinAmount = allPortfolioPositions
+                        .filter { !isEffectivelyZero(it.amountRemaining) && !it.isClosed }
+                        .sumOf { it.amountRemaining },
                     accountCreditState = accountCreditState
                 )
             }

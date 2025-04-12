@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -57,7 +58,15 @@ class SimBrokerViewModel(
 
     ) : AndroidViewModel(application) {
 
-    // Zugriff auf aktives Repository basierend auf DataStore-Flag
+    // DataStore -----------------------------------------------------------------------------
+    private val dataStore = application.dataStore
+
+    // Proof Value for Sell-------------------------------------------------------------------------
+    private val proofValue = 0.000001
+    private fun isEffectivelyZero(value: Double): Boolean = abs(value) < proofValue
+    private fun isEffectivelyEqual(a: Double, b: Double): Boolean = abs(a - b) < proofValue
+
+    // Zugriff auf aktives Repository basierend auf DataStore-Flag----------------------------------
     private val repository: SimBrokerRepositoryInterface
         get() = if (mockDataState.value) {
             realRepo
@@ -65,67 +74,54 @@ class SimBrokerViewModel(
             mockRepo
         }
 
-
     // Dialog States -------------------------------------------------------------------------------
     private var _showAccountMaxValueDialog = MutableStateFlow(false)
     var showAccountMaxValueDialog: StateFlow<Boolean> = _showAccountMaxValueDialog
-
     fun setShowAccountMaxValueDialog(value: Boolean) {
         _showAccountMaxValueDialog.value = value
     }
 
     private var _showAccountNotEnoughMoney = MutableStateFlow(false)
     var showAccountNotEnoughMoney: StateFlow<Boolean> = _showAccountNotEnoughMoney
-
     fun setShowAccountNotEnoughMoney(value: Boolean) {
         _showAccountNotEnoughMoney.value = value
     }
 
     private var _showAccountNotEnoughCoins = MutableStateFlow(false)
     var showAccountNotEnoughCoins: StateFlow<Boolean> = _showAccountNotEnoughCoins
-
     fun setAccountNotEnoughCoins(value: Boolean) {
         _showAccountNotEnoughCoins.value = value
     }
 
     private var _showGameDifficultDialog = MutableStateFlow(false)
     var showGameDifficultDialog: StateFlow<Boolean> = _showGameDifficultDialog
-
     fun setShowGameDifficultDialog(value: Boolean) {
         _showGameDifficultDialog.value = value
     }
 
     private var _showMockOrRealdataDialog = MutableStateFlow(false)
     var showMockOrRealdataDialog: StateFlow<Boolean> = _showMockOrRealdataDialog
-
     fun setShowMockOrRealdataDialog(value: Boolean) {
         _showMockOrRealdataDialog.value = value
     }
 
     private var _showFirstGameAccountValueDialog = MutableStateFlow(false)
     var showFirstGameAccountValueDialog: StateFlow<Boolean> = _showFirstGameAccountValueDialog
-
     fun setShowFirstGameAccountValueDialog(value: Boolean) {
         _showFirstGameAccountValueDialog.value = value
     }
 
     private var _showEraseDialog = MutableStateFlow(false)
     var showEraseDialog: StateFlow<Boolean> = _showEraseDialog
-
     fun setShowEraseDialog(value: Boolean) {
         _showEraseDialog.value = value
     }
 
     private var _showAccountCashIn = MutableStateFlow(false)
     var showAccountCashIn: StateFlow<Boolean> = _showAccountCashIn
-
     fun setAccountCashIn(value: Boolean) {
         _showAccountCashIn.value = value
     }
-
-
-    // DataStore -----------------------------------------------------------------------------
-    private val dataStore = application.dataStore
 
     // Mockdata -----------------------------------------------------------------------------
     // MOCKDATEN AKTIV (true/false)
@@ -283,7 +279,6 @@ class SimBrokerViewModel(
         .map { it[DATASTORE_TOTALINVESTVALUE] ?: 0.0 }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 0.0)
 
-
     fun resetInvestedValue() {
         viewModelScope.launch {
             dataStore.edit {
@@ -310,10 +305,8 @@ class SimBrokerViewModel(
     // Timer -----------------------------------------------------------------------
 
     private var timerJob: Job? = null
-
     private val _refreshTimer = MutableStateFlow(0)
     val refreshTimer: StateFlow<Int> = _refreshTimer
-
     private fun startTimer() {
         timerJob?.cancel()
         timerJob = viewModelScope.launch {
@@ -330,12 +323,10 @@ class SimBrokerViewModel(
 
 
     // Pagination ---------------------------------------------------------------------------------
-
     private var isLoading = false
     private var offset = 0
     private val limit = 100
     private var hasMoreData = true
-
     fun loadMoreCoins() {
         if (isLoading || !hasMoreData) return
 
@@ -357,7 +348,6 @@ class SimBrokerViewModel(
 
 
     // API Response -------------------------------------------------------------------------------
-
     private val _coinList = MutableStateFlow<List<Coin>>(emptyList())
     val coinList: StateFlow<List<Coin>> = _coinList
 
@@ -390,7 +380,7 @@ class SimBrokerViewModel(
         }
     }
 
-    fun loadAllPortfolioCoins() {
+    private fun loadAllPortfolioCoins() {
         viewModelScope.launch(Dispatchers.IO) {
             val portfolioUuids = allPortfolioPositions.value.map { it.coinUuid }.distinct()
             val existingUuids = _coinList.value.map { it.uuid }
@@ -411,7 +401,6 @@ class SimBrokerViewModel(
 
 
     // Room Database -----------------------------------------------------------------------------
-
     // Delete all Data -----------------------------------------------------------------------------
     fun deleteAllTransactions() {
         viewModelScope.launch {
@@ -426,7 +415,6 @@ class SimBrokerViewModel(
     }
 
     // Insert Data -----------------------------------------------------------------------------
-
     private fun addTransaction(transaction: TransactionPositions) {
         Log.d("simDebug", "addTransaction over ViewModel started")
         viewModelScope.launch {
@@ -441,6 +429,12 @@ class SimBrokerViewModel(
         }
     }
 
+    private fun updatePortfolio(portfolio: PortfolioPositions) {
+        viewModelScope.launch {
+            repository.updatePortfolio(portfolio)
+        }
+    }
+
     private fun deletePortfolioById(entryId: Int) {
         Log.d("simDebug", "deletePosition over ViewModel started")
         viewModelScope.launch {
@@ -448,15 +442,14 @@ class SimBrokerViewModel(
         }
     }
 
+    // Kaufen und Verkaufen -----------------------------------------------------------------------------
     fun buyCoin(selectedCoin: Coin, amount: Double, feeValue: Double, totalValue: Double) {
         viewModelScope.launch(Dispatchers.IO) {
-
             setInvestedValue(totalValue)
             updateAccountValue(-totalValue - feeValue)
 
             Log.d("simDebug", "setInvestedValue: $totalValue")
             Log.d("simDebug", "setAccountValue: ${(-totalValue - feeValue)}")
-
 
             addPortfolio(
                 PortfolioPositions(
@@ -471,7 +464,7 @@ class SimBrokerViewModel(
                 )
             )
 
-            delay(1000)
+            delay(500)
 
             addTransaction(
                 TransactionPositions(
@@ -490,8 +483,95 @@ class SimBrokerViewModel(
         }
     }
 
-    // Update Data -----------------------------------------------------------------------------
+    fun sellCoin(coinUuid: String, amountToSell: Double, currentPrice: Double, fee: Double) {
+        viewModelScope.launch(Dispatchers.IO) {
 
+            // Offene BUY-Transaktionen nach FIFO sortieren
+            val openBuys = repository.getOpenBuyTransactionsByCoin(coinUuid)
+                .filter { !it.isClosed }
+                .sortedBy { it.timestamp }
+
+            // Portfolio-Positionen
+            val portfolioMap = repository.getAllPortfolioPositions()
+                .first()
+                .filter { it.coinUuid == coinUuid && !isEffectivelyZero(it.amountRemaining) }
+                .associateBy { it.id }
+
+            var remainingToSell = amountToSell
+            var isFirstSell = true
+            var totalCashIn = 0.0
+            var totalInvestReduction = 0.0
+
+            for (buy in openBuys) {
+                if (isEffectivelyZero(remainingToSell)) break
+
+                val portfolio = portfolioMap[buy.portfolioCoinID] ?: continue
+                val availableAmount = portfolio.amountRemaining
+                if (isEffectivelyZero(availableAmount)) continue
+
+                // Verkaufe so viel wie noch da ist
+                val sellAmount = minOf(remainingToSell, availableAmount)
+                val sellValue = sellAmount * currentPrice
+                val appliedFee = if (isFirstSell) fee else 0.0
+
+
+                addTransaction(
+                    TransactionPositions(
+                        coinUuid = buy.coinUuid,
+                        symbol = buy.symbol,
+                        iconUrl = buy.iconUrl,
+                        name = buy.name,
+                        price = currentPrice,
+                        amount = sellAmount,
+                        fee = appliedFee,
+                        type = TransactionType.SELL,
+                        totalValue = sellValue,
+                        portfolioCoinID = buy.portfolioCoinID
+                    )
+                )
+
+
+                val newRemaining = portfolio.amountRemaining - sellAmount
+                val correctedRemaining = if (isEffectivelyZero(newRemaining)) 0.0 else newRemaining
+                val newTotalValue = correctedRemaining * portfolio.pricePerUnit
+
+                totalInvestReduction += sellAmount * portfolio.pricePerUnit
+                totalCashIn += sellValue
+                remainingToSell -= sellAmount
+                isFirstSell = false
+
+                updatePortfolio(
+                    portfolio.copy(
+                        amountRemaining = correctedRemaining,
+                        totalValue = newTotalValue,
+                        isClosed = isEffectivelyZero(correctedRemaining)
+                    )
+                )
+
+                if (isEffectivelyZero(correctedRemaining)) {
+                    updatePortfolioClosed(portfolio.id)
+                    updateTransactionClosed(buy.id)
+                }
+            }
+
+            val currentAccount = dataStore.data.first()[DATASTORE_ACCOUNTVALUE] ?: 0.0
+            val currentInvested = dataStore.data.first()[DATASTORE_TOTALINVESTVALUE] ?: 0.0
+
+            val updatedAccount = (currentAccount + totalCashIn - fee).coerceAtLeast(0.0)
+            val updatedInvested = (currentInvested - totalInvestReduction).coerceAtLeast(0.0)
+
+            dataStore.edit {
+                it[DATASTORE_ACCOUNTVALUE] = updatedAccount
+                it[DATASTORE_TOTALINVESTVALUE] = updatedInvested
+            }
+
+            Log.d("simDebug", "Sell abgeschlossen: Einnahmen $totalCashIn | Invest reduziert um $totalInvestReduction")
+        }
+    }
+
+
+
+    // Update Data -----------------------------------------------------------------------------
     fun updatePortfolio(coinId: String, isFavorite: Boolean) {
         Log.d("simDebug", "updatePosition over ViewModel started")
         viewModelScope.launch(Dispatchers.IO) {
@@ -523,115 +603,7 @@ class SimBrokerViewModel(
     }
 
 
-
-    // Kaufen und Verkaufen -----------------------------------------------------------------------------
-
-    fun sellCoin(coinUuid: String, amountToSell: Double, currentPrice: Double, fee: Double) {
-        viewModelScope.launch(Dispatchers.IO) {
-
-            // Alle offenen Kauf-Transaktionen
-            val openBuysRaw = repository.getOpenBuyTransactionsByCoin(coinUuid)
-                .filter { !it.isClosed }
-
-            // Alle Portfolio-Positionen zum Coin > 0
-            val portfolioPositions = repository.getAllPortfolioPositions().first()
-                .filter { it.coinUuid == coinUuid && it.amountRemaining > 0.0000001 }
-                .associateBy { it.id } // zum späteren schnellen Zugriff via portfolioCoinID
-
-            // Offene Käufe, die tatsächlich noch Restmenge haben
-            val openBuys = openBuysRaw.filter {
-                (portfolioPositions[it.portfolioCoinID]?.amountRemaining ?: 0.0) > 0.0000001
-            }.sortedBy { it.timestamp }
-
-            var remainingToSell = amountToSell
-            var isFirstSell = true
-            var totalCashIn = 0.0
-            var totalInvestReduction = 0.0
-
-            // Passende SELL-Transaktionen aus offenen Käufen
-            for (buy in openBuys) {
-                Log.d("simDebug", "openBuy: $remainingToSell")
-                if (remainingToSell <= 0.0000001) break
-
-                val sellAmount = minOf(remainingToSell, buy.amount) // wie viel vom Kauf verwendet wird
-                val usedFee = if (isFirstSell) fee else 0.0
-                val value = sellAmount * currentPrice
-
-                totalCashIn += value
-                remainingToSell -= sellAmount
-                isFirstSell = false
-
-                addTransaction(
-                    TransactionPositions(
-                        coinUuid = buy.coinUuid,
-                        symbol = buy.symbol,
-                        iconUrl = buy.iconUrl,
-                        name = buy.name,
-                        price = currentPrice,
-                        amount = sellAmount,
-                        fee = usedFee,
-                        type = TransactionType.SELL,
-                        totalValue = value,
-                        portfolioCoinID = buy.portfolioCoinID
-                    )
-                )
-
-                if (abs(sellAmount - buy.amount) < 0.0000001) {
-                    updateTransactionClosed(buy.id)
-                }
-            }
-
-            // Portfolio-Positionen nochmal zum Reduzieren der Restmenge
-            val portfolioEntries = repository.getAllPortfolioPositions().first()
-                .filter { it.coinUuid == coinUuid && it.amountRemaining > 0 }
-                .sortedBy { it.timestamp }
-
-            var localRemaining = amountToSell
-
-            for (entry in portfolioEntries) {
-                if (localRemaining <= 0.0000001) break
-
-                val reduceAmount = minOf(localRemaining, entry.amountRemaining)
-                val newRemaining = entry.amountRemaining - reduceAmount
-                val valueReduction = reduceAmount * entry.pricePerUnit
-
-                totalInvestReduction += valueReduction
-
-                if (newRemaining <= 0.0000001) {
-//                    deletePortfolioById(entry.id)
-//                    // Position leer dann löschen
-                    Log.d("simDebug", "portfolioPosition ${entry.id} set isClosed over ViewModel started")
-                    updatePortfolioClosed(entry.id)
-
-                } else {
-                    // Restmenge aktualisieren
-                    addPortfolio(
-                        entry.copy(
-                            amountRemaining = newRemaining,
-                            totalValue = newRemaining * entry.pricePerUnit
-                        )
-                    )
-                }
-
-                localRemaining -= reduceAmount
-            }
-
-            // Account- und Investitionswerte im DataStore updaten
-            val currentAccount = dataStore.data.first()[DATASTORE_ACCOUNTVALUE] ?: 0.0
-            val currentInvested = dataStore.data.first()[DATASTORE_TOTALINVESTVALUE] ?: 0.0
-
-            val updatedAccount = (currentAccount + totalCashIn - fee).coerceAtLeast(0.0)
-            val updatedInvested = (currentInvested - totalInvestReduction).coerceAtLeast(0.0)
-
-            dataStore.edit {
-                it[DATASTORE_ACCOUNTVALUE] = updatedAccount
-                it[DATASTORE_TOTALINVESTVALUE] = updatedInvested
-            }
-        }
-    }
-
     // Get Data -----------------------------------------------------------------------------
-
     val allPortfolioPositions: StateFlow<List<PortfolioPositions>> =
         repository.getAllPortfolioPositions()
             .stateIn(
@@ -648,21 +620,17 @@ class SimBrokerViewModel(
                 initialValue = emptyList()
             )
 
-
     fun getRemainingCoinAmount(coinUuid: String): Double {
         val positions = allPortfolioPositions.value
         return positions
-            .filter { it.coinUuid == coinUuid }
+            .filter { it.coinUuid == coinUuid && !isEffectivelyZero(it.amountRemaining) }
             .sumOf { it.amountRemaining }
     }
 
-
-// Init -----------------------------------------------------------------------------
-
+    // Init -----------------------------------------------------------------------------
     init {
-        viewModelScope.launch(Dispatchers.IO) {
-            mockDataState.collect {
-                Log.d("simDebug", "DataStore Mockdata value: $it")
+        viewModelScope.launch {
+            mockDataFlow.firstOrNull()?.let {
                 startTimer()
                 refreshCoins()
                 loadMoreCoins()
@@ -670,4 +638,5 @@ class SimBrokerViewModel(
             }
         }
     }
+
 }

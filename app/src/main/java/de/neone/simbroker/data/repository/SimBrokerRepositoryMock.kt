@@ -38,6 +38,9 @@ class SimBrokerRepositoryMock(
     override suspend fun updatePortfolioFavorite(coinId: String, isFavorite: Boolean) {
         simBrokerDAO.updatePortfolioFavorite(coinId, isFavorite)
     }
+    override suspend fun updatePortfolio(portfolio: PortfolioPositions) {
+        simBrokerDAO.updatePortfolio(portfolio)
+    }
 
     override suspend fun updateTransactionClosed(transactionId: Int, isClosed: Boolean) {
         simBrokerDAO.updateTransactionClosed(transactionId, isClosed)

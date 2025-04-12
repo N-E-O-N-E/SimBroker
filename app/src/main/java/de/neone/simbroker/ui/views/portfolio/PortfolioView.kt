@@ -49,6 +49,7 @@ import de.neone.simbroker.ui.views.coinDetailView.CoinDetailSheet
 import de.neone.simbroker.ui.views.components.AlertDialog
 import de.neone.simbroker.ui.views.portfolio.components.PortfolioCoinListPositionObject
 import kotlinx.coroutines.delay
+import kotlin.math.abs
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
@@ -59,6 +60,9 @@ fun PortfolioView(
         imageLightTheme = R.drawable.simbroker_light_clear,
         imageDarkTheme = R.drawable.simbroker_dark_clear
     )
+
+    val proofValue = 0.000001
+    fun isEffectivelyZero(value: Double): Boolean = abs(value) < proofValue
 
     val timer by viewModel.refreshTimer.collectAsState()
     val gameDifficult by viewModel.gameDifficultState.collectAsState()
@@ -279,7 +283,9 @@ fun PortfolioView(
                     notEnoughCoins = {
                         viewModel.setAccountNotEnoughCoins(true)
                     },
-                    coinAmount = allPortfolioGroupedList.sumOf { it.sumOf { pos -> pos.amountRemaining } },
+                    coinAmount = allPortfolioPositions
+                        .filter { !isEffectivelyZero(it.amountRemaining) && !it.isClosed }
+                        .sumOf { it.amountRemaining },
                     accountCreditState = accountCreditState,
                 )
             }
