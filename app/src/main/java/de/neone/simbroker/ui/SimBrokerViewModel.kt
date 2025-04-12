@@ -143,6 +143,7 @@ class SimBrokerViewModel(
                 it[DATASTORE_MOCKDATA] = value
             }
             Log.d("simDebug", "DataStore Mockdata value updated: $value")
+            refreshCoins()
         }
     }
 
@@ -627,14 +628,16 @@ class SimBrokerViewModel(
             .sumOf { it.amountRemaining }
     }
 
+
     // Init -----------------------------------------------------------------------------
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             mockDataFlow.firstOrNull()?.let {
                 startTimer()
                 refreshCoins()
                 loadMoreCoins()
                 loadAllPortfolioCoins()
+
             }
         }
     }
