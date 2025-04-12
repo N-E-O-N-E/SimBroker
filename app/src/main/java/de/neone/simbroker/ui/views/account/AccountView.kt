@@ -341,8 +341,8 @@ fun AccountView(
                                 viewModel.resetInvestedValue()
                                 viewModel.deleteAllTransactions()
                                 viewModel.deleteAllPortfolioPositions()
-                                viewModel.setMockData(it)
                                 viewModel.setShowMockOrRealdataDialog(true)
+                                viewModel.setMockData(it)
                             }
                         )
                         Text(

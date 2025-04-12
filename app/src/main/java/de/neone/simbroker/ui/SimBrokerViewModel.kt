@@ -143,9 +143,14 @@ class SimBrokerViewModel(
                 it[DATASTORE_MOCKDATA] = value
             }
             Log.d("simDebug", "DataStore Mockdata value updated: $value")
-            refreshCoins()
+
+            _coinList.value = emptyList()
+            offset = 0
+            hasMoreData = true
+
         }
     }
+
 
     // Game Difficulty -----------------------------------------------------------------------------
     // SCHWIERIGKEIT: Easy / Medium / Pro / Custom
@@ -637,7 +642,6 @@ class SimBrokerViewModel(
                 refreshCoins()
                 loadMoreCoins()
                 loadAllPortfolioCoins()
-
             }
         }
     }
