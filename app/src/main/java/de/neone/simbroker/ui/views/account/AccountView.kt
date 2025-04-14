@@ -3,7 +3,6 @@ package de.neone.simbroker.ui.views.account
 import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,15 +21,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Slider
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -40,7 +34,6 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import de.neone.simbroker.R
-import de.neone.simbroker.data.helper.MyNotificationService
 import de.neone.simbroker.data.helper.SBHelper.toEuroString
 import de.neone.simbroker.ui.SimBrokerViewModel
 import de.neone.simbroker.ui.theme.activity.ViewWallpaperImageBox
@@ -59,11 +52,9 @@ fun AccountView(
     )
 
     val context = LocalContext.current
-    val notificationService = remember { MyNotificationService(context) }
 
     val showAccountMaxValueDialog by viewModel.showAccountMaxValueDialog.collectAsState()
     val showGameDifficultDialog by viewModel.showGameDifficultDialog.collectAsState()
-    val showMockOrRealdataDialog by viewModel.showMockOrRealdataDialog.collectAsState()
     val showFirstGameAccountValueDialog by viewModel.showFirstGameAccountValueDialog.collectAsState()
     val showEraseDialog by viewModel.showEraseDialog.collectAsState()
 
@@ -73,12 +64,8 @@ fun AccountView(
     val allFees by viewModel.allTransactionPositions.collectAsState()
     val allFeesSum = allFees.sumOf { it.fee }
 
-    val mockdataValue by viewModel.mockDataState.collectAsState()
     val selectedOption by viewModel.gameDifficultState.collectAsState()
     val firstGame by viewModel.firstGameState.collectAsState()
-
-    var developerMode by remember { mutableStateOf(false) }
-    var developerModeClicker by remember { mutableIntStateOf(0) }
 
     Column(
         modifier = Modifier
@@ -164,7 +151,11 @@ fun AccountView(
                                     viewModel.setShowGameDifficultDialog(true)
                                     viewModel.setFirstGameAccountValue(1600.0)
                                     viewModel.setFeeValue(4.0)
-                                    Toast.makeText(context, "Game Difficulty is now: Easy", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        context,
+                                        "Game Difficulty is now: Easy",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 } else {
                                     viewModel.setShowFirstGameAccountValueDialog(true)
                                 }
@@ -183,7 +174,11 @@ fun AccountView(
                                     viewModel.setShowGameDifficultDialog(true)
                                     viewModel.setFirstGameAccountValue(800.0)
                                     viewModel.setFeeValue(8.0)
-                                    Toast.makeText(context, "Game Difficulty is now: Medium", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        context,
+                                        "Game Difficulty is now: Medium",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 } else {
                                     viewModel.setShowFirstGameAccountValueDialog(true)
                                 }
@@ -202,7 +197,11 @@ fun AccountView(
                                     viewModel.setShowGameDifficultDialog(true)
                                     viewModel.setFirstGameAccountValue(400.0)
                                     viewModel.setFeeValue(16.0)
-                                    Toast.makeText(context, "Game Difficulty is now: Pro", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        context,
+                                        "Game Difficulty is now: Pro",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 } else {
                                     viewModel.setShowFirstGameAccountValueDialog(true)
                                 }
@@ -222,7 +221,11 @@ fun AccountView(
                                     viewModel.setShowGameDifficultDialog(true)
                                     viewModel.setFirstGameAccountValue(0.0)
                                     viewModel.setFeeValue(0.0)
-                                    Toast.makeText(context, "Game Difficulty is now: Custom", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        context,
+                                        "Game Difficulty is now: Custom",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 } else {
                                     viewModel.setShowFirstGameAccountValueDialog(true)
                                 }
@@ -251,15 +254,6 @@ fun AccountView(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        modifier = Modifier
-                            .clickable {
-                                developerModeClicker++
-                                if (developerModeClicker == 4) {
-                                    notificationService.showImportantMessageNotification()
-                                    developerMode = !developerMode
-
-                                }
-                            },
                         text = "Your Account: ${(accountCreditState + totalInvested).toEuroString()}",
                         style = typography.headlineMedium
                     )
@@ -312,48 +306,6 @@ fun AccountView(
                 }
             }
 
-            if (developerMode) {
-                developerModeClicker = 0
-
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 5.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
-                    )
-                ) {
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(10.dp),
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Switch(
-                            checked = mockdataValue,
-                            onCheckedChange = {
-                                viewModel.setFirstGameState(true)
-                                viewModel.setGameDifficult("Unknown")
-                                viewModel.setFeeValue(0.0)
-                                viewModel.resetAccountValue()
-                                viewModel.resetInvestedValue()
-                                viewModel.deleteAllTransactions()
-                                viewModel.deleteAllPortfolioPositions()
-                                viewModel.setShowMockOrRealdataDialog(true)
-                                viewModel.setMockData(it)
-                            }
-                        )
-                        Text(
-                            modifier = Modifier.padding(start = 20.dp),
-                            text = if (mockdataValue) "Real data is activated" else "Real data is deactivated!",
-                            style = typography.titleMedium
-                        )
-                    }
-                }
-            }
-
             Button(
                 modifier = Modifier.fillMaxWidth(1f),
                 onClick = {
@@ -373,15 +325,13 @@ fun AccountView(
             message = "Click on Delete to delete all your data. Purchases, sales and all settings.\n" +
                     "\n" + "If you do not want this, click outside the message without confirming it!",
             onConfirm = {
-                viewModel.setFirstGameState(true)
-                viewModel.setGameDifficult("Unknown")
-                viewModel.setFeeValue(0.0)
+                viewModel.deleteAllPortfolioPositions()
+                viewModel.deleteAllTransactions()
                 viewModel.resetAccountValue()
                 viewModel.resetInvestedValue()
-                viewModel.deleteAllTransactions()
-                viewModel.deleteAllPortfolioPositions()
-                viewModel.setMockData(false)
-                developerMode = false
+                viewModel.setGameDifficult("Unknown")
+                viewModel.setFeeValue(0.0)
+                viewModel.setFirstGameState(true)
                 Toast.makeText(context, "New Game started...", Toast.LENGTH_SHORT).show()
             },
             onDismiss = { viewModel.setShowEraseDialog(false) }
@@ -396,11 +346,6 @@ fun AccountView(
     if (showGameDifficultDialog) {
         AlertDialog("Game Difficulty is now: ${selectedOption.uppercase()}") {
             viewModel.setShowGameDifficultDialog(false)
-        }
-    }
-    if (showMockOrRealdataDialog) {
-        AlertDialog("Datasource is now: ${if (mockdataValue) "Real API Data" else "Mockdata"}") {
-            viewModel.setShowMockOrRealdataDialog(false)
         }
     }
 

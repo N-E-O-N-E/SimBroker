@@ -24,9 +24,9 @@ class SimBrokerRepositoryImpl(
         }
     }
 
-    override suspend fun getCoins(limit: Int, offset: Int): List<Coin> {
+    override suspend fun getCoins(): List<Coin> {
         return try {
-            apiService.getCoins(limit = limit, offset = offset).data.coins
+            apiService.getCoins().data.coins
         } catch (e: Exception) {
             Log.e("SimBrokerRepository", "Fehler beim Laden der API Coins", e)
             emptyList()

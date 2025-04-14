@@ -5,7 +5,6 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import de.neone.simbroker.BuildConfig
 import de.neone.simbroker.data.remote.models.CoinResponse
 import de.neone.simbroker.data.remote.models.CoinsResponse
-import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -57,8 +56,7 @@ interface APIService {
         @Query("tiers") tiers: String = "1",
         @Query("orderBy") orderBy: String = "marketCap",
         @Query("orderDirection") orderDirection: String = "desc",
-        @Query("limit") limit: Int,
-        @Query("offset") offset: Int,
+        @Query("limit") limit: Int = 100,
         @Query("timePeriod") timePeriod: String = "3h",
     ): CoinsResponse
 
@@ -82,19 +80,5 @@ interface APIService {
         @Query("referenceCurrencyUuid") referenceCurrencyUuid: String = "5k-_VTxqtCEI",
         @Query("timePeriod") timePeriod: String = "30d", // 30 Sparklines
     ): CoinResponse
-}
 
-
-fun main() = runBlocking {
-    val api = CoinbaseAPI.retrofitService
-    try {
-        val response = api.getCoin3h(
-            uuid = "Qwsogvtv82FCd",
-            referenceCurrencyUuid = "5k-_VTxqtCEI",
-            timePeriod = "3h"
-        )
-        println("API Response: $response")
-    } catch (e: Exception) {
-        println("API Fehler: ${e.message}")
-    }
 }

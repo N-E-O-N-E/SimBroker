@@ -17,7 +17,7 @@ class SimBrokerRepositoryMock(
         return coinPrice.toDouble()
     }
 
-    override suspend fun getCoins(limit: Int, offset: Int): List<Coin> {
+    override suspend fun getCoins(): List<Coin> {
         return coins_Mockdata
     }
 

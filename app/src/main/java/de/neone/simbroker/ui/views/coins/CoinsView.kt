@@ -36,7 +36,6 @@ import de.neone.simbroker.ui.SimBrokerViewModel
 import de.neone.simbroker.ui.theme.activity.ViewWallpaperImageBox
 import de.neone.simbroker.ui.views.coinDetailView.CoinDetailSheet
 import de.neone.simbroker.ui.views.coins.components.CoinsListItem
-import de.neone.simbroker.ui.views.coins.components.CoinsSearchLoadIndicator
 import de.neone.simbroker.ui.views.coins.components.CoinsSearchSheet
 import de.neone.simbroker.ui.views.components.AlertDialog
 import kotlin.math.abs
@@ -79,7 +78,7 @@ fun CoinsView(
     val showAccountCashInDialog by viewModel.showAccountCashIn.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.loadMoreCoins()
+        viewModel.refreshCoins()
     }
 
     Column(
@@ -128,17 +127,6 @@ fun CoinsView(
                         Log.d("simDebug", selectedCoin.toString())
                     },
                 )
-            }
-
-            // Pagination zeigt den Loader, wenn die Liste nicht leer ist
-
-            item {
-                if (coinList.isNotEmpty()) {
-                    CoinsSearchLoadIndicator()
-                    LaunchedEffect(Unit) {
-                        viewModel.loadMoreCoins()
-                    }
-                }
             }
         }
 

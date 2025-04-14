@@ -21,30 +21,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
-/**
- * ViewModel für die SimBroker Krypto-Trading-App.
- *
- * Steuert zentrale Spiellogik, hält UI-State über StateFlows bereit und koordiniert:
- * - Account- und Investitionswerte via DataStore
- * - Transaktionen und Portfolio über Repository
- * - API-Aufrufe für Coins und deren Details
- * - Benutzerinteraktionen wie Kaufen/Verkaufen/Favorisieren
- * - Dialogzustände (Alerts, Hinweise)
- * - Timer für automatische Preisupdates
- *
- * Die Repository-Auswahl (Mock vs. Echt) wird zur Laufzeit via DataStore geregelt.
- *
- * @property realRepo Echtzeit-Repository (z.B. mit Retrofit)
- * @property mockRepo Offline-/Mock-Repository für Testdaten
- */
-
-private val DATASTORE_MOCKDATA = booleanPreferencesKey("mockData")
 private val DATASTORE_FIRSTGAME = booleanPreferencesKey("firstGame")
 private val DATASTORE_ACCOUNTVALUE = doublePreferencesKey("accountValue")
 private val DATASTORE_TOTALINVESTVALUE = doublePreferencesKey("totalInvested")
@@ -53,8 +34,7 @@ private val DATASTORE_GAMEDIFFICULTY = stringPreferencesKey("gameDifficulty")
 
 class SimBrokerViewModel(
     application: Application,
-    private val realRepo: SimBrokerRepositoryInterface,
-    private val mockRepo: SimBrokerRepositoryInterface,
+    private val repository: SimBrokerRepositoryInterface,
 
     ) : AndroidViewModel(application) {
 
@@ -64,15 +44,7 @@ class SimBrokerViewModel(
     // Proof Value for Sell-------------------------------------------------------------------------
     private val proofValue = 0.000001
     private fun isEffectivelyZero(value: Double): Boolean = abs(value) < proofValue
-    private fun isEffectivelyEqual(a: Double, b: Double): Boolean = abs(a - b) < proofValue
 
-    // Zugriff auf aktives Repository basierend auf DataStore-Flag----------------------------------
-    private val repository: SimBrokerRepositoryInterface
-        get() = if (mockDataState.value) {
-            realRepo
-        } else {
-            mockRepo
-        }
 
     // Dialog States -------------------------------------------------------------------------------
     private var _showAccountMaxValueDialog = MutableStateFlow(false)
@@ -99,11 +71,6 @@ class SimBrokerViewModel(
         _showGameDifficultDialog.value = value
     }
 
-    private var _showMockOrRealdataDialog = MutableStateFlow(false)
-    var showMockOrRealdataDialog: StateFlow<Boolean> = _showMockOrRealdataDialog
-    fun setShowMockOrRealdataDialog(value: Boolean) {
-        _showMockOrRealdataDialog.value = value
-    }
 
     private var _showFirstGameAccountValueDialog = MutableStateFlow(false)
     var showFirstGameAccountValueDialog: StateFlow<Boolean> = _showFirstGameAccountValueDialog
@@ -122,35 +89,6 @@ class SimBrokerViewModel(
     fun setAccountCashIn(value: Boolean) {
         _showAccountCashIn.value = value
     }
-
-    // Mockdata -----------------------------------------------------------------------------
-    // MOCKDATEN AKTIV (true/false)
-    private val mockDataFlow = dataStore.data
-        .map {
-            it[DATASTORE_MOCKDATA] ?: false
-        }
-
-    val mockDataState: StateFlow<Boolean> = mockDataFlow
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = false
-        )
-
-    fun setMockData(value: Boolean) {
-        viewModelScope.launch(Dispatchers.IO) {
-            dataStore.edit {
-                it[DATASTORE_MOCKDATA] = value
-            }
-            Log.d("simDebug", "DataStore Mockdata value updated: $value")
-
-            _coinList.value = emptyList()
-            offset = 0
-            hasMoreData = true
-
-        }
-    }
-
 
     // Game Difficulty -----------------------------------------------------------------------------
     // SCHWIERIGKEIT: Easy / Medium / Pro / Custom
@@ -252,11 +190,10 @@ class SimBrokerViewModel(
 
     fun setAccountValue(value: Double) {
         viewModelScope.launch(Dispatchers.IO) {
-            val currentValue = dataStore.data.first()[DATASTORE_ACCOUNTVALUE] ?: 0.0
-            val newValue = currentValue.plus(value).coerceAtLeast(0.0)
+            val currentValue = accountValueState.value
             if (currentValue in 0.0..450.0) {
                 dataStore.edit {
-                    it[DATASTORE_ACCOUNTVALUE] = newValue
+                    it[DATASTORE_ACCOUNTVALUE] = accountValueState.value + value
                 }
                 Log.d("simDebug", "DataStore Account Credit manual increased")
 
@@ -313,6 +250,7 @@ class SimBrokerViewModel(
     private var timerJob: Job? = null
     private val _refreshTimer = MutableStateFlow(0)
     val refreshTimer: StateFlow<Int> = _refreshTimer
+
     private fun startTimer() {
         timerJob?.cancel()
         timerJob = viewModelScope.launch {
@@ -323,31 +261,6 @@ class SimBrokerViewModel(
                     delay(1000)
                 }
                 refreshCoins()
-            }
-        }
-    }
-
-
-    // Pagination ---------------------------------------------------------------------------------
-    private var isLoading = false
-    private var offset = 0
-    private val limit = 100
-    private var hasMoreData = true
-    fun loadMoreCoins() {
-        if (isLoading || !hasMoreData) return
-
-        isLoading = true
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val newCoins = repository.getCoins(offset = offset, limit = limit)
-                _coinList.value += newCoins
-                offset += limit
-                hasMoreData = newCoins.isNotEmpty()
-            } catch (e: Exception) {
-                Log.e("simBroker", "Error loading more coins", e)
-            } finally {
-                isLoading = false
-
             }
         }
     }
@@ -371,37 +284,17 @@ class SimBrokerViewModel(
         }
     }
 
-    private fun refreshCoins() {
+    fun refreshCoins() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val refreshedCoins = repository.getCoins(offset = 0, limit = limit)
+                val refreshedCoins = repository.getCoins()
                 if (refreshedCoins.isNotEmpty()) {
                     _coinList.value = refreshedCoins
-                    offset = refreshedCoins.size
                 }
                 Log.d("simDebug", "Coins refreshed: ${refreshedCoins.size}")
             } catch (e: Exception) {
                 Log.e("simDebug", "Error refreshing coins", e)
             }
-        }
-    }
-
-    private fun loadAllPortfolioCoins() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val portfolioUuids = allPortfolioPositions.value.map { it.coinUuid }.distinct()
-            val existingUuids = _coinList.value.map { it.uuid }
-
-            val missingUuids = portfolioUuids.filter { it !in existingUuids }
-
-            val loadedPortfolioCoins = missingUuids.mapNotNull { uuid ->
-                try {
-                    repository.getCoin(uuid, timePeriod = "3h")
-                } catch (e: Exception) {
-                    Log.e("simDebug", "Error loading portfolio coin $uuid", e)
-                    null
-                }
-            }
-            _coinList.value = (_coinList.value + loadedPortfolioCoins).distinctBy { it.uuid }
         }
     }
 
@@ -438,13 +331,6 @@ class SimBrokerViewModel(
     private fun updatePortfolio(portfolio: PortfolioPositions) {
         viewModelScope.launch {
             repository.updatePortfolio(portfolio)
-        }
-    }
-
-    private fun deletePortfolioById(entryId: Int) {
-        Log.d("simDebug", "deletePosition over ViewModel started")
-        viewModelScope.launch {
-            repository.deletePortfolioById(entryId)
         }
     }
 
@@ -570,11 +456,8 @@ class SimBrokerViewModel(
                 it[DATASTORE_ACCOUNTVALUE] = updatedAccount
                 it[DATASTORE_TOTALINVESTVALUE] = updatedInvested
             }
-
-            Log.d("simDebug", "Sell abgeschlossen: Einnahmen $totalCashIn | Invest reduziert um $totalInvestReduction")
         }
     }
-
 
 
     // Update Data -----------------------------------------------------------------------------
@@ -637,12 +520,8 @@ class SimBrokerViewModel(
     // Init -----------------------------------------------------------------------------
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            mockDataFlow.firstOrNull()?.let {
-                startTimer()
-                refreshCoins()
-                loadMoreCoins()
-                loadAllPortfolioCoins()
-            }
+            startTimer()
+            refreshCoins()
         }
     }
 

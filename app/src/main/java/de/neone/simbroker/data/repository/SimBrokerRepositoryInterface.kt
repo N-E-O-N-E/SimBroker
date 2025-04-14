@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 interface SimBrokerRepositoryInterface {
 
     suspend fun getCoinPrice(uuid: String): Double
-    suspend fun getCoins(limit: Int, offset: Int): List<Coin>
+    suspend fun getCoins(): List<Coin>
     suspend fun getCoin(uuid: String, timePeriod: String): Coin
 
     suspend fun insertTransaction(transaction: TransactionPositions)
