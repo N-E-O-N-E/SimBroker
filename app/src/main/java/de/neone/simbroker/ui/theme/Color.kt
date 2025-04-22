@@ -2,7 +2,7 @@ package de.neone.simbroker.ui.theme
 import androidx.compose.ui.graphics.Color
 
 val topBarColorLight = Color(0xFFC4D7EE)
-val bottomBarColorLight = Color(0xFFA6BBE0)
+val bottomBarColorLight = Color(0xFFE7F0F9)
 //val bottomBarColorLight = Color(0xFFC2D7ED)
 
 val topBarColorDark = Color(0xFF4779A0)

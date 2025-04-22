@@ -1,21 +1,21 @@
 [versions]
-agp = "8.9.1"
-composeMaterial = "1.5.0-alpha12"
+agp = "8.9.2"
+composeMaterial = "1.5.0-alpha13"
 kotlin = "2.1.10"
-coreKtx = "1.15.0"
+coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.10.1"
-composeBom = "2025.03.01"
-koinBom = "4.1.0-Beta5"             # DI
+composeBom = "2025.04.00"
+koinBom = "4.1.0-Beta7"             # DI
 loggingInterceptor = "4.12.0"       # HTTP Logging
 moshiVersion = "1.15.2"             # Moshi JSON Parser
 retrofitVersion = "2.11.0"          # Retrofit HTTP Client
-roomRuntime = "2.6.1"               # Room Database
+roomRuntime = "2.7.0"               # Room Database
 kspVersion = "2.0.21-1.0.27"        # KSP für Room
-kotlinSerialization = "1.8.0"       # Kotlin Serialization Plugin
+kotlinSerialization = "1.8.1"       # Kotlin Serialization Plugin
 navigationCompose = "2.8.9"         # Navigation in Compose
 datastorePreferences = "1.1.4"      # DataStore Preferences
 uiTextGoogleFonts = "1.7.8"         # Google Fonts für Text
@@ -63,8 +63,8 @@ koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", versi
 
 logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "loggingInterceptor" }
 
-kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = "1.10.1" }
-kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version = "1.10.1" }
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = "1.10.2" }
+kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version = "1.10.2" }
 androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
 
 jetchart = { module = "com.github.basakjeet08:JetChart", version.ref = "jetchart" }

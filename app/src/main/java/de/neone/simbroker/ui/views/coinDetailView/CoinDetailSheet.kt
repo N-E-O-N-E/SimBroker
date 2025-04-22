@@ -161,7 +161,7 @@ fun CoinDetailSheet(
                             .scale(0.8f),
                         onClick = {
                             selectedOption = "amount"
-                            inputValue = coinAmount.roundTo8().toString()
+                            inputValue = coinAmount.toString()
                             Toast.makeText(context, "Value copied", Toast.LENGTH_SHORT).show()
                         },
                     ) {

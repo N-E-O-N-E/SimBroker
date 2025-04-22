@@ -28,6 +28,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -62,6 +65,7 @@ fun AccountView(
     val showGameWinDialog by viewModel.showGameWinDialog.collectAsState()
     val showFirstGameAccountValueDialog by viewModel.showFirstGameAccountValueDialog.collectAsState()
     val showEraseDialog by viewModel.showEraseDialog.collectAsState()
+    var klicker by rememberSaveable { mutableIntStateOf(5) }
 
     val accountCreditState by viewModel.accountValueState.collectAsState()
     val totalInvested by viewModel.investedValueState.collectAsState()
@@ -126,6 +130,57 @@ fun AccountView(
         ) {
 
             Card(
+                modifier = Modifier.padding(vertical = 5.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
+                )
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 15.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        modifier = Modifier.clickable {
+                            if (accountCreditState < 10000) {
+                                klicker--
+                                Toast.makeText(
+                                    context,
+                                    "Winner winner chicken dinner! $klicker",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                if (klicker == 0) {
+                                    viewModel.setGameEndAccountValue()
+                                    viewModel.setGameDifficult("Free-Play")
+                                    viewModel.setFirstGameState(false)
+                                    klicker = 5
+                                }
+                            }
+                        },
+                        text = "Account wallet: ${(accountCreditState + totalInvested).toEuroString()}",
+                        style = typography.headlineMedium
+                    )
+                }
+            }
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 5.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
+                )
+            ) {
+
+                AccountPieChartPlotter(
+                    creditValue = accountCreditState,
+                    investedValue = totalInvested,
+                    fees = allFeesSum
+                )
+            }
+
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 5.dp),
@@ -153,7 +208,7 @@ fun AccountView(
                             painter = painterResource(id = R.drawable.m1),
                             contentDescription = null,
                             colorFilter = if (accountCreditState >= 2000) null else ColorFilter.tint(
-                                color = MaterialTheme.colorScheme.surfaceContainerHigh
+                                color = MaterialTheme.colorScheme.background
                             )
                         )
                         Image(
@@ -161,7 +216,7 @@ fun AccountView(
                             painter = painterResource(id = R.drawable.m2),
                             contentDescription = null,
                             colorFilter = if (accountCreditState >= 4000) null else ColorFilter.tint(
-                                color = MaterialTheme.colorScheme.surfaceContainerHigh
+                                color = MaterialTheme.colorScheme.background
                             )
                         )
                         Image(
@@ -169,7 +224,7 @@ fun AccountView(
                             painter = painterResource(id = R.drawable.m3),
                             contentDescription = null,
                             colorFilter = if (accountCreditState >= 6000) null else ColorFilter.tint(
-                                color = MaterialTheme.colorScheme.surfaceContainerHigh
+                                color = MaterialTheme.colorScheme.background
                             )
                         )
                         Image(
@@ -177,7 +232,7 @@ fun AccountView(
                             painter = painterResource(id = R.drawable.m4),
                             contentDescription = null,
                             colorFilter = if (accountCreditState >= 8000) null else ColorFilter.tint(
-                                color = MaterialTheme.colorScheme.surfaceContainerHigh
+                                color = MaterialTheme.colorScheme.background
                             )
                         )
                         Image(
@@ -185,7 +240,7 @@ fun AccountView(
                             painter = painterResource(id = R.drawable.m5),
                             contentDescription = null,
                             colorFilter = if (accountCreditState >= 10000) null else ColorFilter.tint(
-                                color = MaterialTheme.colorScheme.surfaceContainerHigh
+                                color = MaterialTheme.colorScheme.background
                             )
                         )
                     }
@@ -297,12 +352,12 @@ fun AccountView(
                                     viewModel.setGameDifficult("Custom")
                                     viewModel.setFirstGameState(false)
                                     viewModel.setShowGameDifficultDialog(true)
-                                    viewModel.setFirstGameAccountValue(0.0)
-                                    viewModel.setFeeValue(0.0)
+                                    viewModel.setFirstGameAccountValue(1000.0)
+                                    viewModel.setFeeValue(2.0)
                                     Toast.makeText(
                                         context,
-                                        "Game Difficulty is now: Custom",
-                                        Toast.LENGTH_SHORT
+                                        "Game Difficulty is now: Custom - Fill your wallet up to 6.000 €!",
+                                        Toast.LENGTH_LONG
                                     ).show()
                                 } else {
                                     viewModel.setShowFirstGameAccountValueDialog(true)
@@ -319,46 +374,6 @@ fun AccountView(
             }
 
 
-            Card(
-                modifier = Modifier.padding(vertical = 5.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
-                )
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 15.dp),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        modifier = Modifier.clickable {
-                            if (accountCreditState < 20000) {
-                                viewModel.setGameEndAccountValue()
-                                viewModel.setGameDifficult("Free-Play")
-                            }
-                        },
-                        text = "Account wallet: ${(accountCreditState + totalInvested).toEuroString()}",
-                        style = typography.headlineMedium
-                    )
-                }
-            }
-
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 5.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
-                )
-            ) {
-
-                AccountPieChartPlotter(
-                    creditValue = accountCreditState,
-                    investedValue = totalInvested,
-                    fees = allFeesSum
-                )
-            }
 
             Card(
                 modifier = Modifier
@@ -381,7 +396,9 @@ fun AccountView(
                             .semantics { contentDescription = "Localized Description" },
                         value = feeValue.toFloat(),
                         onValueChange = {
-                            viewModel.setFeeValue(it.toDouble())
+                            if (viewModel.gameDifficultState.value == "Custom") viewModel.setFeeValue(
+                                it.toDouble()
+                            )
                         },
                         valueRange = 0f..10f,
                         onValueChangeFinished = { },
@@ -434,8 +451,10 @@ fun AccountView(
     }
 
     if (showGameWinDialog) {
-        AlertDialog("Congratulations! Your account has reached the target of €10,000. \n\n" +
-                "You can now reset the game to start a new game or simply continue playing to trade even more money.") {
+        AlertDialog(
+            "Congratulations! Your account has reached the target of €10,000. \n\n" +
+                    "You can now reset the game to start a new game or simply continue playing to trade even more money."
+        ) {
             viewModel.setShowGameWinDialog(false)
         }
     }
@@ -443,7 +462,6 @@ fun AccountView(
     if (showFirstGameAccountValueDialog) {
         AlertDialog(
             "This option is only available in the first game. Reset all data to activate this option.\n\n" +
-                    "Currently you can only adjust the fees! \n\n" +
                     "Have you won yet? Then you're playing in Free Play and can't set a difficulty!"
         ) {
             viewModel.setShowFirstGameAccountValueDialog(false)
