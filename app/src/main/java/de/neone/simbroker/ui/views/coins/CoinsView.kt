@@ -17,7 +17,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -108,9 +107,9 @@ fun CoinsView(
     val showNotEnoughCreditDialog by viewModel.showAccountNotEnoughMoney.collectAsState()
     val showAccountCashInDialog by viewModel.showAccountCashIn.collectAsState()
 
-    LaunchedEffect(Unit) {
-        viewModel.refreshCoins()
-    }
+//    LaunchedEffect(Unit) {
+//        viewModel.refreshCoins()
+//    }
 
     Column(
         modifier = Modifier
