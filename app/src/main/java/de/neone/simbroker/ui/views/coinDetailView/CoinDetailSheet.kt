@@ -115,23 +115,24 @@ fun CoinDetailSheet(
                 horizontalAlignment = Alignment.Start,
                 ) {
 
-                Text(
-                    text = "Account credit: ${accountCreditState.toEuroString()}",
-                    style = MaterialTheme.typography.titleSmall
-                )
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
 
-                HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
-
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(25.dp)) {
                     Text(
-                        text = "Deposits: ${coinValue.toEuroString()}",
+                        text = "Account credit: ${accountCreditState.toEuroString()}",
                         style = MaterialTheme.typography.titleSmall
                     )
-
-                }
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(25.dp)) {
                     Text(
-                        text = "After profit: ${(coinAmount * currentCoinPrice).toEuroString()}",
+                        text = "Depot: ${coinValue.toEuroString()}",
+                        style = MaterialTheme.typography.titleSmall
+                    )
+                }
+
+
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+                Row(modifier = Modifier.height(25.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(
+                        text = "Depot + profit: ${(coinAmount * currentCoinPrice).toEuroString()}",
                         style = MaterialTheme.typography.titleSmall
                     )
                     IconButton(
@@ -148,8 +149,9 @@ fun CoinDetailSheet(
                             contentDescription = "Copy value"
                         )
                     }
-                }
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(25.dp)) {
+
+                    Spacer(modifier = Modifier.weight(1f))
+
                     Text(
                         text = "Amount: ${coinAmount.roundTo8()}",
                         style = MaterialTheme.typography.titleSmall

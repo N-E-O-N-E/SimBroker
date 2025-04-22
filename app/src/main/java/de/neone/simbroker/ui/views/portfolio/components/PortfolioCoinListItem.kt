@@ -258,15 +258,15 @@ fun PortfolioCoinListItem(
                             }
 
                             Text(
-                                text = "Current Market-Price: ${currentPrice.toEuroString()}",
+                                text = "Current Price: ${currentPrice.toEuroString()}",
                                 style = MaterialTheme.typography.labelSmall
                             )
                             Text(
-                                text = "Invest + Profit: ${(totalInvested + profit).toEuroString()}",
+                                text = "Invest with Profit: ${(totalInvested + profit).toEuroString()}",
                                 style = MaterialTheme.typography.labelSmall
                             )
                             Text(
-                                text = "Sum of Fees: ${totalFee.toEuroString()}",
+                                text = "Fee over all: ${totalFee.toEuroString()}",
                                 style = MaterialTheme.typography.labelSmall
                             )
                         }

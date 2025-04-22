@@ -191,7 +191,7 @@ class SimBrokerViewModel(
     fun setAccountValue(value: Double) {
         viewModelScope.launch(Dispatchers.IO) {
             val currentValue = accountValueState.value
-            if (currentValue in 0.0..450.0) {
+            if (currentValue in 0.0..4900.0) {
                 dataStore.edit {
                     it[DATASTORE_ACCOUNTVALUE] = accountValueState.value + value
                 }

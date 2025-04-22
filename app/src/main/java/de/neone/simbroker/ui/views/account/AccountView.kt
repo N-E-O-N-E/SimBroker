@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -77,7 +78,7 @@ fun AccountView(
 
         Row(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxWidth().height(35.dp)
                 .background(MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.9f))
                 .padding(horizontal = 10.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -86,19 +87,24 @@ fun AccountView(
 
             // Head -----------------------------------------------------------------
 
-            Text("Fill your account to a maximum of 500", style = typography.bodyLarge)
+            if (selectedOption == "Custom") {
+                Text("Fill your account to a maximum of 5.000", style = typography.bodyLarge)
 
-            IconButton(onClick = {
-                if (!showAccountMaxValueDialog) {
-                    viewModel.setAccountValue(50.0)
+                IconButton(onClick = {
+                    if (!showAccountMaxValueDialog) {
+                        viewModel.setAccountValue(100.0)
+                    }
+                }) {
+                    Icon(
+                        modifier = Modifier.scale(1.3f),
+                        painter = painterResource(id = R.drawable.baseline_euro_24),
+                        contentDescription = null
+                    )
                 }
-            }) {
-                Icon(
-                    modifier = Modifier.scale(1.3f),
-                    painter = painterResource(id = R.drawable.baseline_euro_24),
-                    contentDescription = null
-                )
+            } else {
+                Text("Game Difficulty: ${selectedOption.uppercase()}", style = typography.bodyLarge)
             }
+
         }
 
         // Body -----------------------------------------------------------------------
@@ -149,8 +155,8 @@ fun AccountView(
                                     viewModel.setGameDifficult("Easy")
                                     viewModel.setFirstGameState(false)
                                     viewModel.setShowGameDifficultDialog(true)
-                                    viewModel.setFirstGameAccountValue(1600.0)
-                                    viewModel.setFeeValue(4.0)
+                                    viewModel.setFirstGameAccountValue(3000.0)
+                                    viewModel.setFeeValue(1.5)
                                     Toast.makeText(
                                         context,
                                         "Game Difficulty is now: Easy",
@@ -172,8 +178,8 @@ fun AccountView(
                                     viewModel.setGameDifficult("Medium")
                                     viewModel.setFirstGameState(false)
                                     viewModel.setShowGameDifficultDialog(true)
-                                    viewModel.setFirstGameAccountValue(800.0)
-                                    viewModel.setFeeValue(8.0)
+                                    viewModel.setFirstGameAccountValue(2000.0)
+                                    viewModel.setFeeValue(3.5)
                                     Toast.makeText(
                                         context,
                                         "Game Difficulty is now: Medium",
@@ -195,8 +201,8 @@ fun AccountView(
                                     viewModel.setGameDifficult("Pro")
                                     viewModel.setFirstGameState(false)
                                     viewModel.setShowGameDifficultDialog(true)
-                                    viewModel.setFirstGameAccountValue(400.0)
-                                    viewModel.setFeeValue(16.0)
+                                    viewModel.setFirstGameAccountValue(1000.0)
+                                    viewModel.setFeeValue(8.0)
                                     Toast.makeText(
                                         context,
                                         "Game Difficulty is now: Pro",
@@ -299,9 +305,9 @@ fun AccountView(
                         onValueChange = {
                             viewModel.setFeeValue(it.toDouble())
                         },
-                        valueRange = 0f..20f,
+                        valueRange = 0f..10f,
                         onValueChangeFinished = { },
-                        steps = 9
+                        steps = 19
                     )
                 }
             }
@@ -339,7 +345,7 @@ fun AccountView(
     }
 
     if (showAccountMaxValueDialog) {
-        AlertDialog("You can not set a credit higher than 500€") {
+        AlertDialog("You can not set a credit higher than 5.000€") {
             viewModel.setShowAccountMaxValueDialog(false)
         }
     }
