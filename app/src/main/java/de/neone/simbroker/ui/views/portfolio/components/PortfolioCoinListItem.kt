@@ -39,7 +39,6 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
@@ -51,7 +50,6 @@ import de.neone.simbroker.data.helper.SBHelper.roundTo2
 import de.neone.simbroker.data.helper.SBHelper.roundTo8
 import de.neone.simbroker.data.helper.SBHelper.toEuroString
 import de.neone.simbroker.data.helper.SBHelper.toPercentString
-import de.neone.simbroker.data.local.mockdata.coins_Mockdata
 import de.neone.simbroker.data.local.models.PortfolioPositions
 import de.neone.simbroker.data.local.models.TransactionPositions
 import de.neone.simbroker.data.local.models.TransactionType
@@ -340,7 +338,7 @@ fun PortfolioCoinListItem(
                     }
                 }
 
-                Column(modifier = Modifier.heightIn(min = 150.dp, max = 300.dp)
+                Column(modifier = Modifier.heightIn(min = 130.dp, max = 260.dp)
                     .verticalScroll(scrollState)) {
 
                     allCoinTransactions.sortedByDescending { sortedByDescending ->
@@ -439,18 +437,18 @@ fun PortfolioCoinListItem(
                                     )
                                 }
 
-                                Row() {
-                                    Text(
-                                        text = "Transaction",
-                                        style = MaterialTheme.typography.labelMedium
-                                    )
-                                    Spacer(modifier = Modifier.weight(1f))
-                                    Text(
-                                        text = it.type.toString(),
-                                        style = MaterialTheme.typography.labelMedium
-                                    )
-                                }
-
+//                                Row() {
+//                                    Text(
+//                                        text = "Transaction",
+//                                        style = MaterialTheme.typography.labelMedium
+//                                    )
+//                                    Spacer(modifier = Modifier.weight(1f))
+//                                    Text(
+//                                        text = it.type.toString(),
+//                                        style = MaterialTheme.typography.labelMedium
+//                                    )
+//                                }
+//
                                 HorizontalDivider(color = MaterialTheme.colorScheme.onSurface)
 
                                 Row() {
@@ -470,6 +468,7 @@ fun PortfolioCoinListItem(
                                         style = MaterialTheme.typography.labelMedium
                                     )
                                 }
+
                                 if (it.isClosed && it.type == TransactionType.BUY) {
                                     Row(
                                         modifier = Modifier
@@ -492,26 +491,3 @@ fun PortfolioCoinListItem(
     }
 }
 
-@Preview
-@Composable
-private fun PortfolioCoinListPreview() {
-    PortfolioCoinListItem(
-        coins = listOf(
-            PortfolioPositions(
-                coinUuid = coins_Mockdata[2].uuid,
-                symbol = coins_Mockdata[2].symbol,
-                iconUrl = coins_Mockdata[2].iconUrl,
-                name = coins_Mockdata[2].name,
-                amountBought = 2.0,
-                amountRemaining = 0.0,
-                pricePerUnit = 3500.0,
-                totalValue = 7000.0
-            )
-        ),
-        currentPrice = 3680.0,
-        allCoinTransactions = emptyList(),
-        profit = 1200.0,
-        setFavorite = { _, _ -> },
-        isClicked = { }
-    )
-}

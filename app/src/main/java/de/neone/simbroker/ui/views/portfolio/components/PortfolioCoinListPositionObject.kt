@@ -1,6 +1,8 @@
 package de.neone.simbroker.ui.views.portfolio.components
 
 import androidx.compose.runtime.Composable
+import de.neone.simbroker.data.helper.SBHelper.roundTo2
+import de.neone.simbroker.data.helper.SBHelper.roundTo8
 import de.neone.simbroker.data.local.models.PortfolioPositions
 import de.neone.simbroker.data.local.models.TransactionPositions
 import de.neone.simbroker.data.local.models.TransactionType
@@ -12,35 +14,29 @@ fun PortfolioCoinListPositionObject(
     transactionList: List<TransactionPositions>,
     portfolioPosition: List<PortfolioPositions>,
     isFavorite: (String, Boolean) -> Unit,
-    isClicked: () -> Unit
+    isClicked: () -> Unit,
+    profitCallback: (Double) -> Unit,
 ) {
 
     val coinUuid = portfolioPosition.first().coinUuid
 
     val coinBuyTransactions =
         transactionList.filter { it.coinUuid == coinUuid && it.type == TransactionType.BUY && !it.isClosed }
-
     val coinSellTransactions =
         transactionList.filter { it.coinUuid == coinUuid && it.type == TransactionType.SELL }
 
-    val portfolioIdsForThisCoin = portfolioPosition.filter{ !it.isClosed }.map { it.id }
-
+    val portfolioIdsForThisCoin = portfolioPosition.filter { !it.isClosed }.map { it.id }
     val transactionFiltered = transactionList.filter {
         it.coinUuid == coinUuid && it.portfolioCoinID in portfolioIdsForThisCoin
     }
 
     val totalFee = transactionFiltered.sumOf { it.fee }
-
-    val totalAmount = portfolioPosition.filter{ !it.isClosed }.sumOf { it.amountRemaining }
-
-
-    val totalInvested = portfolioPosition.filter{ !it.isClosed }.sumOf { it.amountRemaining * it.pricePerUnit }
-
-
+    val totalAmount =
+        portfolioPosition.filter { !it.isClosed }.sumOf { it.amountRemaining.roundTo8() }
+    val totalInvested = portfolioPosition.filter { !it.isClosed }
+        .sumOf { it.amountRemaining.roundTo8() * it.pricePerUnit.roundTo2() }
     val currentPrice = coinList.find { it.uuid == coinUuid }?.price?.toDouble() ?: 0.0
-
     val currentValue = totalAmount * currentPrice
-
 
     val realizedProfit = coinSellTransactions.sumOf { sellTx ->
         val matchingBuy = coinBuyTransactions
@@ -54,7 +50,6 @@ fun PortfolioCoinListPositionObject(
     }
 
     val unrealizedProfit = currentValue - totalInvested
-
     val profit = realizedProfit + unrealizedProfit
 
 
@@ -68,10 +63,13 @@ fun PortfolioCoinListPositionObject(
         sparks = sparksForPosition,
         totalFee = totalFee,
         totalInvested = totalInvested,
-        setFavorite = { coinUuid, isFavorite ->
-            isFavorite(coinUuid, isFavorite)
+        setFavorite = { id, bool ->
+            isFavorite(id, bool)
         },
-        isClicked = { isClicked() }
+        isClicked = {
+            isClicked()
+            profitCallback(profit)
+        },
     )
 
     return result

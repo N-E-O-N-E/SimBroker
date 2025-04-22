@@ -31,6 +31,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import de.neone.simbroker.R
 import de.neone.simbroker.data.helper.SBHelper.roundTo2
+import de.neone.simbroker.data.helper.SBHelper.roundTo8
+import de.neone.simbroker.data.local.models.TransactionType
 import de.neone.simbroker.data.remote.models.Coin
 import de.neone.simbroker.ui.SimBrokerViewModel
 import de.neone.simbroker.ui.theme.activity.ViewWallpaperImageBox
@@ -69,6 +71,35 @@ fun CoinsView(
         allPortfolioPositionsGrouped.values
             .toList()
             .filter { it.sumOf { pos -> pos.amountRemaining } > 0 && !it.first().isFavorite }
+
+    val coinValue = allPortfolioPositions.filter { selectedCoin?.uuid == it.coinUuid }.sumOf { it.totalValue }
+
+    val allTransactionPositions by viewModel.allTransactionPositions.collectAsState()
+    val coinBuyTransactions =
+        allTransactionPositions.filter { it.coinUuid == selectedCoin?.uuid && it.type == TransactionType.BUY && !it.isClosed }
+    val coinSellTransactions =
+        allTransactionPositions.filter { it.coinUuid == selectedCoin?.uuid && it.type == TransactionType.SELL }
+
+    val realizedProfit = coinSellTransactions.sumOf { sellTx ->
+        val matchingBuy = coinBuyTransactions
+            .filter { it.timestamp <= sellTx.timestamp }
+            .minByOrNull { it.timestamp }
+
+        if (matchingBuy != null) {
+            val gainPerCoin = sellTx.price - matchingBuy.price
+            gainPerCoin * sellTx.amount
+        } else 0.0
+    }
+
+    val totalAmount = allPortfolioPositions.filter { !it.isClosed && it.coinUuid == selectedCoin?.uuid }.sumOf { it.amountRemaining.roundTo8() }
+    val totalInvested = allPortfolioPositions.filter { !it.isClosed && it.coinUuid == selectedCoin?.uuid }
+        .sumOf { it.amountRemaining.roundTo8() * it.pricePerUnit.roundTo2() }
+
+    val currentPrice = coinList.find { it.uuid == selectedCoin?.uuid }?.price?.toDouble() ?: 0.0
+    val currentValue = totalAmount * currentPrice
+
+    val unrealizedProfit = currentValue - totalInvested
+    val profit = realizedProfit + unrealizedProfit
 
     var openSucheSheet by rememberSaveable { mutableStateOf(false) }
     var openCoinDetailSheet by rememberSaveable { mutableStateOf(false) }
@@ -193,7 +224,7 @@ fun CoinsView(
                     coinAmount = allPortfolioPositions
                         .filter { !isEffectivelyZero(it.amountRemaining) && !it.isClosed && selectedCoin?.uuid == it.coinUuid }
                         .sumOf { it.amountRemaining },
-                    coinValue = allPortfolioPositions.filter { selectedCoin?.uuid == it.coinUuid }.sumOf { it.totalValue },
+                    coinValue = coinValue + profit,
                     accountCreditState = accountCreditState
                 )
             }

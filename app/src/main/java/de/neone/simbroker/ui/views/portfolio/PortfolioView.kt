@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -74,16 +75,17 @@ fun PortfolioView(
     var openCoinDetailSheet by rememberSaveable { mutableStateOf(false) }
 
     val coinList by viewModel.coinList.collectAsState()
+
     val allPortfolioPositions by viewModel.allPortfolioPositions.collectAsState()
 
     val allPortfolioPositionsGrouped = allPortfolioPositions
         .filter { !it.isClosed }
         .groupBy { it.coinUuid }
+
     val allPortfolioGroupedList =
         allPortfolioPositionsGrouped.values
             .toList()
             .filter { it.sumOf { pos -> pos.amountRemaining } > 0 && !it.first().isFavorite }
-
 
     val allPortfolioPositionsGroupedByFavorite = allPortfolioPositions
         .filter { !it.isClosed }
@@ -93,6 +95,9 @@ fun PortfolioView(
             .filter { it.sumOf { pos -> pos.amountRemaining } > 0 && it.first().isFavorite }
 
     val allTransactionPositions by viewModel.allTransactionPositions.collectAsState()
+
+    val coinValue = allPortfolioPositions.filter { selectedCoin?.uuid == it.coinUuid }.sumOf { it.totalValue }
+    var profit by remember { mutableDoubleStateOf(0.0) }
 
     var showFavorites by rememberSaveable { mutableStateOf(true) }
     var favoriteTrigger by rememberSaveable { mutableStateOf(false) }
@@ -113,10 +118,6 @@ fun PortfolioView(
             favoriteTrigger = false
         }
     }
-
-//    LaunchedEffect(Unit) {
-//        viewModel.loadAllPortfolioCoins()
-//    }
 
     Column(
         modifier = Modifier
@@ -186,6 +187,9 @@ fun PortfolioView(
                                     selectedCoin =
                                         coinList.find { it.uuid == position.first().coinUuid }
                                     openCoinDetailSheet = true
+                                },
+                                profitCallback = {
+                                    profit = it
                                 }
                             )
                         }
@@ -243,6 +247,9 @@ fun PortfolioView(
                     isClicked = {
                         selectedCoin = coinList.find { it.uuid == positions.first().coinUuid }
                         openCoinDetailSheet = true
+                    },
+                    profitCallback = {
+                        profit = it
                     }
                 )
             }
@@ -286,7 +293,7 @@ fun PortfolioView(
                     coinAmount = allPortfolioPositions
                         .filter { !isEffectivelyZero(it.amountRemaining) && !it.isClosed && selectedCoin?.uuid == it.coinUuid }
                         .sumOf { it.amountRemaining },
-                    coinValue = allPortfolioPositions.filter { selectedCoin?.uuid == it.coinUuid }.sumOf { it.totalValue },
+                    coinValue = coinValue + profit,
                     accountCreditState = accountCreditState,
                 )
             }

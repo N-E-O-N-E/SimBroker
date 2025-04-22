@@ -57,7 +57,6 @@ import de.neone.simbroker.ui.views.components.AlertDialog
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoinDetailSheet(
-    modifier: Modifier = Modifier,
     coinDetails: Coin,
     selectedCoin: Coin,
     coinAmount: Double,
@@ -132,7 +131,7 @@ fun CoinDetailSheet(
                             .scale(0.8f),
                         onClick = {
                             selectedOption = "price"
-                            inputValue = coinAmount.toString()
+                            inputValue = coinValue.toString()
                             Toast.makeText(context, "Value copied", Toast.LENGTH_SHORT).show()
                         },
                     ) {
