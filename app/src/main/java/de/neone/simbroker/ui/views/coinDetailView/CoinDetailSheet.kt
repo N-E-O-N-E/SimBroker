@@ -117,21 +117,29 @@ fun CoinDetailSheet(
 
                 Text(
                     text = "Account credit: ${accountCreditState.toEuroString()}",
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleSmall
                 )
+
                 HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(25.dp)) {
                     Text(
-                        text = "Coins: ${coinValue.toEuroString()}",
-                        style = MaterialTheme.typography.titleMedium
+                        text = "Deposits: ${coinValue.toEuroString()}",
+                        style = MaterialTheme.typography.titleSmall
+                    )
+
+                }
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(25.dp)) {
+                    Text(
+                        text = "After profit: ${(coinAmount * currentCoinPrice).toEuroString()}",
+                        style = MaterialTheme.typography.titleSmall
                     )
                     IconButton(
                         modifier = Modifier
                             .scale(0.8f),
                         onClick = {
                             selectedOption = "price"
-                            inputValue = coinValue.toString()
+                            inputValue = (coinAmount * currentCoinPrice).toString()
                             Toast.makeText(context, "Value copied", Toast.LENGTH_SHORT).show()
                         },
                     ) {
@@ -143,15 +151,15 @@ fun CoinDetailSheet(
                 }
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(25.dp)) {
                     Text(
-                        text = "Amount in wallet: ${coinAmount.roundTo8()}",
-                        style = MaterialTheme.typography.titleMedium
+                        text = "Amount: ${coinAmount.roundTo8()}",
+                        style = MaterialTheme.typography.titleSmall
                     )
                     IconButton(
                         modifier = Modifier
                             .scale(0.8f),
                         onClick = {
                             selectedOption = "amount"
-                            inputValue = coinAmount.toString()
+                            inputValue = coinAmount.roundTo8().toString()
                             Toast.makeText(context, "Value copied", Toast.LENGTH_SHORT).show()
                         },
                     ) {
@@ -284,8 +292,8 @@ fun CoinDetailSheet(
                     label = { Text(if (selectedOption == "amount") "Amount in Coin" else "Price in EUR") })
 
                 Text(
-                    text = if (selectedOption == "amount") "Invest incl. Fee : ${(calculatedValue + feeValue).toEuroString()}"
-                    else "Coins: %.6f Coins".format(calculatedValue),
+                    text = if (selectedOption == "amount") "Invest excl. Fee : ${(calculatedValue).toEuroString()}"
+                    else "Coins excl. Fee: %.8f Coins".format(calculatedValue),
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(top = 15.dp)
                 )

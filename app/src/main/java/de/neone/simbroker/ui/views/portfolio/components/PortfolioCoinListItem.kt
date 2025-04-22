@@ -262,7 +262,7 @@ fun PortfolioCoinListItem(
                                 style = MaterialTheme.typography.labelSmall
                             )
                             Text(
-                                text = "Your investment: ${(totalInvested + profit).toEuroString()}",
+                                text = "Invest + Profit: ${(totalInvested + profit).toEuroString()}",
                                 style = MaterialTheme.typography.labelSmall
                             )
                             Text(
