@@ -258,7 +258,9 @@ fun PortfolioView(
 
     if (openCoinDetailSheet) {
         selectedCoin?.let { it ->
-            viewModel.getCoinDetails(it.uuid, "3h")
+            LaunchedEffect(Unit) {
+                viewModel.getCoinDetails(it.uuid, "3h")
+            }
             selectedCoinDetails?.let { coinDetails ->
                 CoinDetailSheet(
                     selectedCoin = it,

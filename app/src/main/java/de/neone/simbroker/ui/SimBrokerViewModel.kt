@@ -255,7 +255,7 @@ class SimBrokerViewModel(
         timerJob?.cancel()
         timerJob = viewModelScope.launch {
             while (true) {
-                _refreshTimer.value = 90
+                _refreshTimer.value = 60
                 for (i in _refreshTimer.value downTo 1) {
                     _refreshTimer.value = i
                     delay(1000)
