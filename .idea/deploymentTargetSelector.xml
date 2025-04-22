@@ -3,11 +3,11 @@
   <component name="deploymentTargetSelector">
     <selectionStates>
       <SelectionState runConfigName="SimBroker">
-        <option name="selectionMode" value="DIALOG" />
-        <DropdownSelection timestamp="2025-04-14T19:56:38.541892800Z">
+        <option name="selectionMode" value="DROPDOWN" />
+        <DropdownSelection timestamp="2025-04-22T09:53:48.019081200Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="PhysicalDevice" identifier="serial=wc79y58ljbtklvwc" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\wirtz\.android\avd\Pixel_7_Pro_Edited_API_35.avd" />
             </handle>
           </Target>
         </DropdownSelection>

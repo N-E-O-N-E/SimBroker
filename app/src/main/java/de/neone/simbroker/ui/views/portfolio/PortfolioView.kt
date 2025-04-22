@@ -284,8 +284,9 @@ fun PortfolioView(
                         viewModel.setAccountNotEnoughCoins(true)
                     },
                     coinAmount = allPortfolioPositions
-                        .filter { !isEffectivelyZero(it.amountRemaining) && !it.isClosed }
+                        .filter { !isEffectivelyZero(it.amountRemaining) && !it.isClosed && selectedCoin?.uuid == it.coinUuid }
                         .sumOf { it.amountRemaining },
+                    coinValue = allPortfolioPositions.filter { selectedCoin?.uuid == it.coinUuid }.sumOf { it.totalValue },
                     accountCreditState = accountCreditState,
                 )
             }

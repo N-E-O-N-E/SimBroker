@@ -12,8 +12,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -57,7 +60,7 @@ import de.neone.simbroker.ui.theme.colorUp
 import de.neone.simbroker.ui.theme.sell
 import kotlinx.coroutines.delay
 
-@SuppressLint("SuspiciousIndentation")
+@SuppressLint("SuspiciousIndentation", "UnrememberedMutableInteractionSource")
 @Composable
 fun PortfolioCoinListItem(
     coins: List<PortfolioPositions>,
@@ -80,6 +83,8 @@ fun PortfolioCoinListItem(
         .crossfade(true)
         .error(R.drawable.coinplaceholder)
         .build()
+
+    val scrollState = rememberScrollState()
 
     var zoomUp by remember { mutableStateOf(false) }
     var zoomTrigger by rememberSaveable { mutableStateOf(false) }
@@ -155,6 +160,7 @@ fun PortfolioCoinListItem(
             containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
         )
     ) {
+
         Column(
             modifier = Modifier
                 .padding(10.dp)
@@ -334,150 +340,152 @@ fun PortfolioCoinListItem(
                     }
                 }
 
-                allCoinTransactions.sortedByDescending { sortedByDescending ->
-                    sortedByDescending.timestamp
-                }.forEach {
+                Column(modifier = Modifier.heightIn(min = 150.dp, max = 300.dp)
+                    .verticalScroll(scrollState)) {
 
-                    val anteilEUR = it.price.roundTo2() * it.amount
-                    val gewVer =
-                        (currentPrice.roundTo2() - it.price.roundTo2()) * it.amount.roundTo8()
-                    val gvProzent =
-                        (((currentPrice.roundTo2() / it.price.roundTo2()) - 1) * 100)
+                    allCoinTransactions.sortedByDescending { sortedByDescending ->
+                        sortedByDescending.timestamp
+                    }.forEach {
 
+                        val anteilEUR = it.price.roundTo2() * it.amount
+                        val gewVer =
+                            (currentPrice.roundTo2() - it.price.roundTo2()) * it.amount.roundTo8()
+                        val gvProzent =
+                            (((currentPrice.roundTo2() / it.price.roundTo2()) - 1) * 100)
 
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(5.dp)
-                            .animateContentSize(
-                                animationSpec = tween(
-                                    durationMillis = 100,
-                                    easing = FastOutSlowInEasing
-                                )
-                            ),
-                        colors = CardDefaults.cardColors(
-                            containerColor =
-                                if (it.type == TransactionType.BUY) {
-                                    MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f)
-                                } else {
-                                    sell.copy(alpha = 0.6f)
-                                }
-                        )
-                    ) {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(5.dp)
+                                .animateContentSize(
+                                    animationSpec = tween(
+                                        durationMillis = 100,
+                                        easing = FastOutSlowInEasing
+                                    )
+                                ),
+                            colors = CardDefaults.cardColors(
+                                containerColor =
+                                    if (it.type == TransactionType.BUY) {
+                                        MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f)
+                                    } else {
+                                        sell.copy(alpha = 0.6f)
+                                    }
+                            )
+                        ) {
 
-                        Column(modifier = Modifier.padding(15.dp)) {
+                            Column(modifier = Modifier.padding(15.dp)) {
 
-                            Row() {
-                                Text(
-                                    text = "Date",
-                                    style = MaterialTheme.typography.labelMedium
-                                )
-                                Spacer(modifier = Modifier.weight(1f))
-                                Text(
-                                    text = SBHelper.timestampToStringLong(it.timestamp),
-                                    style = MaterialTheme.typography.labelMedium
-                                )
-                            }
-
-                            Row() {
-                                Text(
-                                    text = "Amount",
-                                    style = MaterialTheme.typography.labelMedium
-                                )
-                                Spacer(modifier = Modifier.weight(1f))
-                                Text(
-                                    text = (it.amount).roundTo8().toString(),
-                                    style = MaterialTheme.typography.labelMedium
-                                )
-
-                            }
-                            Row() {
-                                Text(
-                                    text = "Price p. Coin",
-                                    style = MaterialTheme.typography.labelMedium
-                                )
-                                Spacer(modifier = Modifier.weight(1f))
-                                Text(
-                                    text = it.price.toEuroString(),
-                                    style = MaterialTheme.typography.labelMedium
-                                )
-
-                            }
-
-                            HorizontalDivider(color = MaterialTheme.colorScheme.onSurface)
-
-                            Row() {
-                                Text(
-                                    text = "Fee",
-                                    style = MaterialTheme.typography.labelMedium
-                                )
-                                Spacer(modifier = Modifier.weight(1f))
-                                Text(
-                                    text = it.fee.toEuroString(),
-                                    style = MaterialTheme.typography.labelMedium
-                                )
-
-                            }
-
-                            Row() {
-                                Text(
-                                    text = "Value",
-                                    style = MaterialTheme.typography.labelMedium
-                                )
-                                Spacer(modifier = Modifier.weight(1f))
-                                Text(
-                                    text = anteilEUR.toEuroString(),
-                                    style = MaterialTheme.typography.labelMedium
-                                )
-                            }
-
-                            Row() {
-                                Text(
-                                    text = "Transaction",
-                                    style = MaterialTheme.typography.labelMedium
-                                )
-                                Spacer(modifier = Modifier.weight(1f))
-                                Text(
-                                    text = it.type.toString(),
-                                    style = MaterialTheme.typography.labelMedium
-                                )
-                            }
-
-                            HorizontalDivider(color = MaterialTheme.colorScheme.onSurface)
-
-                            Row() {
-                                Text(
-                                    text = "Profit/Loss",
-                                    style = MaterialTheme.typography.labelMedium
-                                )
-                                Spacer(modifier = Modifier.weight(1f))
-
-                                Text(
-                                    text = gewVer.toEuroString(),
-                                    style = MaterialTheme.typography.labelMedium
-                                )
-                                Spacer(modifier = Modifier.weight(0.05f))
-                                Text(
-                                    text = gvProzent.toPercentString(),
-                                    style = MaterialTheme.typography.labelMedium
-                                )
-                            }
-                            if (it.isClosed && it.type == TransactionType.BUY) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(top = 10.dp),
-                                    horizontalArrangement = Arrangement.Center
-                                ) {
+                                Row() {
                                     Text(
-                                        text = "!!! Completed sell transaction !!!",
+                                        text = "Date",
                                         style = MaterialTheme.typography.labelMedium
                                     )
+                                    Spacer(modifier = Modifier.weight(1f))
+                                    Text(
+                                        text = SBHelper.timestampToStringLong(it.timestamp),
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                }
+
+                                Row() {
+                                    Text(
+                                        text = "Amount",
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                    Spacer(modifier = Modifier.weight(1f))
+                                    Text(
+                                        text = (it.amount).roundTo8().toString(),
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+
+                                }
+                                Row() {
+                                    Text(
+                                        text = "Price p. Coin",
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                    Spacer(modifier = Modifier.weight(1f))
+                                    Text(
+                                        text = it.price.toEuroString(),
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+
+                                }
+
+                                HorizontalDivider(color = MaterialTheme.colorScheme.onSurface)
+
+                                Row() {
+                                    Text(
+                                        text = "Fee",
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                    Spacer(modifier = Modifier.weight(1f))
+                                    Text(
+                                        text = it.fee.toEuroString(),
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+
+                                }
+
+                                Row() {
+                                    Text(
+                                        text = "Value",
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                    Spacer(modifier = Modifier.weight(1f))
+                                    Text(
+                                        text = anteilEUR.toEuroString(),
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                }
+
+                                Row() {
+                                    Text(
+                                        text = "Transaction",
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                    Spacer(modifier = Modifier.weight(1f))
+                                    Text(
+                                        text = it.type.toString(),
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                }
+
+                                HorizontalDivider(color = MaterialTheme.colorScheme.onSurface)
+
+                                Row() {
+                                    Text(
+                                        text = "Profit/Loss",
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                    Spacer(modifier = Modifier.weight(1f))
+
+                                    Text(
+                                        text = gewVer.toEuroString(),
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                    Spacer(modifier = Modifier.weight(0.05f))
+                                    Text(
+                                        text = gvProzent.toPercentString(),
+                                        style = MaterialTheme.typography.labelMedium
+                                    )
+                                }
+                                if (it.isClosed && it.type == TransactionType.BUY) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(top = 10.dp),
+                                        horizontalArrangement = Arrangement.Center
+                                    ) {
+                                        Text(
+                                            text = "!!! Completed sell transaction !!!",
+                                            style = MaterialTheme.typography.labelMedium
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
-
                 }
             }
         }

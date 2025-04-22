@@ -61,6 +61,7 @@ fun CoinDetailSheet(
     coinDetails: Coin,
     selectedCoin: Coin,
     coinAmount: Double,
+    coinValue: Double,
     accountCreditState: Double,
     feeValue: Double,
     onBuyClick: (Double, Double) -> Unit,
@@ -109,29 +110,45 @@ fun CoinDetailSheet(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 10.dp)
+                    .padding(bottom = 8.dp)
+
                     .padding(horizontal = 5.dp),
                 horizontalAlignment = Alignment.Start,
-
-
                 ) {
-                Text(
-                    text = "Your account credit: ${accountCreditState.toEuroString()}",
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Text(
-                    text = "Coin in wallet: ${(selectedCoin.price.toDouble() * coinAmount).toEuroString()}",
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Row(verticalAlignment = Alignment.CenterVertically) {
 
+                Text(
+                    text = "Account credit: ${accountCreditState.toEuroString()}",
+                    style = MaterialTheme.typography.titleMedium
+                )
+                HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(25.dp)) {
+                    Text(
+                        text = "Coins: ${coinValue.toEuroString()}",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    IconButton(
+                        modifier = Modifier
+                            .scale(0.8f),
+                        onClick = {
+                            selectedOption = "price"
+                            inputValue = coinAmount.toString()
+                            Toast.makeText(context, "Value copied", Toast.LENGTH_SHORT).show()
+                        },
+                    ) {
+                        Icon(
+                            painterResource(id = R.drawable.baseline_content_copy_24),
+                            contentDescription = "Copy value"
+                        )
+                    }
+                }
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.height(25.dp)) {
                     Text(
                         text = "Amount in wallet: ${coinAmount.roundTo8()}",
                         style = MaterialTheme.typography.titleMedium
                     )
                     IconButton(
                         modifier = Modifier
-                            .padding(start = 5.dp)
                             .scale(0.8f),
                         onClick = {
                             selectedOption = "amount"
@@ -144,16 +161,18 @@ fun CoinDetailSheet(
                             contentDescription = "Copy value"
                         )
                     }
-                    Text("Copy Coinvalue", style = MaterialTheme.typography.labelMedium)
                 }
+                HorizontalDivider(modifier = Modifier.padding(vertical = 5.dp))
             }
 
+
             CoinDetailChartPlotter(coinSparklineData = selectedCoin.sparkline)
+
 
             Row(
                 modifier = Modifier
                     .fillMaxWidth(1f)
-                    .padding(bottom = 15.dp),
+                    .padding(bottom = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
