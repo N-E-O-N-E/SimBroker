@@ -25,7 +25,7 @@ fun AccountPieChartPlotter(
 
     val dataSet1 = ListDataStrategy(
         itemsList = listOf(
-            Pair("Your Credit", creditValue.toFloat()),
+            Pair("Wallet", creditValue.toFloat()),
             Pair("Investments", investedValue.toFloat())
         ),
         unit = "€" // Unit

@@ -71,6 +71,12 @@ class SimBrokerViewModel(
         _showGameDifficultDialog.value = value
     }
 
+    private var _showGameWinDialog = MutableStateFlow(false)
+    var showGameWinDialog: StateFlow<Boolean> = _showGameWinDialog
+    fun setShowGameWinDialog(value: Boolean) {
+        _showGameWinDialog.value = value
+    }
+
 
     private var _showFirstGameAccountValueDialog = MutableStateFlow(false)
     var showFirstGameAccountValueDialog: StateFlow<Boolean> = _showFirstGameAccountValueDialog
@@ -191,7 +197,7 @@ class SimBrokerViewModel(
     fun setAccountValue(value: Double) {
         viewModelScope.launch(Dispatchers.IO) {
             val currentValue = accountValueState.value
-            if (currentValue in 0.0..4900.0) {
+            if (currentValue in 0.0..5900.0) {
                 dataStore.edit {
                     it[DATASTORE_ACCOUNTVALUE] = accountValueState.value + value
                 }
@@ -201,6 +207,16 @@ class SimBrokerViewModel(
             } else {
                 _showAccountMaxValueDialog.value = true
             }
+        }
+    }
+
+    fun setGameEndAccountValue() {
+        viewModelScope.launch(Dispatchers.IO) {
+            dataStore.edit {
+                it[DATASTORE_ACCOUNTVALUE] = 10000.0
+            }
+            setShowGameWinDialog(true)
+            Log.d("simDebug", "DataStore Account Credit increased to 10.000 €")
         }
     }
 

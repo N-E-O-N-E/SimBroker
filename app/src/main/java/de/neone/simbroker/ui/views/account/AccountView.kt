@@ -2,7 +2,9 @@ package de.neone.simbroker.ui.views.account
 
 import android.annotation.SuppressLint
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
@@ -56,6 +59,7 @@ fun AccountView(
 
     val showAccountMaxValueDialog by viewModel.showAccountMaxValueDialog.collectAsState()
     val showGameDifficultDialog by viewModel.showGameDifficultDialog.collectAsState()
+    val showGameWinDialog by viewModel.showGameWinDialog.collectAsState()
     val showFirstGameAccountValueDialog by viewModel.showFirstGameAccountValueDialog.collectAsState()
     val showEraseDialog by viewModel.showEraseDialog.collectAsState()
 
@@ -78,7 +82,8 @@ fun AccountView(
 
         Row(
             modifier = Modifier
-                .fillMaxWidth().height(35.dp)
+                .fillMaxWidth()
+                .height(35.dp)
                 .background(MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.9f))
                 .padding(horizontal = 10.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -88,11 +93,11 @@ fun AccountView(
             // Head -----------------------------------------------------------------
 
             if (selectedOption == "Custom") {
-                Text("Fill your account to a maximum of 5.000", style = typography.bodyLarge)
+                Text("Fill your account to a maximum of 6.000", style = typography.bodyLarge)
 
                 IconButton(onClick = {
                     if (!showAccountMaxValueDialog) {
-                        viewModel.setAccountValue(100.0)
+                        viewModel.setAccountValue(250.0)
                     }
                 }) {
                     Icon(
@@ -128,6 +133,73 @@ fun AccountView(
                     containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
                 )
             ) {
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        modifier = Modifier.padding(vertical = 5.dp),
+                        text = "Awards",
+                        style = typography.titleLarge
+                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 25.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        Image(
+                            modifier = Modifier.scale(2.5f),
+                            painter = painterResource(id = R.drawable.m1),
+                            contentDescription = null,
+                            colorFilter = if (accountCreditState >= 2000) null else ColorFilter.tint(
+                                color = MaterialTheme.colorScheme.surfaceContainerHigh
+                            )
+                        )
+                        Image(
+                            modifier = Modifier.scale(2.5f),
+                            painter = painterResource(id = R.drawable.m2),
+                            contentDescription = null,
+                            colorFilter = if (accountCreditState >= 4000) null else ColorFilter.tint(
+                                color = MaterialTheme.colorScheme.surfaceContainerHigh
+                            )
+                        )
+                        Image(
+                            modifier = Modifier.scale(2.5f),
+                            painter = painterResource(id = R.drawable.m3),
+                            contentDescription = null,
+                            colorFilter = if (accountCreditState >= 6000) null else ColorFilter.tint(
+                                color = MaterialTheme.colorScheme.surfaceContainerHigh
+                            )
+                        )
+                        Image(
+                            modifier = Modifier.scale(2.5f),
+                            painter = painterResource(id = R.drawable.m4),
+                            contentDescription = null,
+                            colorFilter = if (accountCreditState >= 8000) null else ColorFilter.tint(
+                                color = MaterialTheme.colorScheme.surfaceContainerHigh
+                            )
+                        )
+                        Image(
+                            modifier = Modifier.scale(2.5f),
+                            painter = painterResource(id = R.drawable.m5),
+                            contentDescription = null,
+                            colorFilter = if (accountCreditState >= 10000) null else ColorFilter.tint(
+                                color = MaterialTheme.colorScheme.surfaceContainerHigh
+                            )
+                        )
+                    }
+                }
+            }
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 5.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
+                )
+            ) {
 
                 Column(
                     modifier = Modifier
@@ -137,8 +209,8 @@ fun AccountView(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Game Difficulty",
-                        style = typography.titleLarge
+                        text = "Difficulty",
+                        style = typography.titleMedium
                     )
 
                     Row(
@@ -155,7 +227,7 @@ fun AccountView(
                                     viewModel.setGameDifficult("Easy")
                                     viewModel.setFirstGameState(false)
                                     viewModel.setShowGameDifficultDialog(true)
-                                    viewModel.setFirstGameAccountValue(3000.0)
+                                    viewModel.setFirstGameAccountValue(6000.0)
                                     viewModel.setFeeValue(1.5)
                                     Toast.makeText(
                                         context,
@@ -178,7 +250,7 @@ fun AccountView(
                                     viewModel.setGameDifficult("Medium")
                                     viewModel.setFirstGameState(false)
                                     viewModel.setShowGameDifficultDialog(true)
-                                    viewModel.setFirstGameAccountValue(2000.0)
+                                    viewModel.setFirstGameAccountValue(4000.0)
                                     viewModel.setFeeValue(3.5)
                                     Toast.makeText(
                                         context,
@@ -201,7 +273,7 @@ fun AccountView(
                                     viewModel.setGameDifficult("Pro")
                                     viewModel.setFirstGameState(false)
                                     viewModel.setShowGameDifficultDialog(true)
-                                    viewModel.setFirstGameAccountValue(1000.0)
+                                    viewModel.setFirstGameAccountValue(2000.0)
                                     viewModel.setFeeValue(8.0)
                                     Toast.makeText(
                                         context,
@@ -260,7 +332,13 @@ fun AccountView(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "Your Account: ${(accountCreditState + totalInvested).toEuroString()}",
+                        modifier = Modifier.clickable {
+                            if (accountCreditState < 20000) {
+                                viewModel.setGameEndAccountValue()
+                                viewModel.setGameDifficult("Free-Play")
+                            }
+                        },
+                        text = "Account wallet: ${(accountCreditState + totalInvested).toEuroString()}",
                         style = typography.headlineMedium
                     )
                 }
@@ -345,7 +423,7 @@ fun AccountView(
     }
 
     if (showAccountMaxValueDialog) {
-        AlertDialog("You can not set a credit higher than 5.000€") {
+        AlertDialog("You can not set a credit higher than 6.000€") {
             viewModel.setShowAccountMaxValueDialog(false)
         }
     }
@@ -355,10 +433,18 @@ fun AccountView(
         }
     }
 
+    if (showGameWinDialog) {
+        AlertDialog("Congratulations! Your account has reached the target of €10,000. \n\n" +
+                "You can now reset the game to start a new game or simply continue playing to trade even more money.") {
+            viewModel.setShowGameWinDialog(false)
+        }
+    }
+
     if (showFirstGameAccountValueDialog) {
         AlertDialog(
             "This option is only available in the first game. Reset all data to activate this option.\n\n" +
-                    "Currently you can only adjust the fees!"
+                    "Currently you can only adjust the fees! \n\n" +
+                    "Have you won yet? Then you're playing in Free Play and can't set a difficulty!"
         ) {
             viewModel.setShowFirstGameAccountValueDialog(false)
         }
