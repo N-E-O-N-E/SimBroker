@@ -453,7 +453,7 @@ fun AccountView(
                 },
                 elevation = ButtonDefaults.buttonElevation(3.dp)
             ) {
-                Text(text = "Reset all data", style = typography.titleLarge)
+                Text(text = "RESET GAME", style = typography.titleLarge)
             }
 
         }
