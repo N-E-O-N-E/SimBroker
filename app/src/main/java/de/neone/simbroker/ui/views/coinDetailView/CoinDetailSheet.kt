@@ -95,7 +95,8 @@ fun CoinDetailSheet(
         var selectedOption by remember { mutableStateOf("price") } // "amount" oder "price"
         var inputValue by remember { mutableStateOf("") }
         val currentCoinPrice = selectedCoin.price.toDouble() // Aktueller aus API
-
+        val currentAmountCalc = ((totalInvested + profit) / currentCoinPrice).roundTo8().toString()
+        val currentPriceCalc = (totalInvested + profit).toEuroString()
         val calculatedValue = inputValue.toFloatOrNull()?.let { value ->
             if (selectedOption == "amount") {
                 value * currentCoinPrice
@@ -125,7 +126,7 @@ fun CoinDetailSheet(
                         style = MaterialTheme.typography.bodySmall
                     )
                     Text(
-                        text = "Coin depot: ${coinValue.toEuroString()}",
+                        text = "Coin depot: ${totalInvested.toEuroString()}",
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
@@ -135,7 +136,7 @@ fun CoinDetailSheet(
                 Row(modifier = Modifier.height(25.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(
                         //text = "Depot + profit: ${(coinAmount * currentCoinPrice).toEuroString()}",
-                        text = "Depot + profit: ${(totalInvested + profit).toEuroString()}",
+                        text = "Depot + profit: $currentPriceCalc",
                         style = MaterialTheme.typography.titleSmall
                     )
                     IconButton(
@@ -143,7 +144,7 @@ fun CoinDetailSheet(
                             .scale(0.7f),
                         onClick = {
                             selectedOption = "price"
-                            inputValue = (coinAmount * currentCoinPrice).toString()
+                            inputValue = currentPriceCalc
                             Toast.makeText(context, "Value copied", Toast.LENGTH_SHORT).show()
                         },
                     ) {
@@ -156,7 +157,7 @@ fun CoinDetailSheet(
                     Spacer(modifier = Modifier.weight(1f))
 
                     Text(
-                        text = "Amount: ${coinAmount.roundTo8()}",
+                        text = "Amount: $currentAmountCalc",
                         style = MaterialTheme.typography.titleSmall
                     )
                     IconButton(
@@ -164,7 +165,7 @@ fun CoinDetailSheet(
                             .scale(0.7f),
                         onClick = {
                             selectedOption = "amount"
-                            inputValue = coinAmount.toString()
+                            inputValue = currentAmountCalc
                             Toast.makeText(context, "Value copied", Toast.LENGTH_SHORT).show()
                         },
                     ) {

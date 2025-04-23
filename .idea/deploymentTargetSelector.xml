@@ -4,7 +4,7 @@
     <selectionStates>
       <SelectionState runConfigName="SimBroker">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-04-23T14:40:27.541761500Z">
+        <DropdownSelection timestamp="2025-04-23T19:38:41.377950400Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="PhysicalDevice" identifier="serial=wc79y58ljbtklvwc" />
