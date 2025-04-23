@@ -36,6 +36,7 @@ object SBHelper {
     }
 
     fun Double.roundTo2(): Double = BigDecimal(this).setScale(2, RoundingMode.HALF_EVEN).toDouble()
+    fun Double.roundTo6(): Double = BigDecimal(this).setScale(6, RoundingMode.HALF_EVEN).toDouble()
     fun Double.roundTo8(): Double = BigDecimal(this).setScale(8, RoundingMode.HALF_EVEN).toDouble()
 
     fun Double.toEuroString(): String = "%.2f €".format(this)

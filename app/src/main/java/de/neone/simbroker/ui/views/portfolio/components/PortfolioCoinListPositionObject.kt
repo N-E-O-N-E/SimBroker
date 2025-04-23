@@ -1,8 +1,6 @@
 package de.neone.simbroker.ui.views.portfolio.components
 
 import androidx.compose.runtime.Composable
-import de.neone.simbroker.data.helper.SBHelper.roundTo2
-import de.neone.simbroker.data.helper.SBHelper.roundTo8
 import de.neone.simbroker.data.local.models.PortfolioPositions
 import de.neone.simbroker.data.local.models.TransactionPositions
 import de.neone.simbroker.data.local.models.TransactionType
@@ -32,12 +30,12 @@ fun PortfolioCoinListPositionObject(
 
     val totalFee = transactionFiltered.sumOf { it.fee }
     val totalAmount =
-        portfolioPosition.filter { !it.isClosed }.sumOf { it.amountRemaining.roundTo8() }
+        portfolioPosition.filter { !it.isClosed }.sumOf { it.amountRemaining }
     val currentPrice = coinList.find { it.uuid == coinUuid }?.price?.toDouble() ?: 0.0
     val currentValue = totalAmount * currentPrice
 
     val totalInvested = portfolioPosition.filter { !it.isClosed }
-        .sumOf { it.amountRemaining.roundTo8() * it.pricePerUnit.roundTo2() }
+        .sumOf { it.amountRemaining * it.pricePerUnit }
     val realizedProfit = coinSellTransactions.sumOf { sellTx ->
         val matchingBuy = coinBuyTransactions
             .filter { it.timestamp <= sellTx.timestamp }

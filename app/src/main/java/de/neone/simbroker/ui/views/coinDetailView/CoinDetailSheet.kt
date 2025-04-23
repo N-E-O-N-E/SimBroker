@@ -43,7 +43,7 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.request.error
 import de.neone.simbroker.R
-import de.neone.simbroker.data.helper.SBHelper.roundTo8
+import de.neone.simbroker.data.helper.SBHelper.roundTo6
 import de.neone.simbroker.data.helper.SBHelper.toEuroString
 import de.neone.simbroker.data.helper.SBHelper.toPercentString
 import de.neone.simbroker.data.remote.models.Coin
@@ -95,8 +95,8 @@ fun CoinDetailSheet(
         var selectedOption by remember { mutableStateOf("price") } // "amount" oder "price"
         var inputValue by remember { mutableStateOf("") }
         val currentCoinPrice = selectedCoin.price.toDouble() // Aktueller aus API
-        val currentAmountCalc = ((totalInvested + profit) / currentCoinPrice).roundTo8().toString()
-        val currentPriceCalc = (totalInvested + profit).toEuroString()
+        val currentAmountCalc = ((totalInvested + profit) / currentCoinPrice)
+        val currentPriceCalc = (totalInvested + profit)
         val calculatedValue = inputValue.toFloatOrNull()?.let { value ->
             if (selectedOption == "amount") {
                 value * currentCoinPrice
@@ -136,7 +136,7 @@ fun CoinDetailSheet(
                 Row(modifier = Modifier.height(25.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(
                         //text = "Depot + profit: ${(coinAmount * currentCoinPrice).toEuroString()}",
-                        text = "Depot + profit: $currentPriceCalc",
+                        text = "Depot + profit: ${currentPriceCalc.toEuroString()}",
                         style = MaterialTheme.typography.titleSmall
                     )
                     IconButton(
@@ -144,7 +144,7 @@ fun CoinDetailSheet(
                             .scale(0.7f),
                         onClick = {
                             selectedOption = "price"
-                            inputValue = currentPriceCalc
+                            inputValue = currentPriceCalc.roundTo6().toString()
                             Toast.makeText(context, "Value copied", Toast.LENGTH_SHORT).show()
                         },
                     ) {
@@ -157,7 +157,7 @@ fun CoinDetailSheet(
                     Spacer(modifier = Modifier.weight(1f))
 
                     Text(
-                        text = "Amount: $currentAmountCalc",
+                        text = "Amount: ${currentAmountCalc.roundTo6()}",
                         style = MaterialTheme.typography.titleSmall
                     )
                     IconButton(
@@ -165,7 +165,7 @@ fun CoinDetailSheet(
                             .scale(0.7f),
                         onClick = {
                             selectedOption = "amount"
-                            inputValue = currentAmountCalc
+                            inputValue = currentAmountCalc.roundTo6().toString()
                             Toast.makeText(context, "Value copied", Toast.LENGTH_SHORT).show()
                         },
                     ) {
@@ -294,7 +294,7 @@ fun CoinDetailSheet(
 
                 Text(
                     text = if (selectedOption == "amount") "Invest excl. Fee : ${(calculatedValue).toEuroString()}"
-                    else "Coins excl. Fee: %.8f Coins".format(calculatedValue),
+                    else "Coins excl. Fee: ${calculatedValue.roundTo6()} Coins",
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(top = 15.dp)
                 )
@@ -368,7 +368,7 @@ fun CoinDetailSheet(
                         else inputValue.toDouble() / selectedCoin.price.toDouble()
 
 
-                        if (coinAmount < amount) {
+                        if (currentAmountCalc.roundTo6() < amount) {
                             notEnoughCoins()
                             return@Button
                         }

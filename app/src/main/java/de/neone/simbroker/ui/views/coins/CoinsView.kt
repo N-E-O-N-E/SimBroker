@@ -31,7 +31,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import de.neone.simbroker.R
 import de.neone.simbroker.data.helper.SBHelper.roundTo2
-import de.neone.simbroker.data.helper.SBHelper.roundTo8
 import de.neone.simbroker.data.local.models.TransactionType
 import de.neone.simbroker.data.remote.models.Coin
 import de.neone.simbroker.ui.SimBrokerViewModel
@@ -52,7 +51,7 @@ fun CoinsView(
         imageDarkTheme = R.drawable.simbroker_dark_clear
     )
 
-    val proofValue = 0.000001
+    val proofValue = 0.00000001
     fun isEffectivelyZero(value: Double): Boolean = abs(value) < proofValue
 
     val timer by viewModel.refreshTimer.collectAsState()
@@ -91,9 +90,9 @@ fun CoinsView(
         } else 0.0
     }
 
-    val totalAmount = allPortfolioPositions.filter { !it.isClosed && it.coinUuid == selectedCoin?.uuid }.sumOf { it.amountRemaining.roundTo8() }
+    val totalAmount = allPortfolioPositions.filter { !it.isClosed && it.coinUuid == selectedCoin?.uuid }.sumOf { it.amountRemaining }
     val totalInvested = allPortfolioPositions.filter { !it.isClosed && it.coinUuid == selectedCoin?.uuid }
-        .sumOf { it.amountRemaining.roundTo8() * it.pricePerUnit.roundTo2() }
+        .sumOf { it.amountRemaining * it.pricePerUnit }
 
     val currentPrice = coinList.find { it.uuid == selectedCoin?.uuid }?.price?.toDouble() ?: 0.0
     val currentValue = totalAmount * currentPrice
