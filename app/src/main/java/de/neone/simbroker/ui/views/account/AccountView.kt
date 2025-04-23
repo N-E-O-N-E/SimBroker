@@ -191,22 +191,6 @@ fun AccountView(
                 )
             ) {
 
-                AccountPieChartPlotter(
-                    creditValue = accountCreditState,
-                    investedValue = totalInvested,
-                    fees = allFeesSum
-                )
-            }
-
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 5.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
-                )
-            ) {
-
                 Column(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -288,6 +272,22 @@ fun AccountView(
                         }
                     }
                 }
+            }
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 5.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
+                )
+            ) {
+
+                AccountPieChartPlotter(
+                    creditValue = accountCreditState,
+                    investedValue = totalInvested,
+                    fees = allFeesSum
+                )
             }
 
             Card(

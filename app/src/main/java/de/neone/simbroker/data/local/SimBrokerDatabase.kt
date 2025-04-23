@@ -18,7 +18,7 @@ abstract class SimBrokerDatabase : RoomDatabase() {
         fun getDatabase(context: Context): SimBrokerDatabase {
             return Instance ?: synchronized(this) {
                 Room.databaseBuilder(context, SimBrokerDatabase::class.java, "simBrokerDatabase")
-                    .fallbackToDestructiveMigration()
+                    .fallbackToDestructiveMigration(false)
                     .build()
                     .also { Instance = it }
             }

@@ -70,6 +70,7 @@ fun CoinDetailSheet(
     onDismiss: () -> Unit,
 ) {
     Log.d("simDebug", accountCreditState.toString())
+
     val uriHandler = LocalUriHandler.current
     val coinDetailSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val showEmptyInputDialog = remember { mutableStateOf(false) }
@@ -93,7 +94,7 @@ fun CoinDetailSheet(
         var inputValue by remember { mutableStateOf("") }
         val currentCoinPrice = selectedCoin.price.toDouble() // Aktueller aus API
 
-        val calculatedValue = inputValue.toDoubleOrNull()?.let { value ->
+        val calculatedValue = inputValue.toFloatOrNull()?.let { value ->
             if (selectedOption == "amount") {
                 value * currentCoinPrice
             } else {
@@ -118,11 +119,11 @@ fun CoinDetailSheet(
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
 
                     Text(
-                        text = "Account credit: ${accountCreditState.toEuroString()}",
+                        text = "Your wallet: ${accountCreditState.toEuroString()}",
                         style = MaterialTheme.typography.titleSmall
                     )
                     Text(
-                        text = "Depot: ${coinValue.toEuroString()}",
+                        text = "Coin depot: ${coinValue.toEuroString()}",
                         style = MaterialTheme.typography.titleSmall
                     )
                 }
@@ -315,7 +316,7 @@ fun CoinDetailSheet(
                         containerColor = buy,
                         contentColor = MaterialTheme.colorScheme.onPrimaryContainer
                     ), modifier = Modifier.weight(0.5f), onClick = {
-                        val parsedInput = inputValue.toDoubleOrNull()
+                        val parsedInput = inputValue.toFloatOrNull()
 
                         if (parsedInput == null || parsedInput <= 0.0) {
                             showEmptyInputDialog.value = true
