@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -30,10 +31,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import coil3.ImageLoader
+import coil3.compose.rememberAsyncImagePainter
+import coil3.gif.GifDecoder
+import coil3.request.ImageRequest
+import de.neone.simbroker.R
+import de.neone.simbroker.ui.theme.coinColor
 import de.neone.simbroker.ui.theme.primaryDark
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -65,6 +74,11 @@ fun StartActivityImageBox(
     var currentProgress by rememberSaveable { mutableFloatStateOf(0f) }
     var loading by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    val imageLoader = ImageLoader.Builder(LocalContext.current)
+        .components {
+            add(GifDecoder.Factory())
+        }
+        .build()
 
     var zoomUp by remember { mutableStateOf(false) }
     var zoomTrigger by rememberSaveable { mutableStateOf(false) }
@@ -105,11 +119,11 @@ fun StartActivityImageBox(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-                .padding(top = 330.dp)
                 .padding(bottom = 15.dp),
-            verticalArrangement = Arrangement.SpaceBetween,
+            verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Spacer(modifier = Modifier.weight(1f))
 
             if (!loading) {
                 Button(
@@ -134,13 +148,28 @@ fun StartActivityImageBox(
             }
 
             if (loading) {
+                Image(
+                    modifier = Modifier.fillMaxWidth(),
+                    painter = rememberAsyncImagePainter(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(R.drawable.coinanim3)
+                        .build(),
+                    filterQuality = FilterQuality.High,
+                ),
+                    contentDescription = "Coin animation",
+                )
                 LinearProgressIndicator(
+                    color = coinColor,
                     progress = { currentProgress },
-                    modifier = Modifier.fillMaxWidth(0.8f).height(30.dp),
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .height(25.dp),
                     strokeCap = StrokeCap.Square,
                     gapSize = 0.dp,
                 )
             }
+
+            Spacer(modifier = Modifier.weight(1f))
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
@@ -152,8 +181,8 @@ fun StartActivityImageBox(
 }
 
 suspend fun loadProgress(updateProgress: (Float) -> Unit) {
-    for (i in 1..15) {
-        updateProgress(i.toFloat() / 15)
-        delay(Random.nextLong(150, 550))
+    for (i in 1..20) {
+        updateProgress(i.toFloat() / 20)
+        delay(Random.nextLong(150, 450))
     }
 }

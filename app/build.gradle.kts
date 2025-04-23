@@ -1,3 +1,4 @@
+
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -111,7 +112,9 @@ dependencies {
 
     // --- Coil (Image Loading) ---
     implementation(libs.coil.compose)
+    implementation(libs.coil.gif)
     implementation(libs.coil.network.okhttp)
+
 
     // --- JetChart (Charting) ---
     implementation(libs.jetchart)
