@@ -134,7 +134,9 @@ fun AccountView(
         ) {
 
             Card(
-                modifier = Modifier.padding(vertical = 5.dp).height(65.dp),
+                modifier = Modifier
+                    .padding(vertical = 5.dp)
+                    .height(65.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
                 )
@@ -211,7 +213,10 @@ fun AccountView(
                 ) {
                     Box {
                         Image(
-                            modifier = Modifier.scale(4.0f).height(120.dp).fillMaxWidth(),
+                            modifier = Modifier
+                                .scale(4.0f)
+                                .height(120.dp)
+                                .fillMaxWidth(),
                             painter = rememberAsyncImagePainter(
                                 model = ImageRequest.Builder(LocalContext.current)
                                     .data(R.drawable.load2)
@@ -228,59 +233,59 @@ fun AccountView(
                         ) {
 
 
-                        Text(
-                            modifier = Modifier.padding(vertical = 5.dp),
-                            text = "Awards",
-                            style = typography.titleLarge
-                        )
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 25.dp),
-                            horizontalArrangement = Arrangement.SpaceEvenly
-                        ) {
-                            Image(
-                                modifier = Modifier.scale(2.5f),
-                                painter = painterResource(id = R.drawable.m1),
-                                contentDescription = null,
-                                colorFilter = if (accountCreditState >= 2000) null else ColorFilter.tint(
-                                    color = MaterialTheme.colorScheme.background
-                                )
+                            Text(
+                                modifier = Modifier.padding(vertical = 5.dp),
+                                text = "Your awards",
+                                style = typography.titleLarge
                             )
-                            Image(
-                                modifier = Modifier.scale(2.5f),
-                                painter = painterResource(id = R.drawable.m2),
-                                contentDescription = null,
-                                colorFilter = if (accountCreditState >= 4000) null else ColorFilter.tint(
-                                    color = MaterialTheme.colorScheme.background
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 25.dp),
+                                horizontalArrangement = Arrangement.SpaceEvenly
+                            ) {
+                                Image(
+                                    modifier = Modifier.scale(2.5f),
+                                    painter = painterResource(id = R.drawable.m1),
+                                    contentDescription = null,
+                                    colorFilter = if (accountCreditState >= 2000) null else ColorFilter.tint(
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                                    )
                                 )
-                            )
-                            Image(
-                                modifier = Modifier.scale(2.5f),
-                                painter = painterResource(id = R.drawable.m3),
-                                contentDescription = null,
-                                colorFilter = if (accountCreditState >= 6000) null else ColorFilter.tint(
-                                    color = MaterialTheme.colorScheme.background
+                                Image(
+                                    modifier = Modifier.scale(2.5f),
+                                    painter = painterResource(id = R.drawable.m2),
+                                    contentDescription = null,
+                                    colorFilter = if (accountCreditState >= 4000) null else ColorFilter.tint(
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                                    )
                                 )
-                            )
-                            Image(
-                                modifier = Modifier.scale(2.5f),
-                                painter = painterResource(id = R.drawable.m4),
-                                contentDescription = null,
-                                colorFilter = if (accountCreditState >= 8000) null else ColorFilter.tint(
-                                    color = MaterialTheme.colorScheme.background
+                                Image(
+                                    modifier = Modifier.scale(2.5f),
+                                    painter = painterResource(id = R.drawable.m3),
+                                    contentDescription = null,
+                                    colorFilter = if (accountCreditState >= 6000) null else ColorFilter.tint(
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                                    )
                                 )
-                            )
-                            Image(
-                                modifier = Modifier.scale(2.5f),
-                                painter = painterResource(id = R.drawable.m5),
-                                contentDescription = null,
-                                colorFilter = if (accountCreditState >= 10000) null else ColorFilter.tint(
-                                    color = MaterialTheme.colorScheme.background
+                                Image(
+                                    modifier = Modifier.scale(2.5f),
+                                    painter = painterResource(id = R.drawable.m4),
+                                    contentDescription = null,
+                                    colorFilter = if (accountCreditState >= 8000) null else ColorFilter.tint(
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                                    )
                                 )
-                            )
-                        }
+                                Image(
+                                    modifier = Modifier.scale(2.5f),
+                                    painter = painterResource(id = R.drawable.m5),
+                                    contentDescription = null,
+                                    colorFilter = if (accountCreditState >= 10000) null else ColorFilter.tint(
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                                    )
+                                )
                             }
+                        }
                     }
                 }
             }
@@ -302,7 +307,7 @@ fun AccountView(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Difficulty",
+                        text = "Set your difficulty",
                         style = typography.titleMedium
                     )
 
