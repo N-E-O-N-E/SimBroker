@@ -48,6 +48,7 @@ import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import de.neone.simbroker.R
 import de.neone.simbroker.data.helper.SBHelper.roundTo2
+import de.neone.simbroker.data.helper.SBHelper.roundTo8
 import de.neone.simbroker.data.remote.models.Coin
 import de.neone.simbroker.ui.SimBrokerViewModel
 import de.neone.simbroker.ui.theme.activity.ViewWallpaperImageBox
@@ -112,6 +113,9 @@ fun PortfolioView(
     val showNotEnoughCoinstDialog by viewModel.showAccountNotEnoughCoins.collectAsState()
     val showNotEnoughCreditDialog by viewModel.showAccountNotEnoughMoney.collectAsState()
     val showAccountCashInDialog by viewModel.showAccountCashIn.collectAsState()
+
+    val totalInvested = allPortfolioPositions.filter { !it.isClosed }
+        .sumOf { it.amountRemaining.roundTo8() * it.pricePerUnit.roundTo2() }
 
     val rotationAngle by animateFloatAsState(
         targetValue = if (showFavorites) 180f else 0f,
@@ -319,6 +323,8 @@ fun PortfolioView(
                         .sumOf { it.amountRemaining },
                     coinValue = coinValue,
                     accountCreditState = accountCreditState,
+                    profit = profit,
+                    totalInvested = totalInvested
                 )
             }
         }

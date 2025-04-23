@@ -33,11 +33,11 @@ fun PortfolioCoinListPositionObject(
     val totalFee = transactionFiltered.sumOf { it.fee }
     val totalAmount =
         portfolioPosition.filter { !it.isClosed }.sumOf { it.amountRemaining.roundTo8() }
-    val totalInvested = portfolioPosition.filter { !it.isClosed }
-        .sumOf { it.amountRemaining.roundTo8() * it.pricePerUnit.roundTo2() }
     val currentPrice = coinList.find { it.uuid == coinUuid }?.price?.toDouble() ?: 0.0
     val currentValue = totalAmount * currentPrice
 
+    val totalInvested = portfolioPosition.filter { !it.isClosed }
+        .sumOf { it.amountRemaining.roundTo8() * it.pricePerUnit.roundTo2() }
     val realizedProfit = coinSellTransactions.sumOf { sellTx ->
         val matchingBuy = coinBuyTransactions
             .filter { it.timestamp <= sellTx.timestamp }

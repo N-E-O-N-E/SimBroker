@@ -226,7 +226,9 @@ fun CoinsView(
                         .filter { !isEffectivelyZero(it.amountRemaining) && !it.isClosed && selectedCoin?.uuid == it.coinUuid }
                         .sumOf { it.amountRemaining },
                     coinValue = coinValue + profit,
-                    accountCreditState = accountCreditState
+                    accountCreditState = accountCreditState,
+                    profit = profit,
+                    totalInvested = totalInvested
                 )
             }
         }

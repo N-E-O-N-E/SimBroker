@@ -61,6 +61,8 @@ fun CoinDetailSheet(
     selectedCoin: Coin,
     coinAmount: Double,
     coinValue: Double,
+    totalInvested: Double,
+    profit: Double,
     accountCreditState: Double,
     feeValue: Double,
     onBuyClick: (Double, Double) -> Unit,
@@ -133,7 +135,8 @@ fun CoinDetailSheet(
 
                 Row(modifier = Modifier.height(25.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(
-                        text = "Depot + profit: ${(coinAmount * currentCoinPrice).toEuroString()}",
+                        //text = "Depot + profit: ${(coinAmount * currentCoinPrice).toEuroString()}",
+                        text = "Depot + profit: ${(totalInvested + profit).toEuroString()}",
                         style = MaterialTheme.typography.titleSmall
                     )
                     IconButton(
