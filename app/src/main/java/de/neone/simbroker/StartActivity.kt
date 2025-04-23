@@ -37,7 +37,7 @@ class StartActivity : ComponentActivity() {
                         toMainActivity = {
                             startMainActivity()
                         },
-                        buttonText = "Start the game",
+                        buttonText = "START GAME",
                         footerText = "SIM BROKER - TRADING GAME",
                         licenseText = "LICENSE: CC BY-NC-SA 4.0",
                         imageLightTheme = R.drawable.simbroker_light,

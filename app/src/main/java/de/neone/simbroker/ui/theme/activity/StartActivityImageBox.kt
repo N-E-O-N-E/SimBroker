@@ -50,7 +50,7 @@ fun StartActivityImageBox(
 
     var checked by remember { mutableStateOf(false) }
 
-    Box {
+    Box() {
         if (!isSystemInDarkTheme()) {
             Image(
                 modifier = Modifier.fillMaxSize(),
@@ -69,8 +69,9 @@ fun StartActivityImageBox(
 
         Column(
             modifier = Modifier
+                .padding(innerPadding)
                 .fillMaxSize()
-                .padding(innerPadding).padding(top = 380.dp),
+                .padding(top = 370.dp).padding(bottom = 15.dp),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
