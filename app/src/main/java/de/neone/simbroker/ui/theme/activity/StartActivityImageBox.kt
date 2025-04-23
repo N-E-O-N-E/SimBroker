@@ -42,6 +42,8 @@ fun StartActivityImageBox(
     innerPadding: PaddingValues,
     toMainActivity: () -> Unit,
     buttonText: String,
+    footerText: String,
+    licenseText: String,
     imageLightTheme: Int,
     imageDarkTheme: Int,
 ) {
@@ -68,7 +70,7 @@ fun StartActivityImageBox(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding).padding(top = 350.dp),
+                .padding(innerPadding).padding(top = 380.dp),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -81,7 +83,11 @@ fun StartActivityImageBox(
                 Text(text = buttonText, style = typography.titleLarge)
             }
 
-            Text("SIM BROKER - BETA VERSION", style = typography.bodySmall, color = Color.White)
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+                Text(footerText, style = typography.bodySmall, color = Color.White)
+                Text(licenseText, style = typography.labelSmall, color = Color.White)
+            }
         }
     }
 }
