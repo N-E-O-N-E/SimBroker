@@ -108,10 +108,6 @@ fun CoinsView(
     val showNotEnoughCreditDialog by viewModel.showAccountNotEnoughMoney.collectAsState()
     val showAccountCashInDialog by viewModel.showAccountCashIn.collectAsState()
 
-//    LaunchedEffect(Unit) {
-//        viewModel.refreshCoins()
-//    }
-
     Column(
         modifier = Modifier
             .fillMaxSize(),
@@ -127,13 +123,13 @@ fun CoinsView(
         ) {
             Text(
                 text = "RealoadTime: $timer",
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface
             )
 
             Text(
                 text = "Credit: ${accountCreditState.roundTo2()} €",
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodySmall
             )
 
             IconButton(onClick = {

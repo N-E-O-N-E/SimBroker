@@ -134,7 +134,7 @@ fun PortfolioView(
         modifier = Modifier
             .fillMaxSize()
             .padding(),
-        horizontalAlignment = Alignment.Start,
+        horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
 
@@ -151,12 +151,12 @@ fun PortfolioView(
         ) {
             Text(
                 text = "RealoadTime: $timer",
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
                 text = "Game Difficulty: $gameDifficult",
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodySmall
             )
         }
 
@@ -182,10 +182,10 @@ fun PortfolioView(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Text(text = "No Data found", style = MaterialTheme.typography.headlineLarge)
+                    Text(text = "No Data found", style = MaterialTheme.typography.headlineMedium)
                     Text(
                         text = "Top up your account to be able to trade. \nSet the game difficulty.",
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleMedium,
                         textAlign = TextAlign.Center
                     )
                 }

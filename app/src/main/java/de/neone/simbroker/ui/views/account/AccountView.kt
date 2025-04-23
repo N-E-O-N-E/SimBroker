@@ -101,7 +101,7 @@ fun AccountView(
             // Head -----------------------------------------------------------------
 
             if (selectedOption == "Custom") {
-                Text("Fill your account to a maximum of 6.000", style = typography.bodyLarge)
+                Text("Fill your account to a maximum of 6.000", style = typography.bodySmall)
 
                 IconButton(onClick = {
                     if (!showAccountMaxValueDialog) {
@@ -109,13 +109,13 @@ fun AccountView(
                     }
                 }) {
                     Icon(
-                        modifier = Modifier.scale(1.3f),
+                        modifier = Modifier.scale(1.0f),
                         painter = painterResource(id = R.drawable.baseline_euro_24),
                         contentDescription = null
                     )
                 }
             } else {
-                Text("Game Difficulty: ${selectedOption.uppercase()}", style = typography.bodyLarge)
+                Text("Game Difficulty: ${selectedOption.uppercase()}", style = typography.bodySmall)
             }
 
         }
@@ -135,8 +135,8 @@ fun AccountView(
 
             Card(
                 modifier = Modifier
-                    .padding(vertical = 5.dp)
-                    .height(65.dp),
+                    .padding(vertical = 3.dp)
+                    .height(60.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
                 )
@@ -166,10 +166,10 @@ fun AccountView(
                             }
                         },
                         text = "Wallet:  ${(accountCreditState + totalInvested).toEuroString()}",
-                        style = typography.headlineMedium
+                        style = typography.headlineSmall
                     )
                     Image(
-                        modifier = Modifier.scale(3.0f),
+                        modifier = Modifier.scale(2.5f),
                         painter = rememberAsyncImagePainter(
                             model = ImageRequest.Builder(LocalContext.current)
                                 .data(R.drawable.coinanim)
@@ -185,7 +185,7 @@ fun AccountView(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 5.dp),
+                    .padding(vertical = 3.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
                 )
@@ -219,7 +219,7 @@ fun AccountView(
 
                             Text(
                                 modifier = Modifier.padding(vertical = 5.dp),
-                                text = "Your awards",
+                                text = "Ranking",
                                 style = typography.titleLarge
                             )
                             Row(
@@ -229,7 +229,7 @@ fun AccountView(
                                 horizontalArrangement = Arrangement.SpaceEvenly
                             ) {
                                 Image(
-                                    modifier = Modifier.scale(2.5f),
+                                    modifier = Modifier.scale(2.2f),
                                     painter = painterResource(id = R.drawable.m1),
                                     contentDescription = null,
                                     colorFilter = if (accountCreditState >= 2000) null else ColorFilter.tint(
@@ -237,7 +237,7 @@ fun AccountView(
                                     )
                                 )
                                 Image(
-                                    modifier = Modifier.scale(2.5f),
+                                    modifier = Modifier.scale(2.4f),
                                     painter = painterResource(id = R.drawable.m2),
                                     contentDescription = null,
                                     colorFilter = if (accountCreditState >= 4000) null else ColorFilter.tint(
@@ -245,7 +245,7 @@ fun AccountView(
                                     )
                                 )
                                 Image(
-                                    modifier = Modifier.scale(2.5f),
+                                    modifier = Modifier.scale(2.6f),
                                     painter = painterResource(id = R.drawable.m3),
                                     contentDescription = null,
                                     colorFilter = if (accountCreditState >= 6000) null else ColorFilter.tint(
@@ -253,7 +253,7 @@ fun AccountView(
                                     )
                                 )
                                 Image(
-                                    modifier = Modifier.scale(2.5f),
+                                    modifier = Modifier.scale(2.9f),
                                     painter = painterResource(id = R.drawable.m4),
                                     contentDescription = null,
                                     colorFilter = if (accountCreditState >= 8000) null else ColorFilter.tint(
@@ -261,7 +261,7 @@ fun AccountView(
                                     )
                                 )
                                 Image(
-                                    modifier = Modifier.scale(2.5f),
+                                    modifier = Modifier.scale(3.0f),
                                     painter = painterResource(id = R.drawable.m5),
                                     contentDescription = null,
                                     colorFilter = if (accountCreditState >= 10000) null else ColorFilter.tint(
@@ -293,7 +293,7 @@ fun AccountView(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 5.dp),
+                    .padding(vertical = 3.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
                 )
@@ -302,13 +302,13 @@ fun AccountView(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(10.dp),
+                        .padding(5.dp),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
                         text = "Set your difficulty",
-                        style = typography.titleMedium
+                        style = typography.bodyLarge
                     )
 
                     Row(
@@ -339,7 +339,7 @@ fun AccountView(
                         )
                         Text(
                             text = "Easy",
-                            style = typography.titleSmall
+                            style = typography.bodySmall
                         )
                         RadioButton(
                             selected = selectedOption == "Medium",
@@ -362,7 +362,7 @@ fun AccountView(
                         )
                         Text(
                             text = "Medium",
-                            style = typography.titleSmall
+                            style = typography.bodySmall
                         )
                         RadioButton(
                             selected = selectedOption == "Pro",
@@ -385,7 +385,7 @@ fun AccountView(
                         )
                         Text(
                             text = "Pro",
-                            style = typography.titleSmall
+                            style = typography.bodySmall
                         )
 
                         RadioButton(
@@ -409,7 +409,7 @@ fun AccountView(
                         )
                         Text(
                             text = "Custom",
-                            style = typography.titleSmall
+                            style = typography.bodySmall
                         )
 
                     }
@@ -421,7 +421,7 @@ fun AccountView(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 5.dp),
+                    .padding(vertical = 3.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
                 )
@@ -429,8 +429,8 @@ fun AccountView(
 
                 Column(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.Start) {
                     Text(
-                        text = "Trading Fee: ${feeValue.toEuroString()}",
-                        style = typography.titleMedium
+                        text = "Fee value: ${feeValue.toEuroString()}",
+                        style = typography.bodyMedium
                     )
                     Slider(
                         modifier = Modifier
@@ -458,7 +458,7 @@ fun AccountView(
                 },
                 elevation = ButtonDefaults.buttonElevation(3.dp)
             ) {
-                Text(text = "RESET GAME", style = typography.titleLarge)
+                Text(text = "RESET GAME", style = typography.titleMedium)
             }
 
         }

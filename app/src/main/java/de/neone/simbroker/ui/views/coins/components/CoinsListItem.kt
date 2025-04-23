@@ -57,7 +57,7 @@ fun CoinsListItem(
     ) {
         Column(
             modifier = Modifier
-                .padding(8.dp)
+                .padding(10.dp)
                 .fillMaxWidth(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
@@ -91,11 +91,11 @@ fun CoinsListItem(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.Start
                 ) {
-                    Text(text = coin.symbol, style = MaterialTheme.typography.titleMedium)
+                    Text(text = coin.symbol, style = MaterialTheme.typography.bodyLarge)
                     Row {
                         Text(
-                            text = if(coin.name.length >= 23) coin.name.take(23) + " ..." else coin.name,
-                            style = MaterialTheme.typography.bodyMedium
+                            text = coin.name.take(28) + " ...",
+                            style = MaterialTheme.typography.bodySmall
                         )
                     }
                 }

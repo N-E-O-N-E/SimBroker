@@ -37,12 +37,11 @@ fun AccountPieChartPlotter(
     ) {
         DonutRowPlotStrategy.DonutPlotRow(
             modifier = modifier
-                .fillMaxWidth()
-                .padding(vertical = 5.dp),
+                .fillMaxWidth(),
             circularData = dataSet1,
             circularForeground = DonutForegroundStrategy(
-                strokeWidth = 120f,
-                radiusMultiplier = 1.4f
+                strokeWidth = 80f,
+                radiusMultiplier = 1.3f
             ),
             circularDecoration = CircularDecoration.donutChartDecorations(
                 textColor = MaterialTheme.colorScheme.onSurface,
@@ -51,8 +50,8 @@ fun AccountPieChartPlotter(
 
         Text(
             "Fees over all time: ${fees.toInt()} €",
-            style = MaterialTheme.typography.labelMedium,
-            modifier = Modifier.padding(horizontal = 20.dp)
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.padding(horizontal = 65.dp).padding(bottom = 10.dp)
         )
     }
 }

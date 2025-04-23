@@ -134,8 +134,8 @@ fun StartActivityImageBox(
 
                     Button(
                         modifier = Modifier
-                            .fillMaxWidth(0.8f)
-                            .height(70.dp)
+                            .fillMaxWidth(0.9f)
+                            .height(60.dp)
                             .scale(zoom),
                         onClick = {
                             zoomTrigger = true

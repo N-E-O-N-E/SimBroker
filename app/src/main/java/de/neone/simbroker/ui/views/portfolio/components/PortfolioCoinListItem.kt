@@ -208,7 +208,7 @@ fun PortfolioCoinListItem(
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(200.dp)
+                                .height(220.dp)
                                 .padding(3.dp),
                             colors = CardDefaults.cardColors(
                                 containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(
@@ -248,14 +248,15 @@ fun PortfolioCoinListItem(
                         ) {
                             Text(
                                 text = coin.symbol,
-                                style = MaterialTheme.typography.headlineSmall
+                                style = MaterialTheme.typography.bodyLarge
                             )
                             Row() {
                                 Text(
-                                    text = "${coin.name.take(21) + "..."}  ",
-                                    style = MaterialTheme.typography.bodyLarge
+                                    text = "${coin.name.take(26) + "..."}  ",
+                                    style = MaterialTheme.typography.bodySmall
                                 )
                             }
+                            HorizontalDivider(modifier = Modifier.padding(vertical = 5.dp))
 
                             Text(
                                 text = "Current Price: ${currentPrice.toEuroString()}",
@@ -277,11 +278,11 @@ fun PortfolioCoinListItem(
                         ) {
                             Text(
                                 text = "Total Profit over all",
-                                style = MaterialTheme.typography.labelMedium,
+                                style = MaterialTheme.typography.labelSmall,
                             )
                             Text(
                                 text = profit.toEuroString(),
-                                style = MaterialTheme.typography.titleLarge,
+                                style = MaterialTheme.typography.bodyLarge,
                                 color = if (profit.toEuroString()
                                         .contains("-")
                                 ) colorDown else colorUp
@@ -333,7 +334,7 @@ fun PortfolioCoinListItem(
                     ) {
                         Text(
                             text = ">>> Active buy/sell transactions <<<",
-                            style = MaterialTheme.typography.labelMedium
+                            style = MaterialTheme.typography.bodySmall
                         )
                     }
                 }
@@ -376,36 +377,36 @@ fun PortfolioCoinListItem(
                                 Row() {
                                     Text(
                                         text = "Date",
-                                        style = MaterialTheme.typography.labelMedium
+                                        style = MaterialTheme.typography.bodySmall
                                     )
                                     Spacer(modifier = Modifier.weight(1f))
                                     Text(
                                         text = SBHelper.timestampToStringLong(it.timestamp),
-                                        style = MaterialTheme.typography.labelMedium
+                                        style = MaterialTheme.typography.bodySmall
                                     )
                                 }
 
                                 Row() {
                                     Text(
                                         text = "Amount",
-                                        style = MaterialTheme.typography.labelMedium
+                                        style = MaterialTheme.typography.bodySmall
                                     )
                                     Spacer(modifier = Modifier.weight(1f))
                                     Text(
                                         text = (it.amount).roundTo8().toString(),
-                                        style = MaterialTheme.typography.labelMedium
+                                        style = MaterialTheme.typography.bodySmall
                                     )
 
                                 }
                                 Row() {
                                     Text(
                                         text = "Price p. Coin",
-                                        style = MaterialTheme.typography.labelMedium
+                                        style = MaterialTheme.typography.bodySmall
                                     )
                                     Spacer(modifier = Modifier.weight(1f))
                                     Text(
                                         text = it.price.toEuroString(),
-                                        style = MaterialTheme.typography.labelMedium
+                                        style = MaterialTheme.typography.bodySmall
                                     )
 
                                 }
@@ -415,12 +416,12 @@ fun PortfolioCoinListItem(
                                 Row() {
                                     Text(
                                         text = "Fee",
-                                        style = MaterialTheme.typography.labelMedium
+                                        style = MaterialTheme.typography.bodySmall
                                     )
                                     Spacer(modifier = Modifier.weight(1f))
                                     Text(
                                         text = it.fee.toEuroString(),
-                                        style = MaterialTheme.typography.labelMedium
+                                        style = MaterialTheme.typography.bodySmall
                                     )
 
                                 }
@@ -428,24 +429,24 @@ fun PortfolioCoinListItem(
                                 Row() {
                                     Text(
                                         text = "Value",
-                                        style = MaterialTheme.typography.labelMedium
+                                        style = MaterialTheme.typography.bodySmall
                                     )
                                     Spacer(modifier = Modifier.weight(1f))
                                     Text(
                                         text = anteilEUR.toEuroString(),
-                                        style = MaterialTheme.typography.labelMedium
+                                        style = MaterialTheme.typography.bodySmall
                                     )
                                 }
 
 //                                Row() {
 //                                    Text(
 //                                        text = "Transaction",
-//                                        style = MaterialTheme.typography.labelMedium
+//                                        style = MaterialTheme.typography.bodySmall
 //                                    )
 //                                    Spacer(modifier = Modifier.weight(1f))
 //                                    Text(
 //                                        text = it.type.toString(),
-//                                        style = MaterialTheme.typography.labelMedium
+//                                        style = MaterialTheme.typography.bodySmall
 //                                    )
 //                                }
 //
@@ -454,18 +455,18 @@ fun PortfolioCoinListItem(
                                 Row() {
                                     Text(
                                         text = "Profit/Loss",
-                                        style = MaterialTheme.typography.labelMedium
+                                        style = MaterialTheme.typography.bodySmall
                                     )
                                     Spacer(modifier = Modifier.weight(1f))
 
                                     Text(
                                         text = gewVer.toEuroString(),
-                                        style = MaterialTheme.typography.labelMedium
+                                        style = MaterialTheme.typography.bodySmall
                                     )
                                     Spacer(modifier = Modifier.weight(0.05f))
                                     Text(
                                         text = gvProzent.toPercentString(),
-                                        style = MaterialTheme.typography.labelMedium
+                                        style = MaterialTheme.typography.bodySmall
                                     )
                                 }
 
@@ -478,7 +479,7 @@ fun PortfolioCoinListItem(
                                     ) {
                                         Text(
                                             text = "!!! Completed sell transaction !!!",
-                                            style = MaterialTheme.typography.labelMedium
+                                            style = MaterialTheme.typography.bodySmall
                                         )
                                     }
                                 }

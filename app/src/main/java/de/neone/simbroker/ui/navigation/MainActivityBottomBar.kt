@@ -2,6 +2,7 @@ package de.neone.simbroker.ui.navigation
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
@@ -46,7 +47,7 @@ fun MainActivityBottomBar(
                         contentDescription = route.label
                     )
                 },
-                label = { Text(text = route.label) },
+                label = { Text(text = route.label, style = MaterialTheme.typography.bodySmall) },
                 alwaysShowLabel = true,
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = if (isSystemInDarkTheme()) Color.White else tertiaryLightMediumContrast,
