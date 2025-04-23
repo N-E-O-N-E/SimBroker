@@ -37,9 +37,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import coil3.ImageLoader
 import coil3.compose.rememberAsyncImagePainter
-import coil3.gif.GifDecoder
 import coil3.request.ImageRequest
 import de.neone.simbroker.R
 import de.neone.simbroker.ui.theme.coinColor
@@ -74,11 +72,6 @@ fun StartActivityImageBox(
     var currentProgress by rememberSaveable { mutableFloatStateOf(0f) }
     var loading by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
-    val imageLoader = ImageLoader.Builder(LocalContext.current)
-        .components {
-            add(GifDecoder.Factory())
-        }
-        .build()
 
     var zoomUp by remember { mutableStateOf(false) }
     var zoomTrigger by rememberSaveable { mutableStateOf(false) }
@@ -126,24 +119,38 @@ fun StartActivityImageBox(
             Spacer(modifier = Modifier.weight(1f))
 
             if (!loading) {
-                Button(
-                    modifier = Modifier
-                        .fillMaxWidth(0.8f)
-                        .height(70.dp)
-                        .scale(zoom),
-                    onClick = {
-                        zoomTrigger = true
-                        loading = true
-                        scope.launch {
-                            loadProgress { progress ->
-                                currentProgress = progress
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    Image(
+                        modifier = Modifier.scale(2.0f).fillMaxWidth(),
+                        painter = rememberAsyncImagePainter(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(R.drawable.load2)
+                                .build(),
+                            filterQuality = FilterQuality.High,
+                        ),
+                        contentDescription = "Coin animation",
+                        alpha = 0.1f
+                    )
+
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth(0.8f)
+                            .height(70.dp)
+                            .scale(zoom),
+                        onClick = {
+                            zoomTrigger = true
+                            loading = true
+                            scope.launch {
+                                loadProgress { progress ->
+                                    currentProgress = progress
+                                }
+                                toMainActivity()
                             }
-                            toMainActivity()
-                        }
-                    },
-                    elevation = ButtonDefaults.buttonElevation(3.dp)
-                ) {
-                    Text(text = buttonText, style = typography.headlineLarge)
+                        },
+                        elevation = ButtonDefaults.buttonElevation(3.dp)
+                    ) {
+                        Text(text = buttonText, style = typography.headlineLarge)
+                    }
                 }
             }
 
@@ -152,7 +159,7 @@ fun StartActivityImageBox(
                     modifier = Modifier.fillMaxWidth(),
                     painter = rememberAsyncImagePainter(
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data(R.drawable.coinanim3)
+                        .data(R.drawable.coinanim3).size(coil3.size.Size.ORIGINAL)
                         .build(),
                     filterQuality = FilterQuality.High,
                 ),
@@ -164,8 +171,8 @@ fun StartActivityImageBox(
                     modifier = Modifier
                         .fillMaxWidth(0.8f)
                         .height(25.dp),
-                    strokeCap = StrokeCap.Square,
-                    gapSize = 0.dp,
+                    strokeCap = StrokeCap.Round,
+                    gapSize = 5.dp,
                 )
             }
 
@@ -181,8 +188,8 @@ fun StartActivityImageBox(
 }
 
 suspend fun loadProgress(updateProgress: (Float) -> Unit) {
-    for (i in 1..20) {
-        updateProgress(i.toFloat() / 20)
-        delay(Random.nextLong(150, 450))
+    for (i in 1..30) {
+        updateProgress(i.toFloat() / 30)
+        delay(Random.nextLong(10, 250))
     }
 }

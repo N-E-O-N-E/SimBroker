@@ -7,10 +7,12 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,9 +38,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import coil3.compose.rememberAsyncImagePainter
+import coil3.request.ImageRequest
 import de.neone.simbroker.R
 import de.neone.simbroker.data.helper.SBHelper.roundTo2
 import de.neone.simbroker.data.remote.models.Coin
@@ -152,17 +159,32 @@ fun PortfolioView(
         // Body --------------------------------------------------------------------------------
 
         if (allPortfolioGroupedList.isEmpty() && allPortfolioGroupedFavorites.isEmpty()) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(text = "No Data found", style = MaterialTheme.typography.headlineLarge)
-                Text(
-                    text = "Top up your account to be able to trade. \nSet the game difficulty.",
-                    style = MaterialTheme.typography.titleLarge,
-                    textAlign = TextAlign.Center
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+
+                Image(
+                    modifier = Modifier.scale(2.0f).fillMaxWidth(),
+                    painter = rememberAsyncImagePainter(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(R.drawable.load2)
+                            .build(),
+                        filterQuality = FilterQuality.High,
+                    ),
+                    contentDescription = "Coin animation",
+                    alpha = 0.2f
                 )
+
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(text = "No Data found", style = MaterialTheme.typography.headlineLarge)
+                    Text(
+                        text = "Top up your account to be able to trade. \nSet the game difficulty.",
+                        style = MaterialTheme.typography.titleLarge,
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
         } else {
             // Favoriten Head
