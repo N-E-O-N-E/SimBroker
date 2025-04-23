@@ -114,7 +114,7 @@ fun PortfolioView(
     val showNotEnoughCreditDialog by viewModel.showAccountNotEnoughMoney.collectAsState()
     val showAccountCashInDialog by viewModel.showAccountCashIn.collectAsState()
 
-    val totalInvested = allPortfolioPositions.filter { !it.isClosed }
+    val totalInvested = allPortfolioPositions.filter { !it.isClosed && it.coinUuid == selectedCoin?.uuid }
         .sumOf { it.amountRemaining.roundTo8() * it.pricePerUnit.roundTo2() }
 
     val rotationAngle by animateFloatAsState(

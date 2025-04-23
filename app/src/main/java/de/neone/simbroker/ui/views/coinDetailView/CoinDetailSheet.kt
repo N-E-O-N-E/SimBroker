@@ -263,24 +263,6 @@ fun CoinDetailSheet(
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-                RadioButton(
-                    selected = selectedOption == "price",
-                    onClick = { selectedOption = "price"; inputValue = "" })
-                Text("Price (EUR)", style = MaterialTheme.typography.bodyMedium)
-
-                RadioButton(
-                    selected = selectedOption == "amount",
-                    onClick = { selectedOption = "amount"; inputValue = "" })
-                Text("Amount (Coin)", style = MaterialTheme.typography.bodyMedium)
-            }
-
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -289,12 +271,25 @@ fun CoinDetailSheet(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    value = inputValue,
-                    onValueChange = { inputValue = it },
-                    label = { Text(if (selectedOption == "amount") "Amount in Coin" else "Price in EUR", style = MaterialTheme.typography.bodySmall) })
+                Row(horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically) {
+                    OutlinedTextField(
+                        modifier = Modifier.weight(1f),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        value = inputValue,
+                        onValueChange = { inputValue = it },
+                        label = { Text(if (selectedOption == "amount") "Amount in Coin" else "Price in EUR", style = MaterialTheme.typography.bodySmall) })
+
+                    RadioButton(
+                        selected = selectedOption == "price",
+                        onClick = { selectedOption = "price"; inputValue = "" })
+                    Text("EURO", style = MaterialTheme.typography.bodyMedium)
+
+                    RadioButton(
+                        selected = selectedOption == "amount",
+                        onClick = { selectedOption = "amount"; inputValue = "" })
+                    Text("COINS", style = MaterialTheme.typography.bodyMedium)
+                }
 
                 Text(
                     text = if (selectedOption == "amount") "Invest excl. Fee : ${(calculatedValue).toEuroString()}"
