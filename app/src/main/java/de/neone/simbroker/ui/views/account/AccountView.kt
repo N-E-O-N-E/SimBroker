@@ -29,7 +29,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -73,6 +75,7 @@ fun AccountView(
 
     val accountCreditState by viewModel.accountValueState.collectAsState()
     val totalInvested by viewModel.investedValueState.collectAsState()
+    val walletValue by remember { mutableDoubleStateOf(accountCreditState + totalInvested) }
     val feeValue by viewModel.feeValueState.collectAsState()
     val allFees by viewModel.allTransactionPositions.collectAsState()
     val allFeesSum = allFees.sumOf { it.fee }
@@ -232,7 +235,7 @@ fun AccountView(
                                     modifier = Modifier.scale(2.2f),
                                     painter = painterResource(id = R.drawable.m1),
                                     contentDescription = null,
-                                    colorFilter = if (accountCreditState >= 2000) null else ColorFilter.tint(
+                                    colorFilter = if (walletValue >= 2000) null else ColorFilter.tint(
                                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                                     )
                                 )
@@ -240,7 +243,7 @@ fun AccountView(
                                     modifier = Modifier.scale(2.4f),
                                     painter = painterResource(id = R.drawable.m2),
                                     contentDescription = null,
-                                    colorFilter = if (accountCreditState >= 4000) null else ColorFilter.tint(
+                                    colorFilter = if (walletValue >= 4000) null else ColorFilter.tint(
                                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                                     )
                                 )
@@ -248,7 +251,7 @@ fun AccountView(
                                     modifier = Modifier.scale(2.6f),
                                     painter = painterResource(id = R.drawable.m3),
                                     contentDescription = null,
-                                    colorFilter = if (accountCreditState >= 6000) null else ColorFilter.tint(
+                                    colorFilter = if (walletValue >= 6000) null else ColorFilter.tint(
                                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                                     )
                                 )
@@ -256,7 +259,7 @@ fun AccountView(
                                     modifier = Modifier.scale(2.9f),
                                     painter = painterResource(id = R.drawable.m4),
                                     contentDescription = null,
-                                    colorFilter = if (accountCreditState >= 8000) null else ColorFilter.tint(
+                                    colorFilter = if (walletValue >= 8000) null else ColorFilter.tint(
                                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                                     )
                                 )
@@ -264,7 +267,7 @@ fun AccountView(
                                     modifier = Modifier.scale(3.0f),
                                     painter = painterResource(id = R.drawable.m5),
                                     contentDescription = null,
-                                    colorFilter = if (accountCreditState >= 10000) null else ColorFilter.tint(
+                                    colorFilter = if (walletValue >= 10000) null else ColorFilter.tint(
                                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                                     )
                                 )
