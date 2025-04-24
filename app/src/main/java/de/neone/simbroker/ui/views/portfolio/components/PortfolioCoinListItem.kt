@@ -155,7 +155,7 @@ fun PortfolioCoinListItem(
                 )
             ),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.8f),
         )
     ) {
 

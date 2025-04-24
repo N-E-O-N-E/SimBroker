@@ -16,7 +16,8 @@ val buy = Color(0xFF1B8614)
 val sell = Color(0xFF831313)
 
 val chartLight = Color(0xFF0090FF)
-val chartDark = Color(0xFFF700FF)
+val chartDark = Color(0xFF00D9FF)
+//val chartDark = Color(0xFFF700FF)
 
 val isFavoriteColor = Color(0xFFFFEB3B)
 val coinColor = Color(0xFFC9BE59)

@@ -25,16 +25,13 @@ import dev.anirban.charts.linear.plots.GradientPlotStrategy
 
 @Composable
 fun PortfolioCoinChartPlotter(
-    modifier: Modifier = Modifier,
     coinSparklineData: List<String> = emptyList(),
 ) {
     val xAxisLabels = List(coinSparklineData.size) {
-//        Coordinate("${ it + 1 }")
         Coordinate("")
     }
 
     val coinDataFloat = coinSparklineData
-        .filterNotNull()
         .mapNotNull { it.toFloatOrNull() }
 
     val sparkRangeMin = coinDataFloat.minOrNull()?.roundTo(2) ?: 0f

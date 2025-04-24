@@ -139,7 +139,7 @@ fun AccountView(
                     .padding(vertical = 3.dp)
                     .height(60.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.8f),
                 )
             ) {
                 Row(
@@ -188,7 +188,7 @@ fun AccountView(
                     .fillMaxWidth()
                     .padding(vertical = 3.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.0f),
                 )
             ) {
 
@@ -280,7 +280,7 @@ fun AccountView(
                     .fillMaxWidth()
                     .padding(vertical = 5.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.8f),
                 )
             ) {
 
@@ -296,7 +296,7 @@ fun AccountView(
                     .fillMaxWidth()
                     .padding(vertical = 3.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.8f),
                 )
             ) {
 
@@ -424,7 +424,7 @@ fun AccountView(
                     .fillMaxWidth()
                     .padding(vertical = 3.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f),
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.8f),
                 )
             ) {
 

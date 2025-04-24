@@ -1,6 +1,6 @@
 [versions]
 agp = "8.9.2"
-composeMaterial = "1.5.0-alpha13"
+composeMaterial = "1.5.0-alpha14"
 kotlin = "2.1.20"
 coreKtx = "1.16.0"
 junit = "4.13.2"
@@ -8,20 +8,22 @@ junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.10.1"
-composeBom = "2025.04.00"
+composeBom = "2025.04.01"
 koinBom = "4.1.0-Beta7"             # DI
 loggingInterceptor = "4.12.0"       # HTTP Logging
 moshiVersion = "1.15.2"             # Moshi JSON Parser
 retrofitVersion = "2.11.0"          # Retrofit HTTP Client
-roomRuntime = "2.7.0"               # Room Database
+roomRuntime = "2.7.1"               # Room Database
 kspVersion = "2.1.20-2.0.0"        # KSP für Room
 kotlinSerialization = "1.8.1"       # Kotlin Serialization Plugin
 navigationCompose = "2.8.9"         # Navigation in Compose
+#noinspection GradleDependency
 datastorePreferences = "1.1.4"      # DataStore Preferences
-uiTextGoogleFonts = "1.7.8"         # Google Fonts für Text
+uiTextGoogleFonts = "1.8.0"         # Google Fonts für Text
 coilCompose = "3.1.0"               # AsyncImage KOIL
 coilGif = "3.1.0"                   # GIF Image KOIL
 jetchart = "2.1.0"                  # JetChart
+testManifest = "1.8.0"              # Test Manifest
 
 [libraries]
 androidx-compose-material = { module = "androidx.wear.compose:compose-material", version.ref = "composeMaterial" }
@@ -36,7 +38,7 @@ androidx-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
-androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest", version = "1.7.8" }
+androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest", version.ref = "testManifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coilCompose" }
