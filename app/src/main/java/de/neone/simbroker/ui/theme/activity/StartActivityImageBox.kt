@@ -39,6 +39,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
+import coil3.size.Size
 import de.neone.simbroker.R
 import de.neone.simbroker.ui.theme.coinColor
 import de.neone.simbroker.ui.theme.primaryDark
@@ -181,12 +182,11 @@ fun StartActivityImageBox(
             //--------------------------------------------------------------------------------------
             if (loading) {
                 Image(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().height(250.dp),
                     painter = rememberAsyncImagePainter(
                         model = ImageRequest.Builder(LocalContext.current)
                             .data(R.drawable.coinanim3)
-                            .size(coil3.size.Size.ORIGINAL)
-                            .build(),
+                            .size(Size.ORIGINAL).build(),
                         filterQuality = FilterQuality.High,
                     ),
                     contentDescription = "Coin animation",

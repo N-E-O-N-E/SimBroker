@@ -371,7 +371,7 @@ fun AccountView(
                             .semantics { contentDescription = "Fee Slider" },
                         value = feeValue.toFloat(),
                         onValueChange = {
-                            if (viewModel.gameDifficultState.value == "Custom") {
+                            if (viewModel.gameDifficultState.value == "Custom" || viewModel.gameDifficultState.value == "Free-Play")  {
                                 viewModel.setFeeValue(it.toDouble())
                             }
                         },
