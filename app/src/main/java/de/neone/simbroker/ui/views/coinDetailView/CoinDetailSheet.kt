@@ -45,6 +45,7 @@ import coil3.request.error
 import de.neone.simbroker.R
 import de.neone.simbroker.data.helper.SBHelper.roundTo2
 import de.neone.simbroker.data.helper.SBHelper.roundTo6
+import de.neone.simbroker.data.helper.SBHelper.roundTo8
 import de.neone.simbroker.data.helper.SBHelper.toEuroString
 import de.neone.simbroker.data.helper.SBHelper.toPercentString
 import de.neone.simbroker.data.remote.models.Coin
@@ -119,12 +120,9 @@ fun CoinDetailSheet(
 
                     .padding(horizontal = 5.dp),
                 horizontalAlignment = Alignment.Start,
-            ) {
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
+
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
 
                     Text(
                         text = "Your wallet: ${accountCreditState.toEuroString()}",
@@ -138,12 +136,7 @@ fun CoinDetailSheet(
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-                Row(
-                    modifier = Modifier
-                        .height(25.dp)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
+                Row(modifier = Modifier.height(25.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(
                         //text = "Depot + profit: ${(coinAmount * currentCoinPrice).toEuroString()}",
                         text = "Depot + profit: ${currentPriceCalc.toEuroString()}",
@@ -282,21 +275,14 @@ fun CoinDetailSheet(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                Row(horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically) {
                     OutlinedTextField(
                         modifier = Modifier.weight(1f),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         value = inputValue,
                         onValueChange = { inputValue = it },
-                        label = {
-                            Text(
-                                if (selectedOption == "amount") "Amount in Coin" else "Price in EUR",
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                        })
+                        label = { Text(if (selectedOption == "amount") "Amount in Coin" else "Price in EUR", style = MaterialTheme.typography.bodySmall) })
 
                     RadioButton(
                         selected = selectedOption == "price",
@@ -341,12 +327,7 @@ fun CoinDetailSheet(
                         val amount =
                             if (selectedOption == "amount") inputValue.toDouble() else inputValue.toDouble() / selectedCoin.price.toDouble()
                         val totalValue =
-                            if (selectedOption == "amount") inputValue.toDouble() * selectedCoin.price.toDouble() else inputValue.toDouble()
-
-                        if (parsedInput > 0 && parsedInput < 1.0) {
-                            showMinimumInputDialog.value = true
-                            return@Button
-                        }
+                            if (selectedOption == "amount") (inputValue.toDouble() * selectedCoin.price.toDouble()).roundTo8() else inputValue.toDouble().roundTo8()
 
                         if (accountCreditState >= (totalValue + feeValue)) {
                             Log.d("simDebug", "Credit: $accountCreditState")
@@ -381,9 +362,6 @@ fun CoinDetailSheet(
                         if (parsedInput == null || parsedInput <= 0.0) {
                             showEmptyInputDialog.value = true
                             return@Button
-                        } else if (parsedInput > 0 && parsedInput < 1.0) {
-                            showMinimumInputDialog.value = true
-                            return@Button
                         }
 
                         val amount = if (selectedOption == "amount") inputValue.toDouble()
@@ -411,7 +389,7 @@ fun CoinDetailSheet(
     }
 
     if (showMinimumInputDialog.value) {
-        AlertDialog("Minimum value is 1.00 €") { showMinimumInputDialog.value = false }
+        AlertDialog("Minimum value?!") { showMinimumInputDialog.value = false }
     }
 
 }
