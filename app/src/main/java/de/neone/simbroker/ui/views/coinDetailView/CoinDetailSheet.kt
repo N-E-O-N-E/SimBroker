@@ -119,9 +119,12 @@ fun CoinDetailSheet(
 
                     .padding(horizontal = 5.dp),
                 horizontalAlignment = Alignment.Start,
-                ) {
+            ) {
 
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
 
                     Text(
                         text = "Your wallet: ${accountCreditState.toEuroString()}",
@@ -135,7 +138,12 @@ fun CoinDetailSheet(
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-                Row(modifier = Modifier.height(25.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Row(
+                    modifier = Modifier
+                        .height(25.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
                     Text(
                         //text = "Depot + profit: ${(coinAmount * currentCoinPrice).toEuroString()}",
                         text = "Depot + profit: ${currentPriceCalc.toEuroString()}",
@@ -274,14 +282,21 @@ fun CoinDetailSheet(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                Row(horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     OutlinedTextField(
                         modifier = Modifier.weight(1f),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         value = inputValue,
                         onValueChange = { inputValue = it },
-                        label = { Text(if (selectedOption == "amount") "Amount in Coin" else "Price in EUR", style = MaterialTheme.typography.bodySmall) })
+                        label = {
+                            Text(
+                                if (selectedOption == "amount") "Amount in Coin" else "Price in EUR",
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        })
 
                     RadioButton(
                         selected = selectedOption == "price",
@@ -328,20 +343,22 @@ fun CoinDetailSheet(
                         val totalValue =
                             if (selectedOption == "amount") inputValue.toDouble() * selectedCoin.price.toDouble() else inputValue.toDouble()
 
+                        if (parsedInput > 0 && parsedInput < 1.0) {
+                            showMinimumInputDialog.value = true
+                            return@Button
+                        }
+
                         if (accountCreditState >= (totalValue + feeValue)) {
                             Log.d("simDebug", "Credit: $accountCreditState")
                             Log.d(
                                 "simDebug",
                                 "CalcValue + Fee: ${accountCreditState >= (totalValue + feeValue)}"
                             )
-
                             onBuyClick(amount, totalValue)
 
                         } else {
                             Log.d("simDebug", "Your Credit is $accountCreditState")
-
                             notEnoughCredit()
-
                             return@Button
                         }
 
@@ -394,7 +411,7 @@ fun CoinDetailSheet(
     }
 
     if (showMinimumInputDialog.value) {
-        AlertDialog("Minimum value to sell is 1.00 €") { showMinimumInputDialog.value = false }
+        AlertDialog("Minimum value is 1.00 €") { showMinimumInputDialog.value = false }
     }
 
 }
