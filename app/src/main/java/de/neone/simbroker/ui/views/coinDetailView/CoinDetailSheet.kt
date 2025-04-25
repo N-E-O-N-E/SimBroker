@@ -77,6 +77,7 @@ fun CoinDetailSheet(
     val uriHandler = LocalUriHandler.current
     val coinDetailSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val showEmptyInputDialog = remember { mutableStateOf(false) }
+    val showMinimumInputDialog = remember { mutableStateOf(false) }
 
     val context = LocalContext.current
 
@@ -363,6 +364,9 @@ fun CoinDetailSheet(
                         if (parsedInput == null || parsedInput <= 0.0) {
                             showEmptyInputDialog.value = true
                             return@Button
+                        } else if (parsedInput > 0 && parsedInput < 1.0) {
+                            showMinimumInputDialog.value = true
+                            return@Button
                         }
 
                         val amount = if (selectedOption == "amount") inputValue.toDouble()
@@ -387,6 +391,10 @@ fun CoinDetailSheet(
 
     if (showEmptyInputDialog.value) {
         AlertDialog("The Input must not be empty!") { showEmptyInputDialog.value = false }
+    }
+
+    if (showMinimumInputDialog.value) {
+        AlertDialog("Minimum value to sell is 1.00 €") { showMinimumInputDialog.value = false }
     }
 
 }
