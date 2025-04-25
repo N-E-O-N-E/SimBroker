@@ -63,8 +63,8 @@ fun CoinDetailChartPlotter(
     BasicLinearStrategy.GradientPlot(
         modifier = Modifier.fillMaxWidth().fillMaxHeight(0.30f).padding(5.dp),
         plot = GradientPlotStrategy(
-            lineStroke = 7.0f,
-            circleRadius = 9.0f
+            lineStroke = 4.0f,
+            circleRadius = 0.0f
         ),
 
         decoration = LinearDecoration(

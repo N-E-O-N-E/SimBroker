@@ -52,7 +52,7 @@ fun CoinsListItem(
             .clickable { onListSearchItemSelected() }
             .padding(horizontal = 8.dp).padding(vertical = 3.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.8f),
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.85f),
         )
     ) {
         Column(

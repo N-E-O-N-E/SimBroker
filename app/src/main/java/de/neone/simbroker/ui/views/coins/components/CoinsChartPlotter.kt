@@ -1,8 +1,8 @@
 package de.neone.simbroker.ui.views.coins.components
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -18,8 +18,7 @@ import dev.anirban.charts.linear.data.Coordinate
 import dev.anirban.charts.linear.data.Coordinate.Companion.toCoordinateSet
 import dev.anirban.charts.linear.data.LinearDataSet
 import dev.anirban.charts.linear.decoration.LinearDecoration
-import dev.anirban.charts.linear.legends.NoLegendStrategy
-import dev.anirban.charts.linear.plots.LinePlotStrategy
+import dev.anirban.charts.linear.plots.GradientPlotStrategy
 
 
 @Composable
@@ -58,13 +57,32 @@ fun CoinsChartPlotter(
         )
     )
 
-    BasicLinearStrategy.CustomLinearPlot(
-        modifier = Modifier.height(150.dp).fillMaxWidth().padding(10.dp),
-        plot = LinePlotStrategy(
-            lineStroke = 6.0f,
+//    BasicLinearStrategy.CustomLinearPlot(
+//        modifier = Modifier.height(150.dp).fillMaxWidth().padding(10.dp),
+//        plot = LinePlotStrategy(
+//            lineStroke = 6.0f,
+//            circleRadius = 0.0f
+//        ),
+//        legendDrawer = NoLegendStrategy,
+//
+//        decoration = LinearDecoration(
+//            textColor = MaterialTheme.colorScheme.onBackground,
+//            plotPrimaryColor = listOf(if(isSystemInDarkTheme()) chartDark else chartLight)
+//        ),
+//
+//        linearData = BasicDataStrategy(
+//            linearDataSets = linearDataSet,
+//            yAxisLabels = yAxisLabels.toMutableList(),
+//            xAxisLabels = xAxisLabels,
+//        )
+//    )
+
+    BasicLinearStrategy.GradientPlot(
+        modifier = Modifier.fillMaxWidth().fillMaxHeight(0.30f).padding(5.dp),
+        plot = GradientPlotStrategy(
+            lineStroke = 4.0f,
             circleRadius = 0.0f
         ),
-        legendDrawer = NoLegendStrategy,
 
         decoration = LinearDecoration(
             textColor = MaterialTheme.colorScheme.onBackground,

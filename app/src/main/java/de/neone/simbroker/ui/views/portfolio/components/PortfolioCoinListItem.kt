@@ -212,7 +212,7 @@ fun PortfolioCoinListItem(
                                 .padding(3.dp),
                             colors = CardDefaults.cardColors(
                                 containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(
-                                    alpha = 0.7f
+                                    alpha = 0.8f
                                 ),
                             )
                         ) {
@@ -323,7 +323,7 @@ fun PortfolioCoinListItem(
                         ),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(
-                            alpha = 0.6f
+                            alpha = 0.7f
                         )
                     )
                 ) {
@@ -365,7 +365,7 @@ fun PortfolioCoinListItem(
                             colors = CardDefaults.cardColors(
                                 containerColor =
                                     if (it.type == TransactionType.BUY) {
-                                        MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.6f)
+                                        MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.7f)
                                     } else {
                                         sell.copy(alpha = 0.6f)
                                     }

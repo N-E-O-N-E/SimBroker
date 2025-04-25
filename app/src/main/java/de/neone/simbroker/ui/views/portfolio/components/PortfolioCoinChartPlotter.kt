@@ -59,7 +59,7 @@ fun PortfolioCoinChartPlotter(
     BasicLinearStrategy.GradientPlot(
         modifier = Modifier.fillMaxWidth().height(450.dp).padding(10.dp),
         plot = GradientPlotStrategy(
-            lineStroke = 6.0f,
+            lineStroke = 4.0f,
             circleRadius = 0.0f
         ),
 
