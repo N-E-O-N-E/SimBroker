@@ -1,4 +1,5 @@
 package de.neone.simbroker.ui.theme
+
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -11,6 +12,9 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
+//==============================================================================================
+// 1) Dark Color Scheme Definition
+//==============================================================================================
 private val darkScheme = darkColorScheme(
     primary = primaryDark,
     onPrimary = onPrimaryDark,
@@ -49,6 +53,9 @@ private val darkScheme = darkColorScheme(
     surfaceContainerHighest = surfaceContainerHighestDark,
 )
 
+//==============================================================================================
+// 2) Light Color Scheme Definition (Medium Contrast Variant)
+//==============================================================================================
 private val mediumContrastLightColorScheme = lightColorScheme(
     primary = primaryLightMediumContrast,
     onPrimary = onPrimaryLightMediumContrast,
@@ -87,7 +94,18 @@ private val mediumContrastLightColorScheme = lightColorScheme(
     surfaceContainerHighest = surfaceContainerHighestLightMediumContrast,
 )
 
+//==============================================================================================
+// 3) ColorFamily Data Class
+//==============================================================================================
 
+/**
+ * Gruppe zusammengehöriger Farben und deren "on"-Varianten.
+ *
+ * @property color Hauptfarbe.
+ * @property onColor Text- oder Icon-Farbe geeignet für Hintergrund `color`.
+ * @property colorContainer Container-Hintergrundfarbe.
+ * @property onColorContainer Text- oder Icon-Farbe geeignet für `colorContainer`.
+ */
 @Immutable
 data class ColorFamily(
     val color: Color,
@@ -96,23 +114,44 @@ data class ColorFamily(
     val onColorContainer: Color
 )
 
+/**
+ * Platzhalter für nicht spezifizierte Farb-Sets.
+ */
 val unspecified_scheme = ColorFamily(
-    Color.Unspecified, Color.Unspecified, Color.Unspecified, Color.Unspecified
+    Color.Unspecified,
+    Color.Unspecified,
+    Color.Unspecified,
+    Color.Unspecified
 )
 
+//==============================================================================================
+// 4) SimBrokerTheme Composable
+//==============================================================================================
+
+/**
+ * Thema für die SimBroker-App.
+ *
+ * - Wählt automatisch zwischen Dark- und Light-Scheme.
+ * - Unterstützt dynamische Farben ab Android 12 (optional).
+ * - Verwendet [AppTypography] für Schriftstile.
+ *
+ * @param darkTheme Wenn true, wird das Dark-Scheme verwendet (Standard: System-Setting).
+ * @param dynamicColor Wenn true und Android 12+, werden systemdynamische Farben genutzt.
+ * @param content Composable-Inhalt, auf den das Thema angewendet wird.
+ */
 @Composable
 fun SimBrokerTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false,
-    content: @Composable() () -> Unit
+    content: @Composable () -> Unit
 ) {
+    // Entscheide, welches Farbschema genutzt wird
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            if (darkTheme) dynamicDarkColorScheme(context)
+            else dynamicLightColorScheme(context)
         }
-
         darkTheme -> darkScheme
         else -> mediumContrastLightColorScheme
     }
@@ -123,4 +162,3 @@ fun SimBrokerTheme(
         content = content
     )
 }
-

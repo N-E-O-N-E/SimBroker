@@ -10,35 +10,69 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
-
+/**
+ * Koin Dependency Injection Module für die SimBroker-App.
+ *
+ * Stellt folgende Komponenten bereit:
+ * 1) ViewModel
+ * 2) Remote-API-Service
+ * 3) Room-Datenbank & DAO
+ * 4) Repository-Implementierung (Mock oder Real)
+ */
 val appModule = module {
 
+    //==============================================================================================
+    // 1) ViewModel
+    //==============================================================================================
+    /**
+     * Registriert [SimBrokerViewModel] als Koin ViewModel.
+     */
     viewModelOf(::SimBrokerViewModel)
 
+    //==============================================================================================
+    // 2) Remote API Service
+    //==============================================================================================
+    /**
+     * Singleton für das Retrofit-Service-Interface [CoinbaseAPI.retrofitService].
+     */
     single {
         CoinbaseAPI.retrofitService
     }
 
+    //==============================================================================================
+    // 3) Room Datenbank & DAO
+    //==============================================================================================
+    /**
+     * Singleton für die Room-Datenbank [SimBrokerDatabase].
+     */
     single<SimBrokerDatabase> {
         SimBrokerDatabase.getDatabase(androidContext())
     }
 
+    /**
+     * Singleton für das Data Access Object [SimBrokerDAO].
+     */
     single<SimBrokerDAO> {
         get<SimBrokerDatabase>().simBrokerDAO()
     }
 
+    //==============================================================================================
+    // 4) Repository-Implementierung
+    //==============================================================================================
 
-    // RealData -----------------------------------------------------------------------------------
+    // RealData-Implementation (auskommentiert)
 
-//    single<SimBrokerRepositoryInterface>() {
-//        SimBrokerRepositoryImpl(get(), get())
-//    }
+    // single<SimBrokerRepositoryInterface> {
+    //     SimBrokerRepositoryImpl(get(), get())
+    // }
 
-    // Minimal Mockdata for simple testings! ------------------------------------------------------
+    /**
+     * Mock-Repository für Tests und einfache Demo-Daten.
+     *
+     * Implementiert [SimBrokerRepositoryInterface] auf Basis lokaler Mock-Daten.
+     */
 
-    single<SimBrokerRepositoryInterface>() {
+    single<SimBrokerRepositoryInterface> {
         SimBrokerRepositoryMock(get())
     }
-
-
 }

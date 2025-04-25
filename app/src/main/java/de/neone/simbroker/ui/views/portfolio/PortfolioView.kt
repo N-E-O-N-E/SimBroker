@@ -60,68 +60,101 @@ import de.neone.simbroker.ui.views.portfolio.components.PortfolioCoinListPositio
 import kotlinx.coroutines.delay
 import kotlin.math.abs
 
+
+/**
+ * Zeigt das Portfolio-Fenster mit:
+ * - Hintergrund-Wallpaper
+ * - Header (Schwierigkeitsgrad, Timer, Meilensteine)
+ * - Favoriten- und Portfolio-Listen
+ * - Coin-Detail-Sheet für Kauf/Verkauf
+ * - AlertDialogs für Fehlersituationen
+ *
+ * @param viewModel [SimBrokerViewModel] zur Steuerung der Daten und UI-Zustände
+ */
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun PortfolioView(
     viewModel: SimBrokerViewModel,
 ) {
+    //==============================================================================================
+    // Hintergrund
+    //==============================================================================================
     ViewWallpaperImageBox(
         imageLightTheme = R.drawable.simbroker_light_clear,
         imageDarkTheme = R.drawable.simbroker_dark_clear
     )
 
+    //==============================================================================================
+    // Helper: Proof-Value & Null-Check
+    //==============================================================================================
     val proofValue = 0.00000001
     fun isEffectivelyZero(value: Double): Boolean = abs(value) < proofValue
 
+    //==============================================================================================
+    // State: Timer & Difficulty
+    //==============================================================================================
     val timer by viewModel.refreshTimer.collectAsState()
     val gameDifficult by viewModel.gameDifficultState.collectAsState()
 
+    //==============================================================================================
+    // State: Coin-Auswahl & Details
+    //==============================================================================================
     var selectedCoin by remember { mutableStateOf<Coin?>(null) }
     val selectedCoinDetails by viewModel.coinDetails.collectAsState()
-    val accountCreditState by viewModel.accountValueState.collectAsState()
-    val feeValue by viewModel.feeValueState.collectAsState()
     var openCoinDetailSheet by rememberSaveable { mutableStateOf(false) }
 
+    //==============================================================================================
+    // State: Kontostand & Gebühr
+    //==============================================================================================
+    val accountCreditState by viewModel.accountValueState.collectAsState()
+    val feeValue by viewModel.feeValueState.collectAsState()
+
+    //==============================================================================================
+    // State: Datenströme aus ViewModel
+    //==============================================================================================
     val coinList by viewModel.coinList.collectAsState()
-
     val allPortfolioPositions by viewModel.allPortfolioPositions.collectAsState()
+    val allTransactionPositions by viewModel.allTransactionPositions.collectAsState()
 
+    //==============================================================================================
+    // Berechnete Gruppierungen & Listen
+    //==============================================================================================
+    // Alle offenen Positionen nach Coin gruppiert
     val allPortfolioPositionsGrouped = allPortfolioPositions
         .filter { !it.isClosed }
         .groupBy { it.coinUuid }
 
-    val allPortfolioGroupedList =
-        allPortfolioPositionsGrouped.values
-            .toList()
-            .filter { it.sumOf { pos -> pos.amountRemaining } > 0 && !it.first().isFavorite }
+    // Nicht-favorisierte Positionen mit Rest > 0
+    val allPortfolioGroupedList = allPortfolioPositionsGrouped.values
+        .filter { it.sumOf { pos -> pos.amountRemaining } > 0 && !it.first().isFavorite }
 
+    // Favoriten-Gruppe mit Rest > 0
     val allPortfolioPositionsGroupedByFavorite = allPortfolioPositions
         .filter { !it.isClosed }
         .groupBy { it.coinUuid }
-    val allPortfolioGroupedFavorites =
-        allPortfolioPositionsGroupedByFavorite.values.toList()
-            .filter { it.sumOf { pos -> pos.amountRemaining } > 0 && it.first().isFavorite }
+    val allPortfolioGroupedFavorites = allPortfolioPositionsGroupedByFavorite.values
+        .filter { it.sumOf { pos -> pos.amountRemaining } > 0 && it.first().isFavorite }
 
-    val allTransactionPositions by viewModel.allTransactionPositions.collectAsState()
-
-    val coinValue = allPortfolioPositions.filter { selectedCoin?.uuid == it.coinUuid }.sumOf { it.totalValue }
+    //==============================================================================================
+    // Berechnete Kennzahlen für Detail-Sheet
+    //==============================================================================================
+    val coinValue = allPortfolioPositions
+        .filter { selectedCoin?.uuid == it.coinUuid }
+        .sumOf { it.totalValue }
+    val totalInvested = allPortfolioPositions
+        .filter { !it.isClosed && it.coinUuid == selectedCoin?.uuid }
+        .sumOf { it.amountRemaining * it.pricePerUnit }
     var profit by remember { mutableDoubleStateOf(0.0) }
 
+    //==============================================================================================
+    // UI-Logik: Favoriten Toggle
+    //==============================================================================================
     var showFavorites by rememberSaveable { mutableStateOf(true) }
     var favoriteTrigger by rememberSaveable { mutableStateOf(false) }
-
-    val showNotEnoughCoinstDialog by viewModel.showAccountNotEnoughCoins.collectAsState()
-    val showNotEnoughCreditDialog by viewModel.showAccountNotEnoughMoney.collectAsState()
-    val showAccountCashInDialog by viewModel.showAccountCashIn.collectAsState()
-
-    val totalInvested = allPortfolioPositions.filter { !it.isClosed && it.coinUuid == selectedCoin?.uuid }
-        .sumOf { it.amountRemaining * it.pricePerUnit }
-
     val rotationAngle by animateFloatAsState(
         targetValue = if (showFavorites) 180f else 0f,
         label = "iconRotation"
     )
-
     LaunchedEffect(favoriteTrigger) {
         if (favoriteTrigger) {
             delay(100)
@@ -130,6 +163,16 @@ fun PortfolioView(
         }
     }
 
+    //==============================================================================================
+    // Dialog-State aus ViewModel
+    //==============================================================================================
+    val showNotEnoughCoinstDialog by viewModel.showAccountNotEnoughCoins.collectAsState()
+    val showNotEnoughCreditDialog by viewModel.showAccountNotEnoughMoney.collectAsState()
+    val showAccountCashInDialog by viewModel.showAccountCashIn.collectAsState()
+
+    //==============================================================================================
+    // UI: Hauptlayout
+    //==============================================================================================
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -137,9 +180,9 @@ fun PortfolioView(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
-
-        // Head ----------------------------------------------------------------------------------
-
+        //------------------------------------------------------------------------------------------
+        // Header: Difficulty, Timer, Meilensteine
+        //------------------------------------------------------------------------------------------
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -149,78 +192,40 @@ fun PortfolioView(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = "Difficulty: $gameDifficult",
-                style = MaterialTheme.typography.bodySmall
-            )
-            Text(
-                text = "Timer: $timer",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(0.4f), horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Image(
-                    modifier = Modifier.scale(1.0f),
-                    painter = painterResource(id = R.drawable.m1),
-                    contentDescription = null,
-                    colorFilter = if (accountCreditState + totalInvested >= 2000) null else ColorFilter.tint(
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                    )
-                )
-                Image(
-                    modifier = Modifier.scale(1.0f),
-                    painter = painterResource(id = R.drawable.m2),
-                    contentDescription = null,
-                    colorFilter = if (accountCreditState + totalInvested >= 4000) null else ColorFilter.tint(
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                    )
-                )
-                Image(
-                    modifier = Modifier.scale(1.0f),
-                    painter = painterResource(id = R.drawable.m3),
-                    contentDescription = null,
-                    colorFilter = if (accountCreditState + totalInvested >= 6000) null else ColorFilter.tint(
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                    )
-                )
-                Image(
-                    modifier = Modifier.scale(1.0f),
-                    painter = painterResource(id = R.drawable.m4),
-                    contentDescription = null,
-                    colorFilter = if (accountCreditState + totalInvested >= 8000) null else ColorFilter.tint(
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                    )
-                )
-                Image(
-                    modifier = Modifier.scale(1.0f),
-                    painter = painterResource(id = R.drawable.m5),
-                    contentDescription = null,
-                    colorFilter = if (accountCreditState + totalInvested >= 10000) null else ColorFilter.tint(
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                    )
-                )
+            Text(text = "Difficulty: $gameDifficult", style = MaterialTheme.typography.bodySmall)
+            Text(text = "Timer: $timer", style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface)
+            Row(modifier = Modifier.fillMaxWidth(0.4f), horizontalArrangement = Arrangement.SpaceBetween) {
+                listOf(R.drawable.m1, R.drawable.m2, R.drawable.m3, R.drawable.m4, R.drawable.m5)
+                    .forEachIndexed { idx, resId ->
+                        Image(
+                            modifier = Modifier.scale(1.0f),
+                            painter = painterResource(id = resId),
+                            contentDescription = null,
+                            colorFilter = if (accountCreditState + totalInvested >= (idx + 1) * 2000)
+                                null
+                            else ColorFilter.tint(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+                        )
+                    }
             }
         }
 
-        // Body --------------------------------------------------------------------------------
-
+        //------------------------------------------------------------------------------------------
+        // Body: Keine Daten vs. Favoriten vs. Portfolio-Liste
+        //------------------------------------------------------------------------------------------
         if (allPortfolioGroupedList.isEmpty() && allPortfolioGroupedFavorites.isEmpty()) {
+            // Keine Daten gefunden
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-
                 Image(
                     modifier = Modifier.scale(2.0f).fillMaxWidth(),
                     painter = rememberAsyncImagePainter(
                         model = ImageRequest.Builder(LocalContext.current)
-                            .data(R.drawable.load2)
-                            .build(),
-                        filterQuality = FilterQuality.High,
+                            .data(R.drawable.load2).build(),
+                        filterQuality = FilterQuality.High
                     ),
                     contentDescription = "Coin animation",
                     alpha = 0.2f
                 )
-
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -235,50 +240,40 @@ fun PortfolioView(
                 }
             }
         } else {
-            // Favoriten Head
-
+            // Favoriten-Anzeige
             AnimatedVisibility(
                 visible = showFavorites,
                 enter = expandVertically() + fadeIn(),
                 exit = shrinkVertically() + fadeOut()
             ) {
-                if (showFavorites) {
-                    LazyRow(modifier = Modifier) {
-                        itemsIndexed(allPortfolioGroupedFavorites) { _, position ->
-                            PortfolioCoinListPositionObject(
-                                coinList, allTransactionPositions, position,
-                                isFavorite = { coinUuid, isFavorite ->
-                                    viewModel.updatePortfolio(
-                                        coinId = coinUuid,
-                                        isFavorite = isFavorite
-                                    )
-                                },
-                                isClicked = {
-                                    selectedCoin =
-                                        coinList.find { it.uuid == position.first().coinUuid }
-                                    openCoinDetailSheet = true
-                                },
-                                profitCallback = {
-                                    profit = it
-                                },
-                                gameDifficult,
-                            )
-                        }
+                LazyRow {
+                    itemsIndexed(allPortfolioGroupedFavorites) { _, positions ->
+                        PortfolioCoinListPositionObject(
+                            coinList, allTransactionPositions, positions,
+                            isFavorite = { coinUuid, isFav ->
+                                viewModel.updatePortfolio(coinId = coinUuid, isFavorite = isFav)
+                            },
+                            isClicked = {
+                                selectedCoin = coinList.find { it.uuid == positions.first().coinUuid }
+                                openCoinDetailSheet = true
+                            },
+                            profitCallback = { profit = it },
+                            gameDifficult,
+                        )
                     }
                 }
             }
-
+            // Favoriten-Toggle-Leiste
             if (allPortfolioGroupedFavorites.isNotEmpty()) {
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(25.dp)
-                        .clickable {
-                            favoriteTrigger = !favoriteTrigger
-                        },
-                    color = if (isSystemInDarkTheme()) bottomBarColorDark.copy(alpha = 0.6f) else bottomBarColorLight.copy(
-                        alpha = 0.6f
-                    ),
+                        .clickable { favoriteTrigger = !favoriteTrigger },
+                    color = if (isSystemInDarkTheme())
+                        bottomBarColorDark.copy(alpha = 0.6f)
+                    else
+                        bottomBarColorLight.copy(alpha = 0.6f)
                 ) {
                     Row(horizontalArrangement = Arrangement.Center) {
                         Icon(
@@ -286,86 +281,77 @@ fun PortfolioView(
                             contentDescription = null,
                             modifier = Modifier.rotate(rotationAngle)
                         )
-
                         Text(
-                            text = if (showFavorites) "Hide Favorites" else " Show Favorites",
+                            text = if (showFavorites) "Hide Favorites" else "Show Favorites",
                             modifier = Modifier.padding(horizontal = 10.dp),
-                            style = MaterialTheme.typography.titleSmall,
+                            style = MaterialTheme.typography.titleSmall
                         )
                         Icon(
                             painterResource(id = R.drawable.baseline_arrow_drop_down_48),
                             contentDescription = null,
                             modifier = Modifier.rotate(rotationAngle)
                         )
-
                     }
                 }
             }
         }
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
+
+        //------------------------------------------------------------------------------------------
+        // Portfolio-Liste
+        //------------------------------------------------------------------------------------------
+        LazyColumn(modifier = Modifier.fillMaxWidth()) {
             itemsIndexed(allPortfolioGroupedList) { _, positions ->
                 PortfolioCoinListPositionObject(
                     coinList, allTransactionPositions, positions,
-                    isFavorite = { coinUuid, isFavorite ->
-                        viewModel.updatePortfolio(
-                            coinId = coinUuid,
-                            isFavorite = isFavorite
-                        )
+                    isFavorite = { coinUuid, isFav ->
+                        viewModel.updatePortfolio(coinId = coinUuid, isFavorite = isFav)
                     },
                     isClicked = {
                         selectedCoin = coinList.find { it.uuid == positions.first().coinUuid }
                         openCoinDetailSheet = true
                     },
-                    profitCallback = {
-                        profit = it
-                    },
+                    profitCallback = { profit = it },
                     gameDifficult,
                 )
             }
         }
     }
 
+    //==============================================================================================
+    // Coin Detail Sheet
+    //==============================================================================================
     if (openCoinDetailSheet) {
-        selectedCoin?.let { it ->
+        selectedCoin?.let { coin ->
             LaunchedEffect(Unit) {
-                viewModel.getCoinDetails(it.uuid, "3h")
+                viewModel.getCoinDetails(coin.uuid, "3h")
             }
-            selectedCoinDetails?.let { coinDetails ->
+            selectedCoinDetails?.let { details ->
                 CoinDetailSheet(
-                    selectedCoin = it,
-                    coinDetails = coinDetails,
+                    selectedCoin = coin,
+                    coinDetails = details,
                     feeValue = feeValue,
-                    onDismiss = {
-                        openCoinDetailSheet = false
-                    },
+                    onDismiss = { openCoinDetailSheet = false },
                     onBuyClick = { amount, totalValue ->
                         viewModel.buyCoin(
-                            selectedCoin = it,
+                            selectedCoin = coin,
                             amount = amount,
                             feeValue = feeValue,
-                            totalValue = totalValue,
+                            totalValue = totalValue
                         )
                     },
                     onSellClick = { amount, currentPrice ->
                         viewModel.sellCoin(
-                            coinUuid = it.uuid,
+                            coinUuid = coin.uuid,
                             amountToSell = amount,
                             currentPrice = currentPrice,
                             fee = feeValue
                         )
                         viewModel.setAccountCashIn(true)
                     },
-                    notEnoughCredit = {
-                        viewModel.setShowAccountNotEnoughMoney(true)
-                    },
-                    notEnoughCoins = {
-                        viewModel.setAccountNotEnoughCoins(true)
-                    },
+                    notEnoughCredit = { viewModel.setShowAccountNotEnoughMoney(true) },
+                    notEnoughCoins = { viewModel.setAccountNotEnoughCoins(true) },
                     coinAmount = allPortfolioPositions
-                        .filter { !isEffectivelyZero(it.amountRemaining) && !it.isClosed && selectedCoin?.uuid == it.coinUuid }
+                        .filter { !isEffectivelyZero(it.amountRemaining) && !it.isClosed && coin.uuid == it.coinUuid }
                         .sumOf { it.amountRemaining },
                     coinValue = coinValue,
                     accountCreditState = accountCreditState,
@@ -376,27 +362,22 @@ fun PortfolioView(
         }
     }
 
+    //==============================================================================================
+    // AlertDialogs
+    //==============================================================================================
     if (showNotEnoughCreditDialog) {
         AlertDialog("You cant buy this Coin! Check your Credit.") {
-            viewModel.setShowAccountNotEnoughMoney(
-                false
-            )
+            viewModel.setShowAccountNotEnoughMoney(false)
         }
     }
-
     if (showNotEnoughCoinstDialog) {
         AlertDialog("You can't sell more than you have. Check your account balance.") {
-            viewModel.setAccountNotEnoughCoins(
-                false
-            )
+            viewModel.setAccountNotEnoughCoins(false)
         }
     }
-
     if (showAccountCashInDialog) {
         AlertDialog("Your Credit is: ${accountCreditState.roundTo2()} €") {
-            viewModel.setAccountCashIn(
-                false
-            )
+            viewModel.setAccountCashIn(false)
         }
     }
 }

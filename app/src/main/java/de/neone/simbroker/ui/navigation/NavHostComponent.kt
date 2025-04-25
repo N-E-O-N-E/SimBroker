@@ -13,29 +13,54 @@ import de.neone.simbroker.ui.views.coins.CoinsView
 import de.neone.simbroker.ui.views.portfolio.PortfolioView
 import org.koin.androidx.compose.koinViewModel
 
-
+/**
+ * Beinhaltet den Navigation Host, der zwischen den Bildschirmen
+ * Portfolio, Coins, Account und Logout wechselt.
+ *
+ * @param innerPadding PaddingValues, das vom Scaffold vorgegeben wird.
+ * @param navController NavHostController zum Steuern der Navigation.
+ * @param action Lambda, das bei Auswahl der Logout-Route ausgeführt wird.
+ * @param viewModel Instanz von [SimBrokerViewModel], bereitgestellt via Koin.
+ */
 @Composable
 fun NavHostComponent(
     innerPadding: PaddingValues,
     navController: NavHostController,
     action: () -> Unit,
     viewModel: SimBrokerViewModel = koinViewModel(),
-    ) {
-
+) {
+    //==============================================================================================
+    // Navigation Host Setup
+    //==============================================================================================
     NavHost(
         navController = navController,
         startDestination = Routes.PORTFOLIO,
         modifier = Modifier.padding(innerPadding)
     ) {
+        //------------------------------------------------------------------------------------------
+        // Ziel: Portfolio-Bildschirm
+        //------------------------------------------------------------------------------------------
         composable(Routes.PORTFOLIO) {
             PortfolioView(viewModel)
         }
+
+        //------------------------------------------------------------------------------------------
+        // Ziel: Coins-Bildschirm
+        //------------------------------------------------------------------------------------------
         composable(Routes.COINS) {
             CoinsView(viewModel)
         }
+
+        //------------------------------------------------------------------------------------------
+        // Ziel: Account-Bildschirm
+        //------------------------------------------------------------------------------------------
         composable(Routes.ACCOUNT) {
             AccountView(viewModel)
         }
+
+        //------------------------------------------------------------------------------------------
+        // Ziel: Logout-Aktion
+        //------------------------------------------------------------------------------------------
         composable(Routes.LOGOUT) {
             action()
         }

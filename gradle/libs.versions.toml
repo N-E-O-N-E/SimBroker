@@ -1,82 +1,119 @@
 [versions]
+# Android Gradle Plugin
 agp = "8.9.2"
+# Jetpack Compose Material für Wear
 composeMaterial = "1.5.0-alpha14"
-kotlin = "2.1.20"
+# Compose BOM (Versionsverwaltung)
+composeBom = "2025.04.01"
+# Core KTX für Kotlin Erweiterungen
 coreKtx = "1.16.0"
+# AndroidX Activity Compose
+activityCompose = "1.10.1"
+# Lifecycle Runtime KTX
+lifecycleRuntimeKtx = "2.8.7"
+# Navigation Compose
+navigationCompose = "2.8.9"
+# DataStore Preferences
+#noinspection GradleDependency
+datastorePreferences = "1.1.4"
+# Compose UI Text Google Fonts
+uiTextGoogleFonts = "1.8.0"
+
+# Testing
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-lifecycleRuntimeKtx = "2.8.7"
-activityCompose = "1.10.1"
-composeBom = "2025.04.01"
-koinBom = "4.1.0-Beta7"             # DI
-loggingInterceptor = "4.12.0"       # HTTP Logging
-moshiVersion = "1.15.2"             # Moshi JSON Parser
-retrofitVersion = "2.11.0"          # Retrofit HTTP Client
-roomRuntime = "2.7.1"               # Room Database
-kspVersion = "2.1.20-2.0.0"        # KSP für Room
-kotlinSerialization = "1.8.1"       # Kotlin Serialization Plugin
-navigationCompose = "2.8.9"         # Navigation in Compose
-#noinspection GradleDependency
-datastorePreferences = "1.1.4"      # DataStore Preferences
-uiTextGoogleFonts = "1.8.0"         # Google Fonts für Text
-coilCompose = "3.1.0"               # AsyncImage KOIL
-coilGif = "3.1.0"                   # GIF Image KOIL
-jetchart = "2.1.0"                  # JetChart
-testManifest = "1.8.0"              # Test Manifest
+testManifest = "1.8.0"
+
+# Dependency Injection (Koin)
+koinBom = "4.1.0-Beta7"
+
+# HTTP Client & JSON Parsing
+retrofitVersion = "2.11.0"
+moshiVersion = "1.15.2"
+loggingInterceptor = "4.12.0"
+
+# Room Database
+roomRuntime = "2.7.1"
+
+# Kotlin Versions
+kotlin = "2.1.20"
+kotlinSerialization = "1.8.1"
+kspVersion = "2.1.20-2.0.0"
+
+# Coil für Bilder
+coilCompose = "3.1.0"
+coilGif = "3.1.0"
+
+# Charts
+jetchart = "2.1.0"
 
 [libraries]
-androidx-compose-material = { module = "androidx.wear.compose:compose-material", version.ref = "composeMaterial" }
+# Android Core
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
-junit = { group = "junit", name = "junit", version.ref = "junit" }
-androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
-androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+# Lifecycle
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
+androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
+# Activity Compose
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
+# Navigation Compose
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+# Compose BOM
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+# Compose Material Wear
+androidx-compose-material = { module = "androidx.wear.compose:compose-material", version.ref = "composeMaterial" }
+# Compose UI Basics
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
-androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest", version.ref = "testManifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest", version.ref = "testManifest" }
+androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
-coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coilCompose" }
-coil-gif = { group = "io.coil-kt.coil3", name = "coil-gif", version.ref = "coilGif" }
-coil-network-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref ="coilCompose" }
 
-androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name ="lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
-
-androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
-kotlinx-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinSerialization" }
-
-androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
-androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
+# Room Database
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
 
+# DataStore Preferences
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastorePreferences" }
 
-moshi = { group = "com.squareup.moshi", name = "moshi-kotlin", version.ref = "moshiVersion" }
-retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofitVersion" }
-converterMoshi = { group = "com.squareup.retrofit2", name = "converter-moshi", version.ref = "retrofitVersion" }
+# Tests
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 
+# Coil (Bilder & GIFs)
+coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coilCompose" }
+coil-gif = { group = "io.coil-kt.coil3", name = "coil-gif", version.ref = "coilGif" }
+coil-network-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coilCompose" }
+
+# Koin Dependency Injection
 koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koinBom" }
 koin-core = { module = "io.insert-koin:koin-core" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koinBom" }
 koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koinBom" }
 
+# Networking: Retrofit + Moshi
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofitVersion" }
+converterMoshi = { group = "com.squareup.retrofit2", name = "converter-moshi", version.ref = "retrofitVersion" }
+moshi = { group = "com.squareup.moshi", name = "moshi-kotlin", version.ref = "moshiVersion" }
 logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "loggingInterceptor" }
 
+# KotlinX
+kotlinx-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinSerialization" }
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = "1.10.2" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version = "1.10.2" }
-androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
 
+# Charts
 jetchart = { module = "com.github.basakjeet08:JetChart", version.ref = "jetchart" }
 
 [plugins]
+# Plugins
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-kotlin-ksp = {id = "com.google.devtools.ksp", version.ref = "kspVersion"}
 jetbrains-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-
+kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "kspVersion" }

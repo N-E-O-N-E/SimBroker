@@ -19,6 +19,7 @@ android {
     defaultConfig {
         applicationId = "de.neone.simbroker"
         minSdk = 30
+        //noinspection OldTargetApi
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -27,7 +28,7 @@ android {
 
         android.buildFeatures.buildConfig = true
 
-        // Todo: API_KEY in die local.properties einfügen nicht vergessen!
+        // API_KEY in die local.properties einfügen nicht vergessen!
 
         val properties = Properties().apply {
             load(FileInputStream(rootProject.file("local.properties")))
@@ -63,16 +64,57 @@ android {
 }
 
 dependencies {
-
+    // --- AndroidX Core & Lifecycle ---
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+
+    // --- Compose UI ---
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.material)
     implementation(libs.androidx.ui.text.google.fonts)
+
+    // --- Navigation ---
+    implementation(libs.androidx.navigation.compose)
+
+    // --- DataStore Preferences ---
+    implementation(libs.androidx.datastore.preferences)
+
+    // --- Room Database ---
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+
+    // --- Retrofit & Moshi (Networking) ---
+    implementation(libs.retrofit)
+    implementation(libs.converterMoshi)
+    implementation(libs.moshi)
+    implementation(libs.logging.interceptor)
+
+    // --- KotlinX Coroutines & Serialization ---
+    implementation(libs.kotlinx.serialization)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
+
+    // --- Koin Dependency Injection ---
+    implementation(project.dependencies.platform(libs.koin.bom))
+    implementation(libs.koin.core)
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
+
+    // --- Coil (Bilder laden) ---
+    implementation(libs.coil.compose)
+    implementation(libs.coil.gif)
+    implementation(libs.coil.network.okhttp)
+
+    // --- JetChart (Charts darstellen) ---
+    implementation(libs.jetchart)
+
+    // --- Testing ---
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -80,44 +122,4 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    implementation(libs.androidx.compose.material)
-
-    implementation(libs.androidx.navigation.compose)    // Navigation in Compose
-    implementation(libs.kotlinx.serialization)          // Kotlin Serialization
-
-    implementation(libs.androidx.lifecycle.viewmodel.compose) // Compose ViewModel
-
-    implementation(libs.androidx.datastore.preferences) // DataStore Preferences
-
-    implementation(libs.androidx.room.runtime)          // Room Runtime
-    implementation(libs.androidx.room.ktx)              // Room Kotlin Extensions
-    ksp(libs.androidx.room.compiler)                    // Room Compiler via KSP
-
-    implementation(libs.moshi)                          // Moshi JSON Parser
-
-    implementation(libs.retrofit)                       // Retrofit HTTP Client
-    implementation(libs.converterMoshi)                 // Retrofit Converter für Moshi
-
-    implementation(libs.logging.interceptor)            // HTTP Logging Interceptor
-
-    implementation (libs.androidx.lifecycle.runtime.ktx)// Retrofit
-    implementation (libs.kotlinx.coroutines.core)       // Retrofit
-    implementation (libs.kotlinx.coroutines.android)    // Retrofit
-
-    // --- Koin (Dependency Injection) ---
-    implementation(project.dependencies.platform(libs.koin.bom))
-    implementation(libs.koin.core)
-    implementation(libs.koin.android)
-    implementation(libs.koin.androidx.compose)
-
-    // --- Coil (Image Loading) ---
-    implementation(libs.coil.compose)
-    implementation(libs.coil.gif)
-    implementation(libs.coil.network.okhttp)
-
-
-    // --- JetChart (Charting) ---
-    implementation(libs.jetchart)
-
-
 }

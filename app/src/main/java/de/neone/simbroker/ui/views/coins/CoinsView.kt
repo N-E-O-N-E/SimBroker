@@ -41,79 +41,103 @@ import de.neone.simbroker.ui.views.coins.components.CoinsSearchSheet
 import de.neone.simbroker.ui.views.components.AlertDialog
 import kotlin.math.abs
 
+
+/**
+ * Zeigt die Coin-Übersicht mit:
+ * - Hintergrund-Wallpaper
+ * - Wallet-Stand und Timer
+ * - Such-Sheet
+ * - Liste aller Coins
+ * - Detail-Sheet für Kauf/Verkauf
+ * - AlertDialogs für Fehlersituationen
+ *
+ * @param viewModel Instanz von [SimBrokerViewModel] zur Steuerung der Daten und UI-Zustände.
+ */
 @SuppressLint("DefaultLocale")
 @Composable
 fun CoinsView(
     viewModel: SimBrokerViewModel,
 ) {
+    //==============================================================================================
+    // 1) Hintergrund
+    //==============================================================================================
     ViewWallpaperImageBox(
         imageLightTheme = R.drawable.simbroker_light_clear,
         imageDarkTheme = R.drawable.simbroker_dark_clear
     )
 
+    //==============================================================================================
+    // 2) Helper-Funktion: Null-Vergleich
+    //==============================================================================================
     val proofValue = 0.00000001
     fun isEffectivelyZero(value: Double): Boolean = abs(value) < proofValue
 
+    //==============================================================================================
+    // 3) ViewModel-States sammeln
+    //==============================================================================================
     val timer by viewModel.refreshTimer.collectAsState()
-
     val coinList by viewModel.coinList.collectAsState()
-    var selectedCoin by remember { mutableStateOf<Coin?>(null) }
     val selectedCoinDetails by viewModel.coinDetails.collectAsState()
     val accountCreditState by viewModel.accountValueState.collectAsState()
     val feeValue by viewModel.feeValueState.collectAsState()
     val allPortfolioPositions by viewModel.allPortfolioPositions.collectAsState()
+    val allTransactionPositions by viewModel.allTransactionPositions.collectAsState()
+    val gameDifficult by viewModel.gameDifficultState.collectAsState()
 
+    //==============================================================================================
+    // 4) Lokale UI-State-Variablen
+    //==============================================================================================
+    var selectedCoin by remember { mutableStateOf<Coin?>(null) }
+    var openSucheSheet by rememberSaveable { mutableStateOf(false) }
+    var openCoinDetailSheet by rememberSaveable { mutableStateOf(false) }
+
+    //==============================================================================================
+    // 5) Berechnungen & Gruppierungen
+    //==============================================================================================
+    // Portfolio nach Coin gruppieren
     val allPortfolioPositionsGrouped = allPortfolioPositions
         .filter { !it.isClosed }
         .groupBy { it.coinUuid }
-    val allPortfolioGroupedList =
-        allPortfolioPositionsGrouped.values
-            .toList()
-            .filter { it.sumOf { pos -> pos.amountRemaining } > 0 && !it.first().isFavorite }
-
-    val coinValue =
-        allPortfolioPositions.filter { selectedCoin?.uuid == it.coinUuid }.sumOf { it.totalValue }
-
-    val allTransactionPositions by viewModel.allTransactionPositions.collectAsState()
-    val coinBuyTransactions =
-        allTransactionPositions.filter { it.coinUuid == selectedCoin?.uuid && it.type == TransactionType.BUY && !it.isClosed }
-    val coinSellTransactions =
-        allTransactionPositions.filter { it.coinUuid == selectedCoin?.uuid && it.type == TransactionType.SELL }
-
-
-    val totalAmount =
-        allPortfolioPositions.filter { !it.isClosed && it.coinUuid == selectedCoin?.uuid }
-            .sumOf { it.amountRemaining }
-    val totalInvested =
-        allPortfolioPositions.filter { !it.isClosed && it.coinUuid == selectedCoin?.uuid }
-            .sumOf { it.amountRemaining * it.pricePerUnit }
-
+    // Coins mit Restbestand & nicht favorisiert
+    val allPortfolioGroupedList = allPortfolioPositionsGrouped.values
+        .filter { it.sumOf { pos -> pos.amountRemaining } > 0 && !it.first().isFavorite }
+    // Gesamtwert und Investitionen für selektierten Coin
+    val coinValue = allPortfolioPositions
+        .filter { selectedCoin?.uuid == it.coinUuid }
+        .sumOf { it.totalValue }
+    val totalAmount = allPortfolioPositions
+        .filter { !it.isClosed && it.coinUuid == selectedCoin?.uuid }
+        .sumOf { it.amountRemaining }
+    val totalInvested = allPortfolioPositions
+        .filter { !it.isClosed && it.coinUuid == selectedCoin?.uuid }
+        .sumOf { it.amountRemaining * it.pricePerUnit }
     val currentPrice = coinList.find { it.uuid == selectedCoin?.uuid }?.price?.toDouble() ?: 0.0
     val currentValue = totalAmount * currentPrice
-
-    val gameDifficult by viewModel.gameDifficultState.collectAsState()
-
+    // Hebel basierend auf Schwierigkeitsgrad
     val gameLeverage = when (gameDifficult) {
         "Easy" -> 5
         "Medium" -> 10
         "Pro" -> 20
         else -> 5
     }
-
+    // Profit-Wert berechnen
     val profit = (currentValue - totalInvested) * gameLeverage
+    // Transaktionen für selektierten Coin
+    val coinBuyTransactions = allTransactionPositions.filter {
+        it.coinUuid == selectedCoin?.uuid && it.type == TransactionType.BUY && !it.isClosed
+    }
+    val coinSellTransactions = allTransactionPositions.filter {
+        it.coinUuid == selectedCoin?.uuid && it.type == TransactionType.SELL
+    }
 
-    var openSucheSheet by rememberSaveable { mutableStateOf(false) }
-    var openCoinDetailSheet by rememberSaveable { mutableStateOf(false) }
-
-    val showNotEnoughCoinstDialog by viewModel.showAccountNotEnoughCoins.collectAsState()
-    val showNotEnoughCreditDialog by viewModel.showAccountNotEnoughMoney.collectAsState()
-    val showAccountCashInDialog by viewModel.showAccountCashIn.collectAsState()
-
+    //==============================================================================================
+    // 6) UI: Hauptcontainer und Header
+    //==============================================================================================
     Column(
-        modifier = Modifier
-            .fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top
     ) {
+        // Header mit Wallet, Timer und Suche
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -123,8 +147,6 @@ fun CoinsView(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-
-
             Text(
                 text = "Wallet: ${accountCreditState.roundTo2()} €",
                 style = MaterialTheme.typography.bodySmall
@@ -134,26 +156,25 @@ fun CoinsView(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface
             )
-
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = "Suche",
                     style = MaterialTheme.typography.bodySmall
                 )
-                IconButton(onClick = {
-                    openSucheSheet = !openSucheSheet
-                }) {
+                IconButton(onClick = { openSucheSheet = !openSucheSheet }) {
                     Icon(
                         modifier = Modifier.scale(1.0f),
                         painter = painterResource(id = R.drawable.baseline_search_24),
-                        contentDescription = null
+                        contentDescription = "Search"
                     )
                 }
             }
         }
 
-
-        LazyColumn() {
+        //==========================================================================================
+        // 7) Coin-Liste
+        //==========================================================================================
+        LazyColumn {
             items(coinList) { coin ->
                 CoinsListItem(
                     coin = coin,
@@ -161,21 +182,19 @@ fun CoinsView(
                         selectedCoin = coin
                         openCoinDetailSheet = true
                         Log.d("simDebug", selectedCoin.toString())
-                    },
+                    }
                 )
             }
         }
-
-
     }
 
-
+    //==============================================================================================
+    // 8) Such-Sheet
+    //==============================================================================================
     if (openSucheSheet) {
         CoinsSearchSheet(
             coinList = coinList,
-            onDismiss = {
-                openSucheSheet = false
-            },
+            onDismiss = { openSucheSheet = false },
             selectedCoin = {
                 selectedCoin = it
                 openSucheSheet = false
@@ -185,27 +204,27 @@ fun CoinsView(
         )
     }
 
-
+    //==============================================================================================
+    // 9) Detail-Sheet für Coin-Kauf/Verkauf
+    //==============================================================================================
     if (openCoinDetailSheet) {
-        selectedCoin?.let { it ->
+        selectedCoin?.let { coin ->
             LaunchedEffect(Unit) {
-                viewModel.getCoinDetails(it.uuid, "3h")
+                viewModel.getCoinDetails(coin.uuid, "3h")
             }
-            val maxSellableAmount = viewModel.getRemainingCoinAmount(it.uuid)
+            val maxSellableAmount = viewModel.getRemainingCoinAmount(coin.uuid)
             selectedCoinDetails?.let { coinDetails ->
                 CoinDetailSheet(
-                    selectedCoin = it,
+                    selectedCoin = coin,
                     coinDetails = coinDetails,
                     feeValue = feeValue,
-                    onDismiss = {
-                        openCoinDetailSheet = false
-                    },
+                    onDismiss = { openCoinDetailSheet = false },
                     onBuyClick = { amount, totalValue ->
                         viewModel.buyCoin(
-                            selectedCoin = it,
+                            selectedCoin = coin,
                             amount = amount,
                             feeValue = feeValue,
-                            totalValue = totalValue,
+                            totalValue = totalValue
                         )
                     },
                     onSellClick = { amount, currentPrice ->
@@ -213,7 +232,7 @@ fun CoinsView(
                             viewModel.setShowAccountNotEnoughMoney(true)
                         } else {
                             viewModel.sellCoin(
-                                coinUuid = it.uuid,
+                                coinUuid = coin.uuid,
                                 amountToSell = amount,
                                 currentPrice = currentPrice,
                                 fee = feeValue
@@ -221,14 +240,10 @@ fun CoinsView(
                             viewModel.setAccountCashIn(true)
                         }
                     },
-                    notEnoughCredit = {
-                        viewModel.setShowAccountNotEnoughMoney(true)
-                    },
-                    notEnoughCoins = {
-                        viewModel.setAccountNotEnoughCoins(true)
-                    },
+                    notEnoughCredit = { viewModel.setShowAccountNotEnoughMoney(true) },
+                    notEnoughCoins = { viewModel.setAccountNotEnoughCoins(true) },
                     coinAmount = allPortfolioPositions
-                        .filter { !isEffectivelyZero(it.amountRemaining) && !it.isClosed && selectedCoin?.uuid == it.coinUuid }
+                        .filter { !isEffectivelyZero(it.amountRemaining) && !it.isClosed && coin.uuid == it.coinUuid }
                         .sumOf { it.amountRemaining },
                     coinValue = coinValue,
                     accountCreditState = accountCreditState,
@@ -239,30 +254,22 @@ fun CoinsView(
         }
     }
 
-    if (showNotEnoughCreditDialog) {
+    //==============================================================================================
+    // 10) AlertDialogs für Fehlersituationen
+    //==============================================================================================
+    if (viewModel.showAccountNotEnoughMoney.collectAsState().value) {
         AlertDialog("You cant buy this Coin! Check your Credit.") {
-            viewModel.setShowAccountNotEnoughMoney(
-                false
-            )
+            viewModel.setShowAccountNotEnoughMoney(false)
         }
     }
-
-    if (showNotEnoughCoinstDialog) {
+    if (viewModel.showAccountNotEnoughCoins.collectAsState().value) {
         AlertDialog("You can't sell more than you have. Check your account balance.") {
-            viewModel.setAccountNotEnoughCoins(
-                false
-            )
+            viewModel.setAccountNotEnoughCoins(false)
         }
     }
-
-    if (showAccountCashInDialog) {
+    if (viewModel.showAccountCashIn.collectAsState().value) {
         AlertDialog("Your Credit is ${accountCreditState.roundTo2()} €") {
-            viewModel.setAccountCashIn(
-                false
-            )
+            viewModel.setAccountCashIn(false)
         }
     }
-
-
 }
-

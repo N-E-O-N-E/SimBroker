@@ -28,6 +28,20 @@ import androidx.compose.ui.unit.dp
 import de.neone.simbroker.R
 import de.neone.simbroker.data.remote.models.Coin
 
+/**
+ * Ein Bottom-Sheet, das eine Quicksearch für Coins ermöglicht.
+ *
+ * - Zeigt ein Suchfeld zum Eingeben eines Namens-Teils.
+ * - Filtert die übergebene [coinList] entsprechend der Eingabe.
+ * - Listet gefilterte Coins in einer LazyColumn auf.
+ * - Ruft [selectedCoin] auf, wenn ein Listeneintrag ausgewählt wird.
+ * - Ruft [onDismiss] auf, wenn das Sheet geschlossen wird.
+ *
+ * @param modifier Modifier, der für das Column-Layout des Sheets verwendet wird.
+ * @param coinList Liste aller Coins, die durchsucht werden können.
+ * @param onDismiss Callback, der beim Schließen des Sheets ausgeführt wird.
+ * @param selectedCoin Callback mit dem ausgewählten [Coin].
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoinsSearchSheet(
@@ -36,16 +50,23 @@ fun CoinsSearchSheet(
     onDismiss: () -> Unit,
     selectedCoin: (Coin) -> Unit,
 ) {
-
+    //==========================================================================================
+    // 1) Sheet- und Suchfeld-States
+    //==========================================================================================
     val skipPartiallyExpanded by rememberSaveable { mutableStateOf(false) }
     val sucheSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = skipPartiallyExpanded)
     var searchField by remember { mutableStateOf("") }
 
-
+    //==========================================================================================
+    // 2) Filterung der Coin-Liste
+    //==========================================================================================
     val filteredCoins = coinList.filter { coin ->
         coin.name.contains(searchField, ignoreCase = true)
     }
 
+    //==========================================================================================
+    // 3) ModalBottomSheet Aufbau
+    //==========================================================================================
     ModalBottomSheet(
         onDismissRequest = { onDismiss() },
         sheetState = sucheSheetState,
@@ -54,10 +75,12 @@ fun CoinsSearchSheet(
         shape = MaterialTheme.shapes.large,
     ) {
         Column(
-            modifier = modifier
-                .fillMaxSize(),
+            modifier = modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Top
         ) {
+            //--------------------------------------------------------------------------------------
+            // 3.1) Suchfeld
+            //--------------------------------------------------------------------------------------
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -79,17 +102,20 @@ fun CoinsSearchSheet(
                     shape = Shapes().extraLarge
                 )
             }
-            LazyColumn() {
+
+            //--------------------------------------------------------------------------------------
+            // 3.2) Gefilterte Coin-Liste
+            //--------------------------------------------------------------------------------------
+            LazyColumn {
                 if (searchField.isNotEmpty()) {
                     items(filteredCoins) { coin ->
                         CoinsListItem(
                             coin = coin,
-                            onListSearchItemSelected = { selectedCoin(coin) },
+                            onListSearchItemSelected = { selectedCoin(coin) }
                         )
                     }
                 }
             }
         }
-
     }
 }

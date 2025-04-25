@@ -23,22 +23,38 @@ import dev.anirban.charts.linear.decoration.LinearDecoration
 import dev.anirban.charts.linear.plots.GradientPlotStrategy
 
 
+/**
+ * Zeichnet ein Sparkline-Liniendiagramm für eine Portfolio-Position.
+ *
+ * - Wandelt die übergebenen String-Werte in Floats um.
+ * - Bestimmt Min- und Max-Werte für die Y-Achse.
+ * - Normalisiert die Daten auf einen festen Wertebereich.
+ * - Rendert ein Liniendiagramm mit Farbverlauf basierend auf dem aktuellen Theme.
+ *
+ * @param coinSparklineData Liste von Kurswerten als Strings, die geplottet werden sollen.
+ */
 @Composable
 fun PortfolioCoinChartPlotter(
     coinSparklineData: List<String> = emptyList(),
 ) {
+    //==========================================================================================
+    // 1) X-Achsen-Beschriftungen (leer, nur Platzhalter)
+    //==========================================================================================
     val xAxisLabels = List(coinSparklineData.size) {
         Coordinate("")
     }
 
+    //==========================================================================================
+    // 2) Sparkline-Daten in Float umwandeln und Bereich ermitteln
+    //==========================================================================================
     val coinDataFloat = coinSparklineData
         .mapNotNull { it.toFloatOrNull() }
-
     val sparkRangeMin = coinDataFloat.minOrNull()?.roundTo(2) ?: 0f
     val sparkRangeMax = coinDataFloat.maxOrNull()?.roundTo(2) ?: 1f
-//    val sparkRangeMid = ((sparkRangeMin + sparkRangeMax) / 2f).roundTo(2)
 
-    // Y Achsen festlegen
+    //==========================================================================================
+    // 3) Y-Achsen-Beschriftungen festlegen
+    //==========================================================================================
     val yAxisLabels = listOf(
         Coordinate(sparkRangeMin),
         Coordinate("Bear"),
@@ -48,6 +64,9 @@ fun PortfolioCoinChartPlotter(
         Coordinate(sparkRangeMax),
     )
 
+    //==========================================================================================
+    // 4) Daten normalisieren und DataSet erstellen
+    //==========================================================================================
     val normalizedData = SBHelper.normalizeValues(coinDataFloat, 5f)
     val linearDataSet: List<LinearDataSet> = listOf(
         LinearDataSet(
@@ -56,18 +75,24 @@ fun PortfolioCoinChartPlotter(
         )
     )
 
+    //==========================================================================================
+    // 5) Chart rendern mit Gradient-Plots und Dekoration
+    //==========================================================================================
     BasicLinearStrategy.GradientPlot(
-        modifier = Modifier.fillMaxWidth().height(450.dp).padding(10.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(450.dp)
+            .padding(10.dp),
         plot = GradientPlotStrategy(
             lineStroke = 4.0f,
             circleRadius = 0.0f
         ),
-
         decoration = LinearDecoration(
             textColor = MaterialTheme.colorScheme.onBackground,
-            plotPrimaryColor = listOf(if(isSystemInDarkTheme()) chartDark else chartLight)
+            plotPrimaryColor = listOf(
+                if (isSystemInDarkTheme()) chartDark else chartLight
+            )
         ),
-
         linearData = BasicDataStrategy(
             linearDataSets = linearDataSet,
             yAxisLabels = yAxisLabels.toMutableList(),
@@ -76,6 +101,9 @@ fun PortfolioCoinChartPlotter(
     )
 }
 
+/**
+ * Preview für [PortfolioCoinChartPlotter] mit Mock-Daten aus coins_Mockdata.
+ */
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun ChartPlotterPreview() {

@@ -17,7 +17,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        maven(url = "https://jitpack.io")
+        maven(url = "https://jitpack.io") // URL für JitPack (JetCharts)
     }
 }
 

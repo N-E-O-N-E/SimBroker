@@ -47,17 +47,23 @@ import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 /**
- * Ui der StartActivity welche ein Wallpaper beinhaltet
- * und einen Button zum Starten der MainActivity.
+ * Composable für die Start-Activity:
+ *
+ * - Zeigt ein vollflächiges Hintergrundbild (hell/dunkel).
+ * - Enthält einen Button zum Starten der MainActivity mit einer Ladeanimation.
+ * - Zeigt bei Klick eine Progressbar mit Zufallsverzögerung.
+ * - Blendet Footer- und Lizenzinformationen ein.
  *
  * @author Markus Wirtz
  *
- * @param innerPadding
- * @param buttonText
- * @param backgroundImage
- * @param startMainActivity
+ * @param innerPadding Padding des umgebenden Scaffold
+ * @param toMainActivity Lambda, das beim Drücken des Buttons aufgerufen wird
+ * @param buttonText Text, der im Start-Button angezeigt wird
+ * @param footerText Text, der als Footer unter den Inhalten angezeigt wird
+ * @param licenseText Lizenzinformation, die unter dem Footer angezeigt wird
+ * @param imageLightTheme Drawable-Resource für das Wallpaper im Light-Theme
+ * @param imageDarkTheme Drawable-Resource für das Wallpaper im Dark-Theme
  */
-
 @Composable
 fun StartActivityImageBox(
     innerPadding: PaddingValues,
@@ -68,11 +74,16 @@ fun StartActivityImageBox(
     imageLightTheme: Int,
     imageDarkTheme: Int,
 ) {
-
+    //==============================================================================================
+    // 1) State: Progress, Loading-Flag, CoroutineScope
+    //==============================================================================================
     var currentProgress by rememberSaveable { mutableFloatStateOf(0f) }
     var loading by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
+    //==============================================================================================
+    // 2) Animation State: Zoom effect on button
+    //==============================================================================================
     var zoomUp by remember { mutableStateOf(false) }
     var zoomTrigger by rememberSaveable { mutableStateOf(false) }
     val zoom by animateFloatAsState(
@@ -80,7 +91,6 @@ fun StartActivityImageBox(
         animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing),
         label = "zoomAnim"
     )
-
     LaunchedEffect(zoomTrigger) {
         if (zoomTrigger) {
             zoomUp = true
@@ -91,7 +101,10 @@ fun StartActivityImageBox(
         }
     }
 
-    Box() {
+    //==============================================================================================
+    // 3) UI-Grundgerüst: Hintergrundbild
+    //==============================================================================================
+    Box {
         if (!isSystemInDarkTheme()) {
             Image(
                 modifier = Modifier.fillMaxSize(),
@@ -108,6 +121,9 @@ fun StartActivityImageBox(
             )
         }
 
+        //==========================================================================================
+        // 4) Inhalt: Button, ProgressBar und Footer
+        //==========================================================================================
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -118,10 +134,16 @@ fun StartActivityImageBox(
         ) {
             Spacer(modifier = Modifier.weight(1f))
 
+            //--------------------------------------------------------------------------------------
+            // 4.1) Start-Button (wenn nicht loading)
+            //--------------------------------------------------------------------------------------
             if (!loading) {
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    // Hintergrund-Animation
                     Image(
-                        modifier = Modifier.scale(2.0f).fillMaxWidth(),
+                        modifier = Modifier
+                            .scale(2.0f)
+                            .fillMaxWidth(),
                         painter = rememberAsyncImagePainter(
                             model = ImageRequest.Builder(LocalContext.current)
                                 .data(R.drawable.load2)
@@ -131,7 +153,7 @@ fun StartActivityImageBox(
                         contentDescription = "Coin animation",
                         alpha = 0.1f
                     )
-
+                    // Start-Button
                     Button(
                         modifier = Modifier
                             .fillMaxWidth(0.9f)
@@ -154,15 +176,19 @@ fun StartActivityImageBox(
                 }
             }
 
+            //--------------------------------------------------------------------------------------
+            // 4.2) Ladeanzeige (wenn loading)
+            //--------------------------------------------------------------------------------------
             if (loading) {
                 Image(
                     modifier = Modifier.fillMaxWidth(),
                     painter = rememberAsyncImagePainter(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(R.drawable.coinanim3).size(coil3.size.Size.ORIGINAL)
-                        .build(),
-                    filterQuality = FilterQuality.High,
-                ),
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(R.drawable.coinanim3)
+                            .size(coil3.size.Size.ORIGINAL)
+                            .build(),
+                        filterQuality = FilterQuality.High,
+                    ),
                     contentDescription = "Coin animation",
                 )
                 LinearProgressIndicator(
@@ -178,8 +204,10 @@ fun StartActivityImageBox(
 
             Spacer(modifier = Modifier.weight(1f))
 
+            //--------------------------------------------------------------------------------------
+            // 4.3) Footer-Texte
+            //--------------------------------------------------------------------------------------
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-
                 Text(footerText, style = typography.bodySmall, color = primaryDark)
                 Text(licenseText, style = typography.bodySmall, color = primaryDark)
             }
@@ -187,6 +215,11 @@ fun StartActivityImageBox(
     }
 }
 
+/**
+ * Simuliert einen Ladefortschritt in 30 Schritten.
+ *
+ * @param updateProgress Callback, das mit dem aktuellen Fortschritt (0f..1f) aufgerufen wird.
+ */
 suspend fun loadProgress(updateProgress: (Float) -> Unit) {
     for (i in 1..30) {
         updateProgress(i.toFloat() / 30)

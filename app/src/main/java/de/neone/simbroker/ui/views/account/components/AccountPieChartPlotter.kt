@@ -15,6 +15,15 @@ import dev.anirban.charts.circular.data.ListDataStrategy
 import dev.anirban.charts.circular.decoration.CircularDecoration
 import dev.anirban.charts.circular.foreground.DonutForegroundStrategy
 
+/**
+ * Zeichnet ein Donut-Diagramm mit den Werten für Wallet-Kredit und Investitionen
+ * sowie eine Textanzeige für die gesamten Gebühren.
+ *
+ * @param modifier Modifier zur Anpassung von Größe und Layout.
+ * @param creditValue Aktueller Wallet-Kreditbetrag.
+ * @param investedValue Aktuell investierter Gesamtbetrag.
+ * @param fees Gesamtsumme aller Gebühren.
+ */
 @Composable
 fun AccountPieChartPlotter(
     modifier: Modifier = Modifier,
@@ -22,22 +31,29 @@ fun AccountPieChartPlotter(
     investedValue: Double,
     fees: Double,
 ) {
-
+    //==============================================================================================
+    // 1) Daten-Strategie erstellen
+    //==============================================================================================
     val dataSet1 = ListDataStrategy(
         itemsList = listOf(
             Pair("Wallet", creditValue.toFloat()),
             Pair("Investments", investedValue.toFloat())
         ),
-        unit = "€" // Unit
+        unit = "€" // Einheit für die Beschriftung
     )
 
+    //==============================================================================================
+    // 2) UI-Aufbau: Donut-Chart und Gebühren-Text
+    //==============================================================================================
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.End
     ) {
+        //------------------------------------------------------------------------------------------
+        // 2.1) Donut-Chart-Reihe
+        //------------------------------------------------------------------------------------------
         DonutRowPlotStrategy.DonutPlotRow(
-            modifier = modifier
-                .fillMaxWidth(),
+            modifier = modifier.fillMaxWidth(),
             circularData = dataSet1,
             circularForeground = DonutForegroundStrategy(
                 strokeWidth = 80f,
@@ -48,10 +64,15 @@ fun AccountPieChartPlotter(
             ),
         )
 
+        //------------------------------------------------------------------------------------------
+        // 2.2) Textanzeige der Gebühren
+        //------------------------------------------------------------------------------------------
         Text(
-            "Fees over all time: ${fees.toInt()} €",
+            text = "Fees over all time: ${fees.toInt()} €",
             style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier.padding(horizontal = 65.dp).padding(bottom = 10.dp)
+            modifier = Modifier
+                .padding(horizontal = 65.dp)
+                .padding(bottom = 10.dp)
         )
     }
 }

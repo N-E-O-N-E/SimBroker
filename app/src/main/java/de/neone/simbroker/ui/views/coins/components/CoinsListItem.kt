@@ -36,21 +36,39 @@ import de.neone.simbroker.data.remote.models.Coin
 import de.neone.simbroker.ui.theme.colorDown
 import de.neone.simbroker.ui.theme.colorUp
 
+/**
+ * Einzelner Listeneintrag für die Coin-Übersicht.
+ *
+ * - Zeigt Sparkline-Chart
+ * - Zeigt Icon, Symbol und Name der Coin
+ * - Zeigt Prozent-Änderung mit passendem Icon und Farbe
+ * - Zeigt aktuellen Preis in Euro
+ *
+ * @param coin Die darzustellende Coin-Information.
+ * @param onListSearchItemSelected Callback, ausgelöst bei Klick auf den Eintrag.
+ */
 @Composable
 fun CoinsListItem(
     coin: Coin,
     onListSearchItemSelected: () -> Unit,
 ) {
+    //==========================================================================================
+    // 1) Bildanfrage für Coin-Icon
+    //==========================================================================================
     val imageRequest = ImageRequest.Builder(LocalContext.current)
         .data(coin.iconUrl)
         .crossfade(true)
         .error(R.drawable.coinplaceholder)
         .build()
 
+    //==========================================================================================
+    // 2) Card-Container mit Clickable
+    //==========================================================================================
     Card(
         modifier = Modifier
             .clickable { onListSearchItemSelected() }
-            .padding(horizontal = 8.dp).padding(vertical = 3.dp),
+            .padding(horizontal = 8.dp)
+            .padding(vertical = 3.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.85f),
         )
@@ -62,73 +80,80 @@ fun CoinsListItem(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
+            //==================================================================================
+            // 3) Sparkline-Chart
+            //==================================================================================
             CoinsChartPlotter(
                 coinSparklineData = coin.sparkline
             )
 
+            //==================================================================================
+            // 4) Haupt-Row mit Icon, Namen und Kursdaten
+            //==================================================================================
             Row(
-                modifier = Modifier,
-                horizontalArrangement = Arrangement.Start,
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-
+                //-------------------------------------------------------------------------------
+                // 4.1) Coin-Icon
+                //-------------------------------------------------------------------------------
                 AsyncImage(
                     modifier = Modifier
-                        .padding(start = 5.dp)
-                        .padding(end = 10.dp)
+                        .padding(start = 5.dp, end = 10.dp)
                         .width(50.dp)
                         .height(50.dp)
-                        .clip(shape = MaterialTheme.shapes.extraLarge),
+                        .clip(MaterialTheme.shapes.extraLarge),
                     model = imageRequest,
                     contentDescription = coin.name,
                     contentScale = ContentScale.Fit,
                     clipToBounds = false
                 )
 
+                //-------------------------------------------------------------------------------
+                // 4.2) Symbol & Name
+                //-------------------------------------------------------------------------------
                 Column(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.Start
                 ) {
                     Text(text = coin.symbol, style = MaterialTheme.typography.bodyLarge)
-                    Row {
-                        Text(
-                            text = coin.name.take(28) + " ...",
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = coin.name.take(28) + " ...",
+                        style = MaterialTheme.typography.bodySmall
+                    )
                 }
 
+                //-------------------------------------------------------------------------------
+                // 4.3) Änderung & Preis
+                //-------------------------------------------------------------------------------
                 Column(
                     modifier = Modifier.fillMaxWidth(0.4f),
                     horizontalAlignment = Alignment.End
                 ) {
-                    Row(modifier = Modifier, verticalAlignment = Alignment.CenterVertically) {
-                        if (coin.change.contains("-")) {
-                            Icon(
-                                modifier = Modifier.scale(0.9f),
-                                painter = painterResource(id = R.drawable.baseline_trending_down_24),
-                                contentDescription = null,
-                                tint = colorDown,
-                            )
-                        } else {
-                            Icon(
-                                modifier = Modifier.scale(0.9f),
-                                painter = painterResource(id = R.drawable.baseline_trending_up_24),
-                                contentDescription = null,
-                                tint = colorUp,
-                            )
-                        }
-
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        // Icon für Up/Down
+                        Icon(
+                            modifier = Modifier.scale(0.9f),
+                            painter = painterResource(
+                                id = if (coin.change.contains("-"))
+                                    R.drawable.baseline_trending_down_24
+                                else
+                                    R.drawable.baseline_trending_up_24
+                            ),
+                            contentDescription = null,
+                            tint = if (coin.change.contains("-")) colorDown else colorUp,
+                        )
                         Spacer(modifier = Modifier.width(8.dp))
-
+                        // Prozentuale Änderung
                         Text(
                             text = coin.change.toDouble().toPercentString(),
                             style = MaterialTheme.typography.bodyLarge,
                             color = if (coin.change.contains("-")) colorDown else colorUp
                         )
                     }
+                    // Aktueller Preis
                     Text(
                         text = coin.price.toDouble().toEuroString(),
                         style = MaterialTheme.typography.bodyLarge
@@ -139,7 +164,10 @@ fun CoinsListItem(
     }
 }
 
-@Preview
+/**
+ * Preview für [CoinsListItem] mit Beispiel-Mockdata.
+ */
+@Preview(showBackground = true)
 @Composable
 private fun CoinListItemPreview() {
     CoinsListItem(

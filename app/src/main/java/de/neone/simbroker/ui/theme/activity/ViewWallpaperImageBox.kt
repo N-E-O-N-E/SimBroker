@@ -9,12 +9,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 
+/**
+ * Zeigt ein vollflächiges Hintergrundbild, abhängig vom aktuellen System-Theme.
+ *
+ * - Wenn im Light-Theme, wird [imageLightTheme] angezeigt.
+ * - Wenn im Dark-Theme, wird [imageDarkTheme] angezeigt.
+ *
+ * @param imageLightTheme Resource-ID für das Wallpaper im Light-Theme.
+ * @param imageDarkTheme Resource-ID für das Wallpaper im Dark-Theme.
+ */
 @Composable
 fun ViewWallpaperImageBox(
     imageLightTheme: Int,
     imageDarkTheme: Int
 ) {
+    //==============================================================================================
+    // 1) Übergeordneter Container für das Hintergrundbild
+    //==============================================================================================
     Box {
+        //------------------------------------------------------------------------------------------
+        // 2) Light-Theme Bild
+        //------------------------------------------------------------------------------------------
         if (!isSystemInDarkTheme()) {
             Image(
                 modifier = Modifier.fillMaxSize(),
@@ -22,6 +37,9 @@ fun ViewWallpaperImageBox(
                 contentDescription = null,
                 contentScale = ContentScale.FillBounds,
             )
+            //------------------------------------------------------------------------------------------
+            // 3) Dark-Theme Bild
+            //------------------------------------------------------------------------------------------
         } else {
             Image(
                 modifier = Modifier.fillMaxSize(),

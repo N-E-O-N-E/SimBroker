@@ -16,6 +16,18 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import de.neone.simbroker.ui.theme.tertiaryLightMediumContrast
 
+/**
+ * Bottom Navigation Bar für die MainActivity.
+ *
+ * - Zeigt Einträge aus [NavigationItem] an.
+ * - Wechselt zwischen den Routen bei Klick.
+ * - Hebt den aktuell ausgewählten Eintrag visuell hervor.
+ *
+ * @param bottomBarColorLight Farbwert für den Bar-Hintergrund im Light-Theme.
+ * @param bottomBarColorDark  Farbwert für den Bar-Hintergrund im Dark-Theme.
+ * @param navController       Controller zur Steuerung der Navigation.
+ * @param currentDestination  Aktuelle Ziel-Route, um die Selektion zu bestimmen.
+ */
 @Composable
 fun MainActivityBottomBar(
     bottomBarColorLight: Color,
@@ -23,19 +35,28 @@ fun MainActivityBottomBar(
     navController: NavHostController,
     currentDestination: NavDestination?,
 ) {
-
+    //==============================================================================================
+    // 1) NavigationBar Container
+    //==============================================================================================
     NavigationBar(
         containerColor = if (isSystemInDarkTheme()) bottomBarColorDark else bottomBarColorLight,
         windowInsets = NavigationBarDefaults.windowInsets
     ) {
+        //==========================================================================================
+        // 2) Navigation Items iterieren
+        //==========================================================================================
+        NavigationItem.entries.forEach { item ->
+            // Bestimme, ob dieser Eintrag aktuell selektiert ist
+            val selected = currentDestination?.hierarchy?.any { it.route == item.route } == true
 
-        NavigationItem.entries.forEach { route ->
-            val selected = currentDestination?.hierarchy?.any { it.route == route.route } == true
-
+            //======================================================================================
+            // 3) Ein einzelner NavigationBarItem
+            //======================================================================================
             NavigationBarItem(
                 selected = selected,
                 onClick = {
-                    navController.navigate(route.route) {
+                    navController.navigate(item.route) {
+                        // Poppe zurück zum Start und erhalte Zustand
                         popUpTo(navController.graph.startDestinationId) { saveState = true }
                         launchSingleTop = true
                         restoreState = true
@@ -43,21 +64,25 @@ fun MainActivityBottomBar(
                 },
                 icon = {
                     Icon(
-                        painter = painterResource(id = route.icon),
-                        contentDescription = route.label
+                        painter = painterResource(id = item.icon),
+                        contentDescription = item.label
                     )
                 },
-                label = { Text(text = route.label, style = MaterialTheme.typography.bodySmall) },
+                label = {
+                    Text(
+                        text = item.label,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                },
                 alwaysShowLabel = true,
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = if (isSystemInDarkTheme()) Color.White else tertiaryLightMediumContrast,
-                    selectedTextColor = if (isSystemInDarkTheme()) Color.White else tertiaryLightMediumContrast,
-                    indicatorColor = if (isSystemInDarkTheme()) Color.White.copy(alpha = 0.15f) else tertiaryLightMediumContrast.copy(alpha = 0.15f),
-                    unselectedIconColor = if (isSystemInDarkTheme()) Color.White else tertiaryLightMediumContrast,
-                    unselectedTextColor = if (isSystemInDarkTheme()) Color.White else tertiaryLightMediumContrast
+                    selectedIconColor      = if (isSystemInDarkTheme()) Color.White else tertiaryLightMediumContrast,
+                    selectedTextColor      = if (isSystemInDarkTheme()) Color.White else tertiaryLightMediumContrast,
+                    indicatorColor         = if (isSystemInDarkTheme()) Color.White.copy(alpha = 0.15f) else tertiaryLightMediumContrast.copy(alpha = 0.15f),
+                    unselectedIconColor    = if (isSystemInDarkTheme()) Color.White else tertiaryLightMediumContrast,
+                    unselectedTextColor    = if (isSystemInDarkTheme()) Color.White else tertiaryLightMediumContrast
                 )
             )
         }
     }
 }
-

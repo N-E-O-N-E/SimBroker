@@ -18,16 +18,33 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+/**
+ * Einfache AlertDialog-Variante mit einer Nachricht und einer „Okay“-Schaltfläche.
+ *
+ * - Zeigt die übergebene Nachricht an.
+ * - Ruft onDismiss() auf, wenn der Dialog geschlossen oder die Schaltfläche gedrückt wird.
+ *
+ * @param message Der anzuzeigende Text im Dialog.
+ * @param onDismiss Callback, der beim Schließen des Dialogs aufgerufen wird.
+ */
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlertDialog(
     message: String,
     onDismiss: () -> Unit,
 ) {
+    //------------------------------------------------------------------------------------------
+    // 1) Dialog-Container
+    //------------------------------------------------------------------------------------------
     BasicAlertDialog(
         onDismissRequest = {
             onDismiss()
-        }) {
+        }
+    ) {
+        //--------------------------------------------------------------------------------------
+        // 2) Surface mit TonalElevation und Form
+        //--------------------------------------------------------------------------------------
         Surface(
             modifier = Modifier
                 .wrapContentWidth()
@@ -35,17 +52,37 @@ fun AlertDialog(
             shape = MaterialTheme.shapes.large,
             tonalElevation = AlertDialogDefaults.TonalElevation
         ) {
+            //----------------------------------------------------------------------------------
+            // 3) Inhalts-Layout
+            //----------------------------------------------------------------------------------
             Column(modifier = Modifier.padding(20.dp)) {
+                //------------------------------------------------------------------------------
+                // 3.1) Nachrichtentext
+                //------------------------------------------------------------------------------
+                Text(
+                    text = message,
+                    style = MaterialTheme.typography.bodyLarge
+                )
 
-                Text(text = message, style = MaterialTheme.typography.bodyLarge)
-
+                //------------------------------------------------------------------------------
+                // 3.2) Abstand
+                //------------------------------------------------------------------------------
                 Spacer(modifier = Modifier.height(24.dp))
 
+                //------------------------------------------------------------------------------
+                // 3.3) Bestätigungs-Schaltfläche
+                //------------------------------------------------------------------------------
                 TextButton(
                     onClick = {
                         onDismiss()
-                    }, modifier = Modifier.align(Alignment.End)
-                ) { Text("Okay", style = MaterialTheme.typography.bodyLarge) }
+                    },
+                    modifier = Modifier.align(Alignment.End)
+                ) {
+                    Text(
+                        text = "Okay",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
             }
         }
     }
