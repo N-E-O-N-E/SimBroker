@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import de.neone.simbroker.ui.SimBrokerViewModel
 import de.neone.simbroker.ui.views.account.AccountView
 import de.neone.simbroker.ui.views.coins.CoinsView
+import de.neone.simbroker.ui.views.info.InfoView
 import de.neone.simbroker.ui.views.portfolio.PortfolioView
 import org.koin.androidx.compose.koinViewModel
 
@@ -56,6 +57,13 @@ fun NavHostComponent(
         //------------------------------------------------------------------------------------------
         composable(Routes.ACCOUNT) {
             AccountView(viewModel)
+        }
+
+        //------------------------------------------------------------------------------------------
+        // Ziel: Info-Bildschirm
+        //------------------------------------------------------------------------------------------
+        composable(Routes.INFO) {
+            InfoView()
         }
 
         //------------------------------------------------------------------------------------------

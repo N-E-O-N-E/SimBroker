@@ -47,6 +47,12 @@ enum class NavigationItem(
         icon = R.drawable.baseline_account_circle_48
     ),
 
+    Info(
+        route = Routes.INFO,
+        label = "Info",
+        icon = R.drawable.sharp_chat_info_24
+    ),
+
     //==============================================================================================
     // Sonstige Aktionen
     //==============================================================================================
