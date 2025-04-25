@@ -79,6 +79,12 @@ fun AccountView(
 
     val selectedOption by viewModel.gameDifficultState.collectAsState()
     val firstGame by viewModel.firstGameState.collectAsState()
+    val isFreePlay = {
+        when (selectedOption) {
+            "Free-Play" -> false
+            else -> true
+        }
+    }
 
 
     Column(
@@ -153,15 +159,15 @@ fun AccountView(
                         modifier = Modifier.clickable {
                             if (accountCreditState < 10000) {
                                 klicker--
-                                Toast.makeText(
-                                    context,
-                                    "Winner winner chicken dinner! $klicker",
-                                    Toast.LENGTH_SHORT
-                                ).show()
                                 if (klicker == 0) {
                                     viewModel.setGameEndAccountValue()
                                     viewModel.setGameDifficult("Free-Play")
                                     viewModel.setFirstGameState(false)
+                                    Toast.makeText(
+                                        context,
+                                        "Winner winner chicken dinner!",
+                                        Toast.LENGTH_LONG
+                                    ).show()
                                     klicker = 3
                                 }
                             }
@@ -336,7 +342,7 @@ fun AccountView(
                                 } else {
                                     viewModel.setShowFirstGameAccountValueDialog(true)
                                 }
-                            }
+                            }, enabled = isFreePlay()
                         )
                         Text(
                             text = "Easy",
@@ -360,7 +366,7 @@ fun AccountView(
                                 } else {
                                     viewModel.setShowFirstGameAccountValueDialog(true)
                                 }
-                            }
+                            }, enabled = isFreePlay()
                         )
                         Text(
                             text = "Medium",
@@ -387,7 +393,7 @@ fun AccountView(
                             } else {
                                 viewModel.setShowFirstGameAccountValueDialog(true)
                             }
-                        }
+                        }, enabled = isFreePlay()
                     )
                     Text(
                         text = "Pro",
@@ -412,10 +418,10 @@ fun AccountView(
                             } else {
                                 viewModel.setShowFirstGameAccountValueDialog(true)
                             }
-                        }
+                        }, enabled = isFreePlay()
                     )
                     Text(
-                        text = "Freeplay",
+                        text = "Custom",
                         style = typography.bodyMedium
                     )
                 }
