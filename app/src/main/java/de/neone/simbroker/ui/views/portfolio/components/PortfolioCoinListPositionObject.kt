@@ -14,6 +14,7 @@ fun PortfolioCoinListPositionObject(
     isFavorite: (String, Boolean) -> Unit,
     isClicked: () -> Unit,
     profitCallback: (Double) -> Unit,
+    gameDifficult: String,
 ) {
 
     val coinUuid = portfolioPosition.first().coinUuid
@@ -36,20 +37,15 @@ fun PortfolioCoinListPositionObject(
 
     val totalInvested = portfolioPosition.filter { !it.isClosed }
         .sumOf { it.amountRemaining * it.pricePerUnit }
-    val realizedProfit = coinSellTransactions.sumOf { sellTx ->
-        val matchingBuy = coinBuyTransactions
-            .filter { it.timestamp <= sellTx.timestamp }
-            .minByOrNull { it.timestamp }
 
-        if (matchingBuy != null) {
-            val gainPerCoin = sellTx.price - matchingBuy.price
-            gainPerCoin * sellTx.amount
-        } else 0.0
+    val gameLeverage = when (gameDifficult) {
+        "Easy" -> 5
+        "Medium" -> 10
+        "Pro" -> 20
+        else -> 5
     }
 
-    val unrealizedProfit = currentValue - totalInvested
-    val profit = realizedProfit + unrealizedProfit
-
+    val profit = (currentValue - totalInvested) * gameLeverage
 
     val sparksForPosition = coinList.find { it.uuid == coinUuid }?.sparkline.orEmpty()
 

@@ -260,7 +260,8 @@ fun PortfolioView(
                                 },
                                 profitCallback = {
                                     profit = it
-                                }
+                                },
+                                gameDifficult,
                             )
                         }
                     }
@@ -320,7 +321,8 @@ fun PortfolioView(
                     },
                     profitCallback = {
                         profit = it
-                    }
+                    },
+                    gameDifficult,
                 )
             }
         }

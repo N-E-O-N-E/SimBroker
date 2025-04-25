@@ -80,16 +80,6 @@ fun CoinsView(
     val coinSellTransactions =
         allTransactionPositions.filter { it.coinUuid == selectedCoin?.uuid && it.type == TransactionType.SELL }
 
-    val realizedProfit = coinSellTransactions.sumOf { sellTx ->
-        val matchingBuy = coinBuyTransactions
-            .filter { it.timestamp <= sellTx.timestamp }
-            .minByOrNull { it.timestamp }
-
-        if (matchingBuy != null) {
-            val gainPerCoin = sellTx.price - matchingBuy.price
-            gainPerCoin * sellTx.amount
-        } else 0.0
-    }
 
     val totalAmount =
         allPortfolioPositions.filter { !it.isClosed && it.coinUuid == selectedCoin?.uuid }
@@ -101,8 +91,16 @@ fun CoinsView(
     val currentPrice = coinList.find { it.uuid == selectedCoin?.uuid }?.price?.toDouble() ?: 0.0
     val currentValue = totalAmount * currentPrice
 
-    val unrealizedProfit = currentValue - totalInvested
-    val profit = realizedProfit + unrealizedProfit
+    val gameDifficult by viewModel.gameDifficultState.collectAsState()
+
+    val gameLeverage = when (gameDifficult) {
+        "Easy" -> 5
+        "Medium" -> 10
+        "Pro" -> 20
+        else -> 5
+    }
+
+    val profit = (currentValue - totalInvested) * gameLeverage
 
     var openSucheSheet by rememberSaveable { mutableStateOf(false) }
     var openCoinDetailSheet by rememberSaveable { mutableStateOf(false) }

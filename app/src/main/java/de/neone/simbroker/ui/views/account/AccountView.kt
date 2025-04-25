@@ -209,7 +209,7 @@ fun AccountView(
                                 filterQuality = FilterQuality.High,
                             ),
                             contentDescription = "Coin animation",
-                            alpha = 0.1f
+                            alpha = 0.2f
                         )
 
                         Column(
@@ -219,7 +219,7 @@ fun AccountView(
 
 
                             Text(
-                                modifier = Modifier.padding(vertical = 5.dp),
+                                modifier = Modifier.padding(vertical = 2.dp),
                                 text = "Ranking",
                                 style = typography.titleLarge
                             )
@@ -230,7 +230,7 @@ fun AccountView(
                                 horizontalArrangement = Arrangement.SpaceEvenly
                             ) {
                                 Image(
-                                    modifier = Modifier.scale(2.2f),
+                                    modifier = Modifier.scale(2.7f),
                                     painter = painterResource(id = R.drawable.m1),
                                     contentDescription = null,
                                     colorFilter = if (accountCreditState + totalInvested >= 2000) null else ColorFilter.tint(
@@ -238,7 +238,7 @@ fun AccountView(
                                     )
                                 )
                                 Image(
-                                    modifier = Modifier.scale(2.4f),
+                                    modifier = Modifier.scale(2.7f),
                                     painter = painterResource(id = R.drawable.m2),
                                     contentDescription = null,
                                     colorFilter = if (accountCreditState + totalInvested >= 4000) null else ColorFilter.tint(
@@ -246,7 +246,7 @@ fun AccountView(
                                     )
                                 )
                                 Image(
-                                    modifier = Modifier.scale(2.6f),
+                                    modifier = Modifier.scale(2.7f),
                                     painter = painterResource(id = R.drawable.m3),
                                     contentDescription = null,
                                     colorFilter = if (accountCreditState + totalInvested >= 6000) null else ColorFilter.tint(
@@ -254,7 +254,7 @@ fun AccountView(
                                     )
                                 )
                                 Image(
-                                    modifier = Modifier.scale(2.9f),
+                                    modifier = Modifier.scale(2.7f),
                                     painter = painterResource(id = R.drawable.m4),
                                     contentDescription = null,
                                     colorFilter = if (accountCreditState + totalInvested >= 8000) null else ColorFilter.tint(
@@ -262,7 +262,7 @@ fun AccountView(
                                     )
                                 )
                                 Image(
-                                    modifier = Modifier.scale(3.0f),
+                                    modifier = Modifier.scale(2.7f),
                                     painter = painterResource(id = R.drawable.m5),
                                     contentDescription = null,
                                     colorFilter = if (accountCreditState + totalInvested >= 10000) null else ColorFilter.tint(
@@ -278,7 +278,7 @@ fun AccountView(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 5.dp),
+                    .padding(vertical = 3.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.8f),
                 )
@@ -308,13 +308,13 @@ fun AccountView(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Set your difficulty",
+                        text = "Game difficulty",
                         style = typography.bodyLarge
                     )
 
                     Row(
                         modifier = Modifier
-                            .fillMaxWidth(),
+                            .fillMaxWidth().padding(horizontal = 10.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -330,7 +330,7 @@ fun AccountView(
                                     viewModel.setFeeValue(1.5)
                                     Toast.makeText(
                                         context,
-                                        "Game Difficulty is now: Easy",
+                                        "Game Difficulty is now: Easy.",
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 } else {
@@ -340,8 +340,9 @@ fun AccountView(
                         )
                         Text(
                             text = "Easy",
-                            style = typography.bodySmall
+                            style = typography.bodyMedium
                         )
+
                         RadioButton(
                             selected = selectedOption == "Medium",
                             onClick = {
@@ -353,7 +354,7 @@ fun AccountView(
                                     viewModel.setFeeValue(3.5)
                                     Toast.makeText(
                                         context,
-                                        "Game Difficulty is now: Medium",
+                                        "Game Difficulty is now: Medium.",
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 } else {
@@ -363,57 +364,61 @@ fun AccountView(
                         )
                         Text(
                             text = "Medium",
-                            style = typography.bodySmall
-                        )
-                        RadioButton(
-                            selected = selectedOption == "Pro",
-                            onClick = {
-                                if (firstGame) {
-                                    viewModel.setGameDifficult("Pro")
-                                    viewModel.setFirstGameState(false)
-                                    viewModel.setShowGameDifficultDialog(true)
-                                    viewModel.setFirstGameAccountValue(2000.0)
-                                    viewModel.setFeeValue(8.0)
-                                    Toast.makeText(
-                                        context,
-                                        "Game Difficulty is now: Pro",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                } else {
-                                    viewModel.setShowFirstGameAccountValueDialog(true)
-                                }
-                            }
-                        )
-                        Text(
-                            text = "Pro",
-                            style = typography.bodySmall
+                            style = typography.bodyMedium
                         )
 
-                        RadioButton(
-                            selected = selectedOption == "Custom",
-                            onClick = {
-                                if (firstGame) {
-                                    viewModel.setGameDifficult("Custom")
-                                    viewModel.setFirstGameState(false)
-                                    viewModel.setShowGameDifficultDialog(true)
-                                    viewModel.setFirstGameAccountValue(1000.0)
-                                    viewModel.setFeeValue(2.0)
-                                    Toast.makeText(
-                                        context,
-                                        "Game Difficulty is now: Custom - Fill your wallet up to 6.000 €!",
-                                        Toast.LENGTH_LONG
-                                    ).show()
-                                } else {
-                                    viewModel.setShowFirstGameAccountValueDialog(true)
-                                }
-                            }
-                        )
-                        Text(
-                            text = "Custom",
-                            style = typography.bodySmall
-                        )
 
-                    }
+
+
+                    RadioButton(
+                        selected = selectedOption == "Pro",
+                        onClick = {
+                            if (firstGame) {
+                                viewModel.setGameDifficult("Pro")
+                                viewModel.setFirstGameState(false)
+                                viewModel.setShowGameDifficultDialog(true)
+                                viewModel.setFirstGameAccountValue(2000.0)
+                                viewModel.setFeeValue(8.0)
+                                Toast.makeText(
+                                    context,
+                                    "Game Difficulty is now: Pro.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                viewModel.setShowFirstGameAccountValueDialog(true)
+                            }
+                        }
+                    )
+                    Text(
+                        text = "Pro",
+                        style = typography.bodyMedium
+                    )
+
+                    RadioButton(
+                        selected = selectedOption == "Custom",
+                        onClick = {
+                            if (firstGame) {
+                                viewModel.setGameDifficult("Custom")
+                                viewModel.setFirstGameState(false)
+                                viewModel.setShowGameDifficultDialog(true)
+                                viewModel.setFirstGameAccountValue(1000.0)
+                                viewModel.setFeeValue(2.0)
+                                Toast.makeText(
+                                    context,
+                                    "Game Difficulty is now: Custom.\n\n" +
+                                            "Fill your wallet up to 6.000 €!",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            } else {
+                                viewModel.setShowFirstGameAccountValueDialog(true)
+                            }
+                        }
+                    )
+                    Text(
+                        text = "Freeplay",
+                        style = typography.bodyMedium
+                    )
+                }
                 }
             }
 
