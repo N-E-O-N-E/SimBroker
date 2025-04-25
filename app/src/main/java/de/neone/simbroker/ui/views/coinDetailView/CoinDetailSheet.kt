@@ -43,6 +43,7 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.request.error
 import de.neone.simbroker.R
+import de.neone.simbroker.data.helper.SBHelper.roundTo2
 import de.neone.simbroker.data.helper.SBHelper.roundTo6
 import de.neone.simbroker.data.helper.SBHelper.toEuroString
 import de.neone.simbroker.data.helper.SBHelper.toPercentString
@@ -144,7 +145,7 @@ fun CoinDetailSheet(
                             .scale(0.7f),
                         onClick = {
                             selectedOption = "price"
-                            inputValue = currentPriceCalc.roundTo6().toString()
+                            inputValue = currentPriceCalc.roundTo2().toString()
                             Toast.makeText(context, "Value copied", Toast.LENGTH_SHORT).show()
                         },
                     ) {
@@ -165,7 +166,7 @@ fun CoinDetailSheet(
                             .scale(0.7f),
                         onClick = {
                             selectedOption = "amount"
-                            inputValue = currentAmountCalc.roundTo6().toString()
+                            inputValue = currentAmountCalc.toString()
                             Toast.makeText(context, "Value copied", Toast.LENGTH_SHORT).show()
                         },
                     ) {
@@ -368,14 +369,12 @@ fun CoinDetailSheet(
                         else inputValue.toDouble() / selectedCoin.price.toDouble()
 
 
-                        if (currentAmountCalc.roundTo6() < amount) {
+                        if (currentAmountCalc < amount) {
                             notEnoughCoins()
                             return@Button
                         }
 
                         onSellClick(amount, selectedCoin.price.toDouble())
-
-
 
                         onDismiss()
 
