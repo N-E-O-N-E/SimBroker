@@ -71,7 +71,8 @@ fun CoinsView(
             .toList()
             .filter { it.sumOf { pos -> pos.amountRemaining } > 0 && !it.first().isFavorite }
 
-    val coinValue = allPortfolioPositions.filter { selectedCoin?.uuid == it.coinUuid }.sumOf { it.totalValue }
+    val coinValue =
+        allPortfolioPositions.filter { selectedCoin?.uuid == it.coinUuid }.sumOf { it.totalValue }
 
     val allTransactionPositions by viewModel.allTransactionPositions.collectAsState()
     val coinBuyTransactions =
@@ -90,9 +91,12 @@ fun CoinsView(
         } else 0.0
     }
 
-    val totalAmount = allPortfolioPositions.filter { !it.isClosed && it.coinUuid == selectedCoin?.uuid }.sumOf { it.amountRemaining }
-    val totalInvested = allPortfolioPositions.filter { !it.isClosed && it.coinUuid == selectedCoin?.uuid }
-        .sumOf { it.amountRemaining * it.pricePerUnit }
+    val totalAmount =
+        allPortfolioPositions.filter { !it.isClosed && it.coinUuid == selectedCoin?.uuid }
+            .sumOf { it.amountRemaining }
+    val totalInvested =
+        allPortfolioPositions.filter { !it.isClosed && it.coinUuid == selectedCoin?.uuid }
+            .sumOf { it.amountRemaining * it.pricePerUnit }
 
     val currentPrice = coinList.find { it.uuid == selectedCoin?.uuid }?.price?.toDouble() ?: 0.0
     val currentValue = totalAmount * currentPrice
@@ -114,31 +118,39 @@ fun CoinsView(
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth().height(35.dp)
+                .fillMaxWidth()
+                .height(35.dp)
                 .background(MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.9f))
                 .padding(horizontal = 10.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
+
+
             Text(
-                text = "RealoadTime: $timer",
+                text = "Wallet: ${accountCreditState.roundTo2()} €",
+                style = MaterialTheme.typography.bodySmall
+            )
+            Text(
+                text = "Timer: $timer",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface
             )
 
-            Text(
-                text = "Credit: ${accountCreditState.roundTo2()} €",
-                style = MaterialTheme.typography.bodySmall
-            )
-
-            IconButton(onClick = {
-                openSucheSheet = !openSucheSheet
-            }) {
-                Icon(
-                    modifier = Modifier.scale(1.0f),
-                    painter = painterResource(id = R.drawable.baseline_search_24),
-                    contentDescription = null
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "Suche",
+                    style = MaterialTheme.typography.bodySmall
                 )
+                IconButton(onClick = {
+                    openSucheSheet = !openSucheSheet
+                }) {
+                    Icon(
+                        modifier = Modifier.scale(1.0f),
+                        painter = painterResource(id = R.drawable.baseline_search_24),
+                        contentDescription = null
+                    )
+                }
             }
         }
 
@@ -230,15 +242,27 @@ fun CoinsView(
     }
 
     if (showNotEnoughCreditDialog) {
-        AlertDialog("You cant buy this Coin! Check your Credit.") { viewModel.setShowAccountNotEnoughMoney(false) }
+        AlertDialog("You cant buy this Coin! Check your Credit.") {
+            viewModel.setShowAccountNotEnoughMoney(
+                false
+            )
+        }
     }
 
     if (showNotEnoughCoinstDialog) {
-        AlertDialog("You can't sell more than you have. Check your account balance.") { viewModel.setAccountNotEnoughCoins(false) }
+        AlertDialog("You can't sell more than you have. Check your account balance.") {
+            viewModel.setAccountNotEnoughCoins(
+                false
+            )
+        }
     }
 
     if (showAccountCashInDialog) {
-        AlertDialog("Your Credit is ${accountCreditState.roundTo2()} €") { viewModel.setAccountCashIn(false) }
+        AlertDialog("Your Credit is ${accountCreditState.roundTo2()} €") {
+            viewModel.setAccountCashIn(
+                false
+            )
+        }
     }
 
 

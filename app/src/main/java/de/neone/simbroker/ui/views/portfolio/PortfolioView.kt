@@ -39,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -149,14 +150,58 @@ fun PortfolioView(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "RealoadTime: $timer",
+                text = "Difficulty: $gameDifficult",
+                style = MaterialTheme.typography.bodySmall
+            )
+            Text(
+                text = "Timer: $timer",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface
             )
-            Text(
-                text = "Game Difficulty: $gameDifficult",
-                style = MaterialTheme.typography.bodySmall
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(0.4f), horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Image(
+                    modifier = Modifier.scale(1.0f),
+                    painter = painterResource(id = R.drawable.m1),
+                    contentDescription = null,
+                    colorFilter = if (accountCreditState + totalInvested >= 2000) null else ColorFilter.tint(
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
+                )
+                Image(
+                    modifier = Modifier.scale(1.0f),
+                    painter = painterResource(id = R.drawable.m2),
+                    contentDescription = null,
+                    colorFilter = if (accountCreditState + totalInvested >= 4000) null else ColorFilter.tint(
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
+                )
+                Image(
+                    modifier = Modifier.scale(1.0f),
+                    painter = painterResource(id = R.drawable.m3),
+                    contentDescription = null,
+                    colorFilter = if (accountCreditState + totalInvested >= 6000) null else ColorFilter.tint(
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
+                )
+                Image(
+                    modifier = Modifier.scale(1.0f),
+                    painter = painterResource(id = R.drawable.m4),
+                    contentDescription = null,
+                    colorFilter = if (accountCreditState + totalInvested >= 8000) null else ColorFilter.tint(
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
+                )
+                Image(
+                    modifier = Modifier.scale(1.0f),
+                    painter = painterResource(id = R.drawable.m5),
+                    contentDescription = null,
+                    colorFilter = if (accountCreditState + totalInvested >= 10000) null else ColorFilter.tint(
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
+                )
+            }
         }
 
         // Body --------------------------------------------------------------------------------

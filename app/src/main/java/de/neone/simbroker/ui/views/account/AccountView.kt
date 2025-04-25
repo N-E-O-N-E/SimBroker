@@ -162,7 +162,7 @@ fun AccountView(
                                     viewModel.setGameEndAccountValue()
                                     viewModel.setGameDifficult("Free-Play")
                                     viewModel.setFirstGameState(false)
-                                    klicker = 5
+                                    klicker = 3
                                 }
                             }
                         },
