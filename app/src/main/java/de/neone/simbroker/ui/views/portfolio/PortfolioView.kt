@@ -106,6 +106,7 @@ fun PortfolioView(
     //==============================================================================================
     // State: Kontostand & Gebühr
     //==============================================================================================
+    val investedValue by viewModel.investedValueState.collectAsState()
     val accountCreditState by viewModel.accountValueState.collectAsState()
     val feeValue by viewModel.feeValueState.collectAsState()
 
@@ -142,7 +143,7 @@ fun PortfolioView(
         .filter { selectedCoin?.uuid == it.coinUuid }
         .sumOf { it.totalValue }
     val totalInvested = allPortfolioPositions
-        .filter { !it.isClosed && it.coinUuid == selectedCoin?.uuid }
+    .filter { !it.isClosed && it.coinUuid == selectedCoin?.uuid }
         .sumOf { it.amountRemaining * it.pricePerUnit }
     var profit by remember { mutableDoubleStateOf(0.0) }
 
@@ -202,7 +203,7 @@ fun PortfolioView(
                             modifier = Modifier.scale(1.0f),
                             painter = painterResource(id = resId),
                             contentDescription = null,
-                            colorFilter = if (accountCreditState + totalInvested >= (idx + 1) * 2000)
+                            colorFilter = if (accountCreditState + investedValue >= (idx + 1) * 2000)
                                 null
                             else ColorFilter.tint(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
                         )

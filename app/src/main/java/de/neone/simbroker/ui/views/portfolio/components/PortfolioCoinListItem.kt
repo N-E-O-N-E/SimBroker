@@ -49,7 +49,6 @@ import de.neone.simbroker.data.helper.SBHelper
 import de.neone.simbroker.data.helper.SBHelper.roundTo2
 import de.neone.simbroker.data.helper.SBHelper.roundTo8
 import de.neone.simbroker.data.helper.SBHelper.toEuroString
-import de.neone.simbroker.data.helper.SBHelper.toPercentString
 import de.neone.simbroker.data.local.models.PortfolioPositions
 import de.neone.simbroker.data.local.models.TransactionPositions
 import de.neone.simbroker.data.local.models.TransactionType
@@ -333,7 +332,7 @@ fun PortfolioCoinListItem(
                 // Scrollbare Liste aller Transaktionen
                 Column(
                     modifier = Modifier
-                        .heightIn(min = 130.dp, max = 260.dp)
+                        .heightIn(min = 120.dp, max = 240.dp)
                         .verticalScroll(scrollState)
                 ) {
                     allCoinTransactions
@@ -341,8 +340,8 @@ fun PortfolioCoinListItem(
                         .forEach { tx ->
                             // Berechnungen für jede Transaktion
                             val anteilEUR = tx.price.roundTo2() * tx.amount
-                            val gewVer = (currentPrice.roundTo2() - tx.price.roundTo2()) * tx.amount.roundTo8()
-                            val gvProzent = ((currentPrice.roundTo2() / tx.price.roundTo2()) - 1) * 100
+                            //val gewVer = (currentPrice.roundTo2() - tx.price.roundTo2()) * tx.amount.roundTo8() * 5
+                            //val gvProzent = ((currentPrice.roundTo2() / tx.price.roundTo2()) - 1) * 100
 
                             Card(
                                 modifier = Modifier
@@ -390,14 +389,7 @@ fun PortfolioCoinListItem(
                                         Text(anteilEUR.toEuroString(), style = MaterialTheme.typography.bodySmall)
                                     }
                                     HorizontalDivider(color = MaterialTheme.colorScheme.onSurface)
-                                    // Profit/Loss
-                                    Row {
-                                        Text("Profit/Loss", style = MaterialTheme.typography.bodySmall)
-                                        Spacer(modifier = Modifier.weight(1f))
-                                        Text(gewVer.toEuroString(), style = MaterialTheme.typography.bodySmall)
-                                        Spacer(modifier = Modifier.weight(0.05f))
-                                        Text(gvProzent.toPercentString(), style = MaterialTheme.typography.bodySmall)
-                                    }
+
                                     // Hinweis bei abgeschlossener Position
                                     if (tx.isClosed && tx.type == TransactionType.BUY) {
                                         Row(

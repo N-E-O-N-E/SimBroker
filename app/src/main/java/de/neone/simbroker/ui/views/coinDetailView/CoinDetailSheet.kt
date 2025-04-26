@@ -43,7 +43,6 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.request.error
 import de.neone.simbroker.R
-import de.neone.simbroker.data.helper.SBHelper.roundTo2
 import de.neone.simbroker.data.helper.SBHelper.roundTo6
 import de.neone.simbroker.data.helper.SBHelper.roundTo8
 import de.neone.simbroker.data.helper.SBHelper.toEuroString
@@ -183,7 +182,7 @@ fun CoinDetailSheet(
                         modifier = Modifier.scale(0.7f),
                         onClick = {
                             selectedOption = "price"
-                            inputValue = currentPriceCalc.roundTo2().toString()
+                            inputValue = currentPriceCalc.toString()
                             Toast.makeText(context, "Value copied", Toast.LENGTH_SHORT).show()
                         },
                     ) {
@@ -194,14 +193,14 @@ fun CoinDetailSheet(
                     }
                     Spacer(modifier = Modifier.weight(1f))
                     Text(
-                        text = "Amount: ${currentAmountCalc.roundTo6()}",
+                        text = "Amount: ${coinAmount.roundTo6()}",
                         style = MaterialTheme.typography.titleSmall
                     )
                     IconButton(
                         modifier = Modifier.scale(0.7f),
                         onClick = {
                             selectedOption = "amount"
-                            inputValue = currentAmountCalc.toString()
+                            inputValue = coinAmount.toString()
                             Toast.makeText(context, "Value copied", Toast.LENGTH_SHORT).show()
                         },
                     ) {
@@ -313,7 +312,7 @@ fun CoinDetailSheet(
                     text = if (selectedOption == "amount")
                         "Invest excl. Fee : ${calculatedValue.toEuroString()}"
                     else
-                        "Coins excl. Fee: ${calculatedValue.roundTo6()} Coins",
+                        "Coins excl. Fee: ${calculatedValue.roundTo8()} Coins",
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(top = 15.dp)
                 )
@@ -373,10 +372,14 @@ fun CoinDetailSheet(
                         }
                         val amount = if (selectedOption == "amount") inputValue.toDouble()
                         else inputValue.toDouble() / selectedCoin.price.toDouble()
-                        if (currentAmountCalc < amount) {
+
+                        // Toleranz von 1e-8 zulassen
+                        val eps = 1e-8
+                        if (amount > currentAmountCalc + eps) {
                             notEnoughCoins()
                             return@Button
                         }
+
                         onSellClick(amount, selectedCoin.price.toDouble())
                         onDismiss()
                     }

@@ -203,7 +203,7 @@ fun AccountView(
                                 }
                             }
                         },
-                        text = "Wallet: ${(accountCreditState + totalInvested).toEuroString()}",
+                        text = "Account: ${(accountCreditState + totalInvested).toEuroString()}",
                         style = typography.headlineSmall
                     )
                     Image(
