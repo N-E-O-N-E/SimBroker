@@ -121,7 +121,7 @@ fun CoinsView(
         else -> 5
     }
     // Profit-Wert berechnen
-    val profit = (currentValue - totalInvested) * gameLeverage
+    val profit = (currentValue - totalInvested).roundTo2() * gameLeverage
     // Transaktionen für selektierten Coin
     val coinBuyTransactions = allTransactionPositions.filter {
         it.coinUuid == selectedCoin?.uuid && it.type == TransactionType.BUY && !it.isClosed

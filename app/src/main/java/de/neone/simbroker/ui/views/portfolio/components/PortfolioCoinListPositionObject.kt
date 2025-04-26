@@ -1,6 +1,7 @@
 package de.neone.simbroker.ui.views.portfolio.components
 
 import androidx.compose.runtime.Composable
+import de.neone.simbroker.data.helper.SBHelper.roundTo2
 import de.neone.simbroker.data.local.models.PortfolioPositions
 import de.neone.simbroker.data.local.models.TransactionPositions
 import de.neone.simbroker.data.local.models.TransactionType
@@ -78,7 +79,7 @@ fun PortfolioCoinListPositionObject(
         else -> 5
     }
     // Berechneter Profit inklusive Hebel
-    val profit = (currentValue - totalInvested) * gameLeverage
+    val profit = (currentValue - totalInvested).roundTo2() * gameLeverage
 
     //==============================================================================================
     // 5) Sparkline-Daten

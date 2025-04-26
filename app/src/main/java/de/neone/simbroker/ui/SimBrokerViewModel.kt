@@ -26,7 +26,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 
-// Preference Keys für DataStore
 private val DATASTORE_FIRSTGAME = booleanPreferencesKey("firstGame")
 private val DATASTORE_ACCOUNTVALUE = doublePreferencesKey("accountValue")
 private val DATASTORE_TOTALINVESTVALUE = doublePreferencesKey("totalInvested")
@@ -34,192 +33,182 @@ private val DATASTORE_FEE = doublePreferencesKey("fee")
 private val DATASTORE_GAMEDIFFICULTY = stringPreferencesKey("gameDifficulty")
 
 /**
- * ViewModel für die SimBroker-App.
+ * ViewModel der SimBroker-App, das
+ * - Kontostand, Gebühren und Spielstatus in DataStore hält,
+ * - Coin-Daten von einem Repository lädt,
+ * - Portfolio- und Transaktions-Operationen (Kauf/Verkauf) durchführt
+ * - und UI-Dialogzustände steuert.
  *
- * Verwaltet:
- * 1) DataStore-Zustände (Konto, Schwierigkeit, Gebühren, erster Spielstart)
- * 2) Dialog-Status-Flows
- * 3) Timer zur Auffrischung der Coin-Daten
- * 4) API-Aufrufe und Repository-Interaktionen
- * 5) Portfolio- und Transaktions-Operationen (Kauf/Verkauf)
- *
- * @param application Android Application Context für DataStore-Zugriff.
- * @param repository Repository zur Abstraktion von Remote und lokaler DB.
+ * @param application Der Android-Application-Context für DataStore-Zugriff.
+ * @param repository Abstraktionsebene für Remote-/Local-Datenoperationen.
  */
+
 class SimBrokerViewModel(
     application: Application,
     private val repository: SimBrokerRepositoryInterface,
-) : AndroidViewModel(application) {
 
-    //==============================================================================================
-    // DataStore
-    //==============================================================================================
+    ) : AndroidViewModel(application) {
 
-    /** DataStore-Instanz für persistente Einstellungen. */
+    // DataStore -----------------------------------------------------------------------------
     private val dataStore = application.dataStore
 
-    /** Toleranzgrenze für Double-Vergleiche nahe Null. */
+    // Proof Value for Sell-------------------------------------------------------------------------
     private val proofValue = 0.000001
 
     /**
-     * Prüft, ob ein Double-Wert effektiv Null ist (< proofValue).
+     * Prüft, ob ein Double-Wert < [proofValue] ist und somit effektiv 0.
      *
-     * @param value Zu prüfender Wert.
+     * @param value Der zu prüfende Wert.
      * @return true, wenn |value| < proofValue.
      */
+
     private fun isEffectivelyZero(value: Double): Boolean = abs(value) < proofValue
 
 
-    //==============================================================================================
-    // Dialog States
-    //==============================================================================================
-
+    // Dialog States -------------------------------------------------------------------------------
     private var _showAccountMaxValueDialog = MutableStateFlow(false)
-    val showAccountMaxValueDialog: StateFlow<Boolean> = _showAccountMaxValueDialog
-    /**
-     * Setzt den Sichtbarkeitsstatus für das Max-Wert-Dialog.
-     *
-     * @param value true = sichtbar, false = ausblenden.
-     */
+    var showAccountMaxValueDialog: StateFlow<Boolean> = _showAccountMaxValueDialog
     fun setShowAccountMaxValueDialog(value: Boolean) {
         _showAccountMaxValueDialog.value = value
     }
 
     private var _showAccountNotEnoughMoney = MutableStateFlow(false)
-    val showAccountNotEnoughMoney: StateFlow<Boolean> = _showAccountNotEnoughMoney
-    /**
-     * Setzt den Status für das „Nicht genug Guthaben“-Dialog.
-     */
+    var showAccountNotEnoughMoney: StateFlow<Boolean> = _showAccountNotEnoughMoney
     fun setShowAccountNotEnoughMoney(value: Boolean) {
         _showAccountNotEnoughMoney.value = value
     }
 
     private var _showAccountNotEnoughCoins = MutableStateFlow(false)
-    val showAccountNotEnoughCoins: StateFlow<Boolean> = _showAccountNotEnoughCoins
-    /**
-     * Setzt den Status für das „Nicht genug Coins“-Dialog.
-     */
+    var showAccountNotEnoughCoins: StateFlow<Boolean> = _showAccountNotEnoughCoins
     fun setAccountNotEnoughCoins(value: Boolean) {
         _showAccountNotEnoughCoins.value = value
     }
 
     private var _showGameDifficultDialog = MutableStateFlow(false)
-    val showGameDifficultDialog: StateFlow<Boolean> = _showGameDifficultDialog
-    /** Setzt den Status für das Schwierigkeit-geändert-Dialog. */
+    var showGameDifficultDialog: StateFlow<Boolean> = _showGameDifficultDialog
     fun setShowGameDifficultDialog(value: Boolean) {
         _showGameDifficultDialog.value = value
     }
 
     private var _showGameWinDialog = MutableStateFlow(false)
-    val showGameWinDialog: StateFlow<Boolean> = _showGameWinDialog
-    /** Setzt den Status für das Spielgewinn-Dialog. */
+    var showGameWinDialog: StateFlow<Boolean> = _showGameWinDialog
     fun setShowGameWinDialog(value: Boolean) {
         _showGameWinDialog.value = value
     }
 
+
     private var _showFirstGameAccountValueDialog = MutableStateFlow(false)
-    val showFirstGameAccountValueDialog: StateFlow<Boolean> = _showFirstGameAccountValueDialog
-    /** Setzt den Status für das FirstGameAccountValue-Dialog. */
+    var showFirstGameAccountValueDialog: StateFlow<Boolean> = _showFirstGameAccountValueDialog
     fun setShowFirstGameAccountValueDialog(value: Boolean) {
         _showFirstGameAccountValueDialog.value = value
     }
 
     private var _showEraseDialog = MutableStateFlow(false)
-    val showEraseDialog: StateFlow<Boolean> = _showEraseDialog
-    /** Setzt den Status für das Reset-Dialog. */
+    var showEraseDialog: StateFlow<Boolean> = _showEraseDialog
     fun setShowEraseDialog(value: Boolean) {
         _showEraseDialog.value = value
     }
 
     private var _showAccountCashIn = MutableStateFlow(false)
-    val showAccountCashIn: StateFlow<Boolean> = _showAccountCashIn
-    /** Setzt den Status für das CashIn-Dialog. */
+    var showAccountCashIn: StateFlow<Boolean> = _showAccountCashIn
     fun setAccountCashIn(value: Boolean) {
         _showAccountCashIn.value = value
     }
 
-
-    //==============================================================================================
-    // Game Difficulty
-    //==============================================================================================
-
-    // Schwierigkeitsgrad: Easy / Medium / Pro / Custom
+    // Game Difficulty -----------------------------------------------------------------------------
+    // SCHWIERIGKEIT: Easy / Medium / Pro / Custom
     private val gameDifficultFlow = dataStore.data
-        .map { it[DATASTORE_GAMEDIFFICULTY] ?: "-" }
+        .map {
+            it[DATASTORE_GAMEDIFFICULTY] ?: "-"
+        }
 
-    /** Aktueller Schwierigkeitsgrad als StateFlow. */
     val gameDifficultState: StateFlow<String> = gameDifficultFlow
-        .stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(), initialValue = "-")
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = "-"
+        )
 
-    /**
-     * Speichert den Schwierigkeitsgrad im DataStore.
-     *
-     * @param value "Easy", "Medium", "Pro" oder "Custom"
-     */
     fun setGameDifficult(value: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            dataStore.edit { it[DATASTORE_GAMEDIFFICULTY] = value }
+            dataStore.edit {
+                it[DATASTORE_GAMEDIFFICULTY] = value
+            }
         }
     }
 
-
-    //==============================================================================================
-    // Game Fee
-    //==============================================================================================
-
-    // Gebühr in EUR
+    // Game Fee -----------------------------------------------------------------------------
+    // FEE-WERT in EUR
     private val feeFlow = dataStore.data
-        .map { it[DATASTORE_FEE] ?: 0.0 }
+        .map {
+            it[DATASTORE_FEE] ?: 0.0
+        }
 
-    /** Aktueller Gebührwert als StateFlow. */
     val feeValueState: StateFlow<Double> = feeFlow
-        .stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(), initialValue = 0.0)
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = 0.0
+        )
 
     /**
-     * Speichert den Gebührwert im DataStore.
+     * Legt die Handelsgebühr für alle Trades fest.
      *
-     * @param value Gebühr in EUR.
+     * @param value Gebühr in Euro.
      */
+
     fun setFeeValue(value: Double) {
         viewModelScope.launch(Dispatchers.IO) {
-            dataStore.edit { it[DATASTORE_FEE] = value }
+            dataStore.edit {
+                it[DATASTORE_FEE] = value
+            }
         }
     }
 
+    //--------------------------------------------------------------------------------------------
+    // Erstes Spiel (Onboarding)
+    //--------------------------------------------------------------------------------------------
 
-    //==============================================================================================
-    // Firstgame
-    //==============================================================================================
-
-    // Erstes Spiel? (true = Schwierigkeit wählbar)
     private val firstGame = dataStore.data
-        .map { it[DATASTORE_FIRSTGAME] ?: true }
+        .map {
+            it[DATASTORE_FIRSTGAME] ?: true
+        }
 
-    /** StateFlow, ob erstes Spiel. */
     val firstGameState: StateFlow<Boolean> = firstGame
-        .stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(), initialValue = true)
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = true
+        )
 
     /**
-     * Speichert den Status, ob noch das erste Spiel ist.
+     * Setzt den Flag, dass das erste Spiel beendet ist.
      *
-     * @param value true = erstes Spiel, false = danach.
+     * @param value false nach dem ersten Spiel, true davor.
      */
+
     fun setFirstGameState(value: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
-            dataStore.edit { it[DATASTORE_FIRSTGAME] = value }
+            dataStore.edit {
+                it[DATASTORE_FIRSTGAME] = value
+            }
         }
     }
 
     /**
-     * Setzt den Kontostand beim ersten Spiel abweichend.
+     * Überschreibt beim ersten Spiel den Start-Kontostand.
      *
-     * @param value Startguthaben in EUR.
+     * @param value Neuer Kontostand in Euro.
      */
+
     fun setFirstGameAccountValue(value: Double) {
         viewModelScope.launch(Dispatchers.IO) {
             if (firstGameState.value) {
-                dataStore.edit { it[DATASTORE_ACCOUNTVALUE] = value }
+                dataStore.edit {
+                    it[DATASTORE_ACCOUNTVALUE] = value
+                }
                 Log.d("simDebug", "DataStore First Account Credit increased $value")
+
                 _showFirstGameAccountValueDialog.value = false
             } else {
                 _showFirstGameAccountValueDialog.value = true
@@ -227,35 +216,43 @@ class SimBrokerViewModel(
         }
     }
 
+    //--------------------------------------------------------------------------------------------
+    // Kontostand (Account Value)
+    //--------------------------------------------------------------------------------------------
+    /** Aktueller Kontostand in Euro als Flow. */
 
-    //==============================================================================================
-    // Account Value
-    //==============================================================================================
-
-    /** StateFlow des aktuellen Kontostands. */
     val accountValueState: StateFlow<Double> = dataStore.data
         .map { it[DATASTORE_ACCOUNTVALUE] ?: 0.0 }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 0.0)
 
-    /** Setzt den Kontostand zurück auf 0. */
+    /** Setzt den Kontostand auf 0 zurück. */
+
     fun resetAccountValue() {
         viewModelScope.launch(Dispatchers.IO) {
-            dataStore.edit { it[DATASTORE_ACCOUNTVALUE] = 0.0 }
+            dataStore.edit {
+                it[DATASTORE_ACCOUNTVALUE] = 0.0
+            }
+
             Log.d("simDebug", "DataStore Account Credit reset done")
         }
     }
 
     /**
-     * Erhöht den Kontostand manuell, wenn das Maximum nicht überschritten ist.
+     * Erhöht (oder verringert) den Kontostand um einen Delta-Betrag.
+     * Prüft, dass Gesamtinvest + Kontostand innerhalb erlaubter Grenzen bleibt.
      *
-     * @param value Betrag in EUR.
+     * @param value Delta in Euro (positiv/negativ).
      */
+
     fun setAccountValue(value: Double) {
         viewModelScope.launch(Dispatchers.IO) {
             val currentValue = accountValueState.value + investedValueState.value
             if (currentValue in 0.0..5900.0) {
-                dataStore.edit { it[DATASTORE_ACCOUNTVALUE] = accountValueState.value + value }
+                dataStore.edit {
+                    it[DATASTORE_ACCOUNTVALUE] = accountValueState.value + value
+                }
                 Log.d("simDebug", "DataStore Account Credit manual increased")
+
                 _showAccountMaxValueDialog.value = false
             } else {
                 _showAccountMaxValueDialog.value = true
@@ -263,76 +260,84 @@ class SimBrokerViewModel(
         }
     }
 
-    /** Setzt den Kontostand am Spielende auf 10.000 €. */
+    /**
+     * Setzt den Kontostand am Spielende auf das Maximum (10 000 €).
+     */
     fun setGameEndAccountValue() {
         viewModelScope.launch(Dispatchers.IO) {
-            dataStore.edit { it[DATASTORE_ACCOUNTVALUE] = 10000.0 }
+            dataStore.edit {
+                it[DATASTORE_ACCOUNTVALUE] = 10000.0
+            }
             setShowGameWinDialog(true)
             Log.d("simDebug", "DataStore Account Credit increased to 10.000 €")
         }
     }
 
     /**
-     * Intern: Aktualisiert den Kontostand um einen Wert und verhindert Negativwerte.
+     * Intern: Addiert einen Wert auf den Kontostand und verhindert negative Salden.
      *
-     * @param value Delta in EUR (positiv/negativ).
+     * @param value Delta in Euro.
      */
     private fun updateAccountValue(value: Double) {
         viewModelScope.launch(Dispatchers.IO) {
             val currentValue = dataStore.data.first()[DATASTORE_ACCOUNTVALUE] ?: 0.0
             val newValue = currentValue.plus(value).coerceAtLeast(0.0)
-            dataStore.edit { it[DATASTORE_ACCOUNTVALUE] = newValue }
+            dataStore.edit {
+                it[DATASTORE_ACCOUNTVALUE] = newValue
+            }
             Log.d("simDebug", "DataStore Account Credit increased $newValue")
         }
     }
 
 
-    //==============================================================================================
-    // Invested Value
-    //==============================================================================================
+    //--------------------------------------------------------------------------------------------
+    // Investierter Gesamtbetrag
+    //--------------------------------------------------------------------------------------------
+    /** Gesamt in Coins investierter Euro-Betrag als Flow. */
 
-    /** StateFlow des insgesamt investierten Betrags. */
     val investedValueState: StateFlow<Double> = dataStore.data
         .map { it[DATASTORE_TOTALINVESTVALUE] ?: 0.0 }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 0.0)
 
-    /** Setzt den investierten Wert zurück auf 0. */
+    /** Setzt den investierten Gesamtwert zurück auf 0. */
     fun resetInvestedValue() {
         viewModelScope.launch {
-            dataStore.edit { it[DATASTORE_TOTALINVESTVALUE] = 0.0 }
+            dataStore.edit {
+                it[DATASTORE_TOTALINVESTVALUE] = 0.0
+            }
             Log.d("simDebug", "DataStore invested value reset. New Value: 0.0 €")
         }
     }
 
     /**
-     * Intern: Erhöht den investierten Gesamtwert und verhindert Negativwerte.
+     * Intern: Erhöht den Gesamt-Investitionswert um einen Delta-Betrag.
      *
-     * @param value Delta in EUR.
+     * @param value Delta in Euro.
      */
+
     private fun setInvestedValue(value: Double) {
         viewModelScope.launch(Dispatchers.IO) {
             val currentValue = dataStore.data.first()[DATASTORE_TOTALINVESTVALUE] ?: 0.0
             val newValue = (currentValue + value).coerceAtLeast(0.0)
-            dataStore.edit { it[DATASTORE_TOTALINVESTVALUE] = newValue }
+
+            dataStore.edit {
+                it[DATASTORE_TOTALINVESTVALUE] = newValue
+            }
+
             Log.d("simDebug", "DataStore invested value increased. New Value: $newValue")
         }
     }
 
 
-    //==============================================================================================
-    // Timer
-    //==============================================================================================
+    //--------------------------------------------------------------------------------------------
+    // Countdown-Timer zum Refresh
+    //--------------------------------------------------------------------------------------------
 
-    /** Hintergrund-Job für den Countdown-Timer. */
     private var timerJob: Job? = null
-
-    /** StateFlow für den 60 s-Refresh-Timer. */
     private val _refreshTimer = MutableStateFlow(0)
     val refreshTimer: StateFlow<Int> = _refreshTimer
 
-    /**
-     * Startet einen endlosen Countdown (60 s) zum periodischen Auffrischen.
-     */
+    /** Startet einen wiederkehrenden 60-Sekunden-Timer, der `refreshCoins()` aufruft. */
     private fun startTimer() {
         timerJob?.cancel()
         timerJob = viewModelScope.launch {
@@ -347,23 +352,25 @@ class SimBrokerViewModel(
         }
     }
 
+    //--------------------------------------------------------------------------------------------
+    // API-Aufrufe
+    //--------------------------------------------------------------------------------------------
 
-    //==============================================================================================
-    // API Response
-    //==============================================================================================
-
+    /** Aktuelle Liste aller Coins vom Remote-API. */
     private val _coinList = MutableStateFlow<List<Coin>>(emptyList())
     val coinList: StateFlow<List<Coin>> = _coinList
 
+    /** Detail-Daten eines ausgewählten Coins. */
     private val _coinDetails: MutableStateFlow<Coin?> = MutableStateFlow(null)
     val coinDetails: StateFlow<Coin?> = _coinDetails
 
     /**
-     * Lädt Detaildaten eines Coins aus dem Repository.
+     * Lädt Detail-Daten eines Coins für eine bestimmte Zeitspanne.
      *
      * @param uuid UUID des Coins.
-     * @param timePeriod Zeitraum für Sparkline.
+     * @param timePeriod Sparkline-Intervall (z.B. "3h", "24h").
      */
+
     fun getCoinDetails(uuid: String, timePeriod: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -376,7 +383,7 @@ class SimBrokerViewModel(
     }
 
     /**
-     * Frischt die Coin-Liste aus dem Repository auf.
+     * Aktualisiert die Coin-Liste vom Repository.
      */
     fun refreshCoins() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -393,63 +400,54 @@ class SimBrokerViewModel(
     }
 
 
-    //==============================================================================================
-    // Room Database
-    //==============================================================================================
-
-    /** Löscht alle Transaktionen aus der lokalen DB. */
+    //--------------------------------------------------------------------------------------------
+    // Datenbank-Operationen (Room)
+    //--------------------------------------------------------------------------------------------
+    /** Löscht alle Transaktionen in der lokalen DB. */
     fun deleteAllTransactions() {
-        viewModelScope.launch {
-            repository.deleteAllTransactions()
-        }
+        viewModelScope.launch { repository.deleteAllTransactions() }
     }
 
-    /** Löscht alle Portfolio-Positionen aus der lokalen DB. */
+    /** Löscht alle Portfolio-Positionen in der lokalen DB. */
     fun deleteAllPortfolioPositions() {
-        viewModelScope.launch {
-            repository.deleteAllPortfolioPositions()
-        }
+        viewModelScope.launch { repository.deleteAllPortfolioPositions() }
     }
 
-    /** Intern: Fügt eine neue Transaktion hinzu. */
+    /** Fügt eine neue Transaktion in die DB ein. */
     private fun addTransaction(transaction: TransactionPositions) {
-        Log.d("simDebug", "addTransaction over ViewModel started")
-        viewModelScope.launch {
-            repository.insertTransaction(transaction)
-        }
+        Log.d("SimBrokerViewModel", "addTransaction started")
+        viewModelScope.launch { repository.insertTransaction(transaction) }
     }
 
-    /** Intern: Fügt eine neue Portfolio-Position hinzu. */
+    /** Fügt eine neue Portfolio-Position in die DB ein. */
     private fun addPortfolio(portfolio: PortfolioPositions) {
-        Log.d("simDebug", "addPosition over ViewModel started")
-        viewModelScope.launch {
-            repository.insertPortfolio(portfolio)
-        }
+        Log.d("SimBrokerViewModel", "addPortfolio started")
+        viewModelScope.launch { repository.insertPortfolio(portfolio) }
     }
 
-    /** Intern: Aktualisiert eine Portfolio-Position. */
+    /** Aktualisiert eine bestehende Portfolio-Position in der DB. */
     private fun updatePortfolio(portfolio: PortfolioPositions) {
-        viewModelScope.launch {
-            repository.updatePortfolio(portfolio)
-        }
+        viewModelScope.launch { repository.updatePortfolio(portfolio) }
     }
 
 
-    //==============================================================================================
+    //--------------------------------------------------------------------------------------------
     // Kaufen und Verkaufen
-    //==============================================================================================
+    //--------------------------------------------------------------------------------------------
 
     /**
-     * Führt den Kauf eines Coins durch:
-     * - Erhöht den investierten Gesamtwert.
-     * - Verringert den Kontostand inkl. Gebühr.
-     * - Legt Portfolio-Position und Transaktion an.
+     * Führt einen Coin-Kauf durch:
+     * - erhöht den investierten Gesamtwert,
+     * - verringert den Kontostand inkl. Gebühr,
+     * - legt neue Portfolio-Position und Transaction an.
      *
-     * @param selectedCoin Coin-Objekt.
-     * @param amount Menge an Coins.
-     * @param feeValue Gebühr in EUR.
-     * @param totalValue Gesamtwert ohne Gebühr.
+     * @param selectedCoin Gewähltes Coin-Objekt.
+     * @param amount Menge an Coins (Double).
+     * @param feeValue Gebühr in Euro für diesen Trade.
+     * @param totalValue Gehandelter Euro-Betrag (ohne Gebühr).
      */
+
+    // Kaufen und Verkaufen -----------------------------------------------------------------------------
     fun buyCoin(selectedCoin: Coin, amount: Double, feeValue: Double, totalValue: Double) {
         viewModelScope.launch(Dispatchers.IO) {
             setInvestedValue(totalValue)
@@ -491,16 +489,18 @@ class SimBrokerViewModel(
     }
 
     /**
-     * Führt den Verkauf eines Coins nach FIFO durch:
-     * - Bearbeitet offene BUY-Transaktionen.
-     * - Aktualisiert Portfolio-Mengen und Kontostand.
-     * - Zieht Gebühren ab und schließt Transaktionen.
+     * Führt einen Coin-Verkauf nach FIFO-Prinzip durch:
+     * - iteriert offene Buy-Transaktionen,
+     * - bucht Teilmengen, zieht Gebühren einmalig ab,
+     * - aktualisiert Portfolio-Positionen und schließt sie ggf.
+     * - passt Kontostand und Gesamtinvest an.
      *
      * @param coinUuid UUID des zu verkaufenden Coins.
-     * @param amountToSell Menge in Coins.
-     * @param currentPrice Aktueller Preis pro Coin.
-     * @param fee Verkaufsgebühr beim ersten Verkauf.
+     * @param amountToSell Gesamtmenge an Coins, die verkauft werden soll.
+     * @param currentPrice Aktueller Marktpreis pro Coin.
+     * @param fee Verkaufsgebühr für den ersten Teilverkauf.
      */
+
     fun sellCoin(coinUuid: String, amountToSell: Double, currentPrice: Double, fee: Double) {
         viewModelScope.launch(Dispatchers.IO) {
 
@@ -509,7 +509,7 @@ class SimBrokerViewModel(
                 .filter { !it.isClosed }
                 .sortedBy { it.timestamp }
 
-            // Portfolio-Positionen laden und nach ID mappen
+            // Portfolio-Positionen
             val portfolioMap = repository.getAllPortfolioPositions()
                 .first()
                 .filter { it.coinUuid == coinUuid && !isEffectivelyZero(it.amountRemaining) }
@@ -527,12 +527,12 @@ class SimBrokerViewModel(
                 val availableAmount = portfolio.amountRemaining
                 if (isEffectivelyZero(availableAmount)) continue
 
-                // Berechne Verkaufsmengen und Werte
+                // Verkaufe so viel wie noch da ist
                 val sellAmount = minOf(remainingToSell, availableAmount)
                 val sellValue = sellAmount * currentPrice
                 val appliedFee = if (isFirstSell) fee else 0.0
 
-                // Transaktion hinzufügen
+
                 addTransaction(
                     TransactionPositions(
                         coinUuid = buy.coinUuid,
@@ -548,10 +548,11 @@ class SimBrokerViewModel(
                     )
                 )
 
-                // Portfolio aktualisieren
+
                 val newRemaining = portfolio.amountRemaining - sellAmount
                 val correctedRemaining = if (isEffectivelyZero(newRemaining)) 0.0 else newRemaining
                 val newTotalValue = correctedRemaining * portfolio.pricePerUnit
+
                 totalInvestReduction += sellAmount * portfolio.pricePerUnit
                 totalCashIn += sellValue
                 remainingToSell -= sellAmount
@@ -571,11 +572,12 @@ class SimBrokerViewModel(
                 }
             }
 
-            // Aktualisiere Kontostand und investierten Wert im DataStore
             val currentAccount = dataStore.data.first()[DATASTORE_ACCOUNTVALUE] ?: 0.0
             val currentInvested = dataStore.data.first()[DATASTORE_TOTALINVESTVALUE] ?: 0.0
+
             val updatedAccount = (currentAccount + totalCashIn - fee).coerceAtLeast(0.0)
             val updatedInvested = (currentInvested - totalInvestReduction).coerceAtLeast(0.0)
+
             dataStore.edit {
                 it[DATASTORE_ACCOUNTVALUE] = updatedAccount
                 it[DATASTORE_TOTALINVESTVALUE] = updatedInvested
@@ -584,60 +586,55 @@ class SimBrokerViewModel(
     }
 
 
-    //==============================================================================================
-    // Update Data
-    //==============================================================================================
-
-    /**
-     * Aktualisiert den Favoriten-Status einer Portfolio-Position.
-     *
-     * @param coinId    UUID des Coins.
-     * @param isFavorite true = Favorit, false = nicht Favorit.
-     */
+    // Update Data -----------------------------------------------------------------------------
     fun updatePortfolio(coinId: String, isFavorite: Boolean) {
         Log.d("simDebug", "updatePosition over ViewModel started")
         viewModelScope.launch(Dispatchers.IO) {
-            repository.updatePortfolioFavorite(coinId = coinId, isFavorite = isFavorite)
+            repository.updatePortfolioFavorite(
+                coinId = coinId,
+                isFavorite = isFavorite
+            )
         }
     }
 
-    /** Intern: Markiert eine Transaktion als geschlossen. */
     private fun updateTransactionClosed(transactionId: Int) {
         Log.d("simDebug", "updateTransaction over ViewModel started")
         viewModelScope.launch(Dispatchers.IO) {
-            repository.updateTransactionClosed(transactionId = transactionId, isClosed = true)
+            repository.updateTransactionClosed(
+                transactionId = transactionId,
+                isClosed = true
+            )
         }
     }
 
-    /** Intern: Markiert eine Portfolio-Position als geschlossen. */
     private fun updatePortfolioClosed(portfolioId: Int) {
         Log.d("simDebug", "updatePortfolio over ViewModel started")
         viewModelScope.launch(Dispatchers.IO) {
-            repository.updatePortfolioClosed(portfolioId = portfolioId, isClosed = true)
+            repository.updatePortfolioClosed(
+                portfolioId = portfolioId,
+                isClosed = true
+            )
         }
     }
 
 
-    //==============================================================================================
-    // Get Data
-    //==============================================================================================
-
-    /** Flow aller Portfolio-Positionen (Live-Daten). */
+    // Get Data -----------------------------------------------------------------------------
     val allPortfolioPositions: StateFlow<List<PortfolioPositions>> =
         repository.getAllPortfolioPositions()
-            .stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(), initialValue = emptyList())
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(),
+                initialValue = emptyList()
+            )
 
-    /** Flow aller Transaktionen (Live-Daten). */
     val allTransactionPositions: StateFlow<List<TransactionPositions>> =
         repository.getAllTransactionPositions()
-            .stateIn(scope = viewModelScope, started = SharingStarted.WhileSubscribed(), initialValue = emptyList())
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(),
+                initialValue = emptyList()
+            )
 
-    /**
-     * Berechnet die verbleibende Menge eines Coins im Portfolio.
-     *
-     * @param coinUuid UUID des Coins.
-     * @return Summe aller amountRemaining.
-     */
     fun getRemainingCoinAmount(coinUuid: String): Double {
         val positions = allPortfolioPositions.value
         return positions
@@ -646,19 +643,12 @@ class SimBrokerViewModel(
     }
 
 
-    //==============================================================================================
-    // Init
-    //==============================================================================================
-
-    /**
-     * Initialisierung:
-     * - Startet den Countdown-Timer.
-     * - Lädt initial die Coin-Liste.
-     */
+    // Init -----------------------------------------------------------------------------
     init {
         viewModelScope.launch(Dispatchers.IO) {
             startTimer()
             refreshCoins()
         }
     }
+
 }

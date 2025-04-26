@@ -47,7 +47,6 @@ import coil3.request.error
 import de.neone.simbroker.R
 import de.neone.simbroker.data.helper.SBHelper
 import de.neone.simbroker.data.helper.SBHelper.roundTo2
-import de.neone.simbroker.data.helper.SBHelper.roundTo8
 import de.neone.simbroker.data.helper.SBHelper.toEuroString
 import de.neone.simbroker.data.local.models.PortfolioPositions
 import de.neone.simbroker.data.local.models.TransactionPositions
@@ -368,7 +367,7 @@ fun PortfolioCoinListItem(
                                     Row {
                                         Text("Amount", style = MaterialTheme.typography.bodySmall)
                                         Spacer(modifier = Modifier.weight(1f))
-                                        Text(tx.amount.roundTo8().toString(), style = MaterialTheme.typography.bodySmall)
+                                        Text(tx.amount.toString(), style = MaterialTheme.typography.bodySmall)
                                     }
                                     // Price p. Coin
                                     Row {
