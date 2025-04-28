@@ -32,6 +32,7 @@ fun PortfolioCoinListPositionObject(
     isClicked: () -> Unit,
     profitCallback: (Double) -> Unit,
     gameDifficult: String,
+    gameLeverage: Int,
 ) {
     //==============================================================================================
     // 1) Coin-Identifikation
@@ -68,18 +69,9 @@ fun PortfolioCoinListPositionObject(
     val totalInvested = portfolioPosition.filter { !it.isClosed }
         .sumOf { it.amountRemaining * it.pricePerUnit }
 
-    //==============================================================================================
-    // 4) Hebel & Profit-Berechnung
-    //==============================================================================================
-    // Hebel abhängig vom Schwierigkeitsgrad
-    val gameLeverage = when (gameDifficult) {
-        "Easy" -> 5
-        "Medium" -> 10
-        "Pro" -> 20
-        else -> 5
-    }
+
     // Berechneter Profit inklusive Hebel
-    val profit = (currentValue - totalInvested).roundTo2() * gameLeverage
+    val profit = (currentValue - totalInvested).roundTo2()
 
     //==============================================================================================
     // 5) Sparkline-Daten
@@ -105,6 +97,7 @@ fun PortfolioCoinListPositionObject(
             isClicked()
             profitCallback(profit)
         },
+        gameLeverage = gameLeverage
     )
 
     return result

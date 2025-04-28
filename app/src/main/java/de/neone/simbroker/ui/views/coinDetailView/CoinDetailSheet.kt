@@ -43,7 +43,6 @@ import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.request.error
 import de.neone.simbroker.R
-import de.neone.simbroker.data.helper.SBHelper.roundTo2
 import de.neone.simbroker.data.helper.SBHelper.roundTo6
 import de.neone.simbroker.data.helper.SBHelper.roundTo8
 import de.neone.simbroker.data.helper.SBHelper.toEuroString
@@ -55,6 +54,7 @@ import de.neone.simbroker.ui.theme.colorUp
 import de.neone.simbroker.ui.theme.sell
 import de.neone.simbroker.ui.views.coinDetailView.components.CoinDetailChartPlotter
 import de.neone.simbroker.ui.views.components.AlertDialog
+import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,6 +72,7 @@ fun CoinDetailSheet(
     notEnoughCredit: () -> Unit,
     notEnoughCoins: () -> Unit,
     onDismiss: () -> Unit,
+    gameLeverage: Int
 ) {
     Log.d("simDebug", accountCreditState.toString())
 
@@ -99,7 +100,9 @@ fun CoinDetailSheet(
         var inputValue by remember { mutableStateOf("") }
         val currentCoinPrice = selectedCoin.price.toDouble() // Aktueller aus API
         val currentAmountCalc = ((totalInvested + profit) / currentCoinPrice)
+        val currentAmountCalcUI = ((totalInvested + profit * 5) / currentCoinPrice)
         val currentPriceCalc = (totalInvested + profit)
+        val currentPriceCalcUI = (totalInvested + (profit * 5))
         val calculatedValue = inputValue.toFloatOrNull()?.let { value ->
             if (selectedOption == "amount") {
                 value * currentCoinPrice
@@ -138,29 +141,14 @@ fun CoinDetailSheet(
 
                 Row(modifier = Modifier.height(25.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(
-                        //text = "Depot + profit: ${(coinAmount * currentCoinPrice).toEuroString()}",
-                        text = "Depot + profit: ${currentPriceCalc.toEuroString()}",
+                        text = "Depot + profit: ${((currentPriceCalcUI).toEuroString())}",
                         style = MaterialTheme.typography.titleSmall
                     )
-                    IconButton(
-                        modifier = Modifier
-                            .scale(0.7f),
-                        onClick = {
-                            selectedOption = "price"
-                            inputValue = currentPriceCalc.roundTo2().toString()
-                            Toast.makeText(context, "Value copied", Toast.LENGTH_SHORT).show()
-                        },
-                    ) {
-                        Icon(
-                            painterResource(id = R.drawable.baseline_content_copy_24),
-                            contentDescription = "Copy value"
-                        )
-                    }
 
                     Spacer(modifier = Modifier.weight(1f))
 
                     Text(
-                        text = "Amount: ${currentAmountCalc.roundTo6()}",
+                        text = "Amount: ${currentAmountCalcUI.roundTo6()}",
                         style = MaterialTheme.typography.titleSmall
                     )
                     IconButton(
@@ -296,7 +284,7 @@ fun CoinDetailSheet(
                 }
 
                 Text(
-                    text = if (selectedOption == "amount") "Invest excl. Fee : ${(calculatedValue).toEuroString()}"
+                    text = if (selectedOption == "amount") "Invest excl. Fee : ${(calculatedValue + (profit * 4)).toEuroString()}"
                     else "Coins excl. Fee: ${calculatedValue.roundTo6()} Coins",
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(top = 15.dp)
@@ -367,13 +355,30 @@ fun CoinDetailSheet(
                         val amount = if (selectedOption == "amount") inputValue.toDouble()
                         else inputValue.toDouble() / selectedCoin.price.toDouble()
 
+                        val maxSellableAmount = coinAmount // allPortfolios summe ammount
 
-                        if (currentAmountCalc < amount) {
-                            notEnoughCoins()
-                            return@Button
+                        val amountToSell = if (abs(amount - maxSellableAmount) < 0.0000001) {
+
+                            maxSellableAmount
+                        } else {
+                            amount
                         }
 
-                        onSellClick(amount, selectedCoin.price.toDouble())
+                        Log.d("simDebug", amount.toString())
+                        Log.d("simDebug", maxSellableAmount.toString())
+                        Log.d("simDebug", amountToSell.toString())
+                        Log.d("simDebug", profit.toString())
+                        Log.d("simDebug", (profit * gameLeverage).toString())
+
+//                        if (amount < amountToSell) {
+//                            notEnoughCoins()
+//                            return@Button
+//                        }
+
+                        onSellClick(amountToSell, selectedCoin.price.toDouble())
+
+                        Log.d("simDebug", amount.toString())
+                        Log.d("simDebug", selectedCoin.price)
 
                         onDismiss()
 

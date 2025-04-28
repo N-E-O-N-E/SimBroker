@@ -70,7 +70,7 @@ import kotlinx.coroutines.delay
  * @param coins Liste der [PortfolioPositions] für diesen Coin.
  * @param allCoinTransactions Alle [TransactionPositions] (offen und geschlossen) für diesen Coin.
  * @param currentPrice Aktueller Marktpreis pro Coin-Einheit.
- * @param profit Berechneter Profit-Wert (mit Hebel).
+ * @param profit Berechneter Profit-Wert.
  * @param sparks Sparkline-Daten für das Chart (List<String>).
  * @param totalFee Gesamtsumme aller Gebühren für diese Position.
  * @param totalInvested Ursprünglich investierter Gesamtbetrag.
@@ -89,6 +89,7 @@ fun PortfolioCoinListItem(
     totalInvested: Double = 0.0,
     setFavorite: (String, Boolean) -> Unit,
     isClicked: () -> Unit,
+    gameLeverage: Int
 ) {
     //==============================================================================================
     // 1) Basis-Daten und States
@@ -267,7 +268,7 @@ fun PortfolioCoinListItem(
                         style = MaterialTheme.typography.labelSmall
                     )
                     Text(
-                        text = "Invest with Profit: ${(totalInvested + profit).toEuroString()}",
+                        text = "Invest with Profit: ${((totalInvested + (profit * gameLeverage)).toEuroString())}",
                         style = MaterialTheme.typography.labelSmall
                     )
                     Text(
@@ -283,7 +284,7 @@ fun PortfolioCoinListItem(
                 ) {
                     Text("Total Profit over all", style = MaterialTheme.typography.labelSmall)
                     Text(
-                        text = profit.toEuroString(),
+                        text = (profit * gameLeverage).toEuroString(),
                         style = MaterialTheme.typography.bodyLarge,
                         color = if (profit.toEuroString().contains("-")) colorDown else colorUp
                     )

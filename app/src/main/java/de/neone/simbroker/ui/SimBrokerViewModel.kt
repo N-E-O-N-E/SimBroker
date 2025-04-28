@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -31,6 +32,7 @@ private val DATASTORE_ACCOUNTVALUE = doublePreferencesKey("accountValue")
 private val DATASTORE_TOTALINVESTVALUE = doublePreferencesKey("totalInvested")
 private val DATASTORE_FEE = doublePreferencesKey("fee")
 private val DATASTORE_GAMEDIFFICULTY = stringPreferencesKey("gameDifficulty")
+private val DATASTORE_LEVERAGE = intPreferencesKey("gameLeverage")
 
 /**
  * ViewModel der SimBroker-App, das
@@ -53,7 +55,7 @@ class SimBrokerViewModel(
     private val dataStore = application.dataStore
 
     // Proof Value for Sell-------------------------------------------------------------------------
-    private val proofValue = 0.000001
+    val proofValue = 0.0001
 
     /**
      * Prüft, ob ein Double-Wert < [proofValue] ist und somit effektiv 0.
@@ -115,6 +117,29 @@ class SimBrokerViewModel(
         _showAccountCashIn.value = value
     }
 
+    // Game Leverage Lavel-----------------------------------------------------------------------
+
+    private val gameLeverageFlow = dataStore.data
+        .map {
+            it[DATASTORE_LEVERAGE] ?: 5
+        }
+
+    val gameLeverageState: StateFlow<Int> = gameLeverageFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = 5
+        )
+
+    fun setGameLeverage(value: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            dataStore.edit {
+                it[DATASTORE_LEVERAGE] = value
+            }
+            Log.d("simDebug", "Game Leverage changed to ${gameLeverageState.value}")
+        }
+    }
+
     // Game Difficulty -----------------------------------------------------------------------------
     // SCHWIERIGKEIT: Easy / Medium / Pro / Custom
     private val gameDifficultFlow = dataStore.data
@@ -135,6 +160,7 @@ class SimBrokerViewModel(
                 it[DATASTORE_GAMEDIFFICULTY] = value
             }
         }
+        Log.d("simDebug", "Game Difficulty changed to $value")
     }
 
     // Game Fee -----------------------------------------------------------------------------
@@ -233,7 +259,7 @@ class SimBrokerViewModel(
                 it[DATASTORE_ACCOUNTVALUE] = 0.0
             }
 
-            Log.d("simDebug", "DataStore Account Credit reset done")
+            Log.d("simDebug", "Account Credit reset - done")
         }
     }
 
@@ -247,7 +273,7 @@ class SimBrokerViewModel(
     fun setAccountValue(value: Double) {
         viewModelScope.launch(Dispatchers.IO) {
             val currentValue = accountValueState.value + investedValueState.value
-            if (currentValue in 0.0..5900.0) {
+            if (currentValue in 0.0..590.0) {
                 dataStore.edit {
                     it[DATASTORE_ACCOUNTVALUE] = accountValueState.value + value
                 }
@@ -261,15 +287,15 @@ class SimBrokerViewModel(
     }
 
     /**
-     * Setzt den Kontostand am Spielende auf das Maximum (10 000 €).
+     * Setzt den Kontostand am Spielende auf das Maximum (1000 €).
      */
     fun setGameEndAccountValue() {
         viewModelScope.launch(Dispatchers.IO) {
             dataStore.edit {
-                it[DATASTORE_ACCOUNTVALUE] = 10000.0
+                it[DATASTORE_ACCOUNTVALUE] = 1000.0
             }
             setShowGameWinDialog(true)
-            Log.d("simDebug", "DataStore Account Credit increased to 10.000 €")
+            Log.d("simDebug", "DataStore Account Credit increased to 1000 €")
         }
     }
 
@@ -305,7 +331,7 @@ class SimBrokerViewModel(
             dataStore.edit {
                 it[DATASTORE_TOTALINVESTVALUE] = 0.0
             }
-            Log.d("simDebug", "DataStore invested value reset. New Value: 0.0 €")
+            Log.d("simDebug", "Invested value reset - done")
         }
     }
 
@@ -385,7 +411,7 @@ class SimBrokerViewModel(
     /**
      * Aktualisiert die Coin-Liste vom Repository.
      */
-    fun refreshCoins() {
+    private fun refreshCoins() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val refreshedCoins = repository.getCoins()
@@ -504,12 +530,10 @@ class SimBrokerViewModel(
     fun sellCoin(coinUuid: String, amountToSell: Double, currentPrice: Double, fee: Double) {
         viewModelScope.launch(Dispatchers.IO) {
 
-            // Offene BUY-Transaktionen nach FIFO sortieren
             val openBuys = repository.getOpenBuyTransactionsByCoin(coinUuid)
                 .filter { !it.isClosed }
                 .sortedBy { it.timestamp }
 
-            // Portfolio-Positionen
             val portfolioMap = repository.getAllPortfolioPositions()
                 .first()
                 .filter { it.coinUuid == coinUuid && !isEffectivelyZero(it.amountRemaining) }
@@ -527,11 +551,9 @@ class SimBrokerViewModel(
                 val availableAmount = portfolio.amountRemaining
                 if (isEffectivelyZero(availableAmount)) continue
 
-                // Verkaufe so viel wie noch da ist
                 val sellAmount = minOf(remainingToSell, availableAmount)
                 val sellValue = sellAmount * currentPrice
                 val appliedFee = if (isFirstSell) fee else 0.0
-
 
                 addTransaction(
                     TransactionPositions(
@@ -547,7 +569,6 @@ class SimBrokerViewModel(
                         portfolioCoinID = buy.portfolioCoinID
                     )
                 )
-
 
                 val newRemaining = portfolio.amountRemaining - sellAmount
                 val correctedRemaining = if (isEffectivelyZero(newRemaining)) 0.0 else newRemaining
@@ -575,13 +596,32 @@ class SimBrokerViewModel(
             val currentAccount = dataStore.data.first()[DATASTORE_ACCOUNTVALUE] ?: 0.0
             val currentInvested = dataStore.data.first()[DATASTORE_TOTALINVESTVALUE] ?: 0.0
 
-            val updatedAccount = (currentAccount + totalCashIn - fee).coerceAtLeast(0.0)
-            val updatedInvested = (currentInvested - totalInvestReduction).coerceAtLeast(0.0)
+            val profit = totalCashIn - totalInvestReduction
+            val leveragedProfit = profit * gameLeverageState.value  // Hier 5-facher Profit
+
+            val updatedAccount =
+                (currentAccount + totalInvestReduction + leveragedProfit - fee).coerceAtLeast(0.0)
+
+            val allPositionsSold = repository.getAllPortfolioPositions()
+                .first()
+                .filter { it.coinUuid == coinUuid }
+                .all { it.isClosed || isEffectivelyZero(it.amountRemaining) }
+
+            val updatedInvested = if (allPositionsSold) {
+                0.0
+            } else {
+                (currentInvested - totalInvestReduction).coerceAtLeast(0.0)
+            }
 
             dataStore.edit {
                 it[DATASTORE_ACCOUNTVALUE] = updatedAccount
                 it[DATASTORE_TOTALINVESTVALUE] = updatedInvested
             }
+
+            Log.d(
+                "simDebug",
+                "Sell complete: UpdatedAccount=$updatedAccount, UpdatedInvested=$updatedInvested"
+            )
         }
     }
 

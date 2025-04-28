@@ -97,6 +97,8 @@ fun AccountView(
     val showFirstGameAccountValueDialog by viewModel.showFirstGameAccountValueDialog.collectAsState()
     val showEraseDialog by viewModel.showEraseDialog.collectAsState()
     var klicker by rememberSaveable { mutableIntStateOf(5) }
+    val gameDifficult by viewModel.gameDifficultState.collectAsState()
+    val gameLeverage by viewModel.gameLeverageState.collectAsState()
 
     val accountCreditState by viewModel.accountValueState.collectAsState()
     val totalInvested by viewModel.investedValueState.collectAsState()
@@ -138,7 +140,7 @@ fun AccountView(
         ) {
             if (selectedOption == "Custom") {
                 // Custom-Modus Aufforderung und Euro-Icon
-                Text("Fill your account to a maximum of 6.000", style = typography.bodySmall)
+                Text("Fill your account to a maximum of 600 €", style = typography.bodySmall)
                 IconButton(onClick = {
                     if (!showAccountMaxValueDialog) {
                         viewModel.setAccountValue(250.0)
@@ -249,20 +251,30 @@ fun AccountView(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("Ranking", style = typography.titleLarge, modifier = Modifier.padding(vertical = 2.dp))
+                        Text(
+                            "Ranking",
+                            style = typography.titleLarge,
+                            modifier = Modifier.padding(vertical = 2.dp)
+                        )
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 25.dp),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            listOf(R.drawable.m1, R.drawable.m2, R.drawable.m3, R.drawable.m4, R.drawable.m5)
+                            listOf(
+                                R.drawable.m1,
+                                R.drawable.m2,
+                                R.drawable.m3,
+                                R.drawable.m4,
+                                R.drawable.m5
+                            )
                                 .forEachIndexed { idx, resId ->
                                     Image(
                                         modifier = Modifier.scale(2.7f),
                                         painter = painterResource(id = resId),
                                         contentDescription = null,
-                                        colorFilter = if (accountCreditState + totalInvested >= (idx + 1) * 2000)
+                                        colorFilter = if (accountCreditState + totalInvested >= (idx + 1) * 200)
                                             null else ColorFilter.tint(
                                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                                         )
@@ -309,7 +321,17 @@ fun AccountView(
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("Game difficulty", style = typography.bodyLarge)
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 15.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text("Game difficulty", style = typography.bodyLarge)
+                        Text("Leverage: $gameLeverage x", style = typography.bodyLarge)
+                    }
+
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -319,10 +341,10 @@ fun AccountView(
                     ) {
                         // RadioButtons für Easy, Medium, Pro, Custom
                         listOf(
-                            "Easy" to (6000.0 to 1.5),
-                            "Medium" to (4000.0 to 3.5),
-                            "Pro" to (2000.0 to 8.0),
-                            "Custom" to (1000.0 to 2.0)
+                            "Easy" to (600.0 to 1.5),
+                            "Medium" to (400.0 to 3.5),
+                            "Pro" to (200.0 to 8.0),
+                            "Custom" to (500.0 to 2.0)
                         ).forEach { (label, pair) ->
                             val (startValue, fee) = pair
                             RadioButton(
@@ -330,6 +352,11 @@ fun AccountView(
                                 onClick = {
                                     if (firstGame) {
                                         viewModel.setGameDifficult(label)
+                                        when (label) {
+                                            "Pro" -> viewModel.setGameLeverage(15)
+                                            "Medium" -> viewModel.setGameLeverage(10)
+                                            else -> viewModel.setGameLeverage(5)
+                                        }
                                         viewModel.setFirstGameState(false)
                                         viewModel.setShowGameDifficultDialog(true)
                                         viewModel.setFirstGameAccountValue(startValue)
@@ -371,7 +398,7 @@ fun AccountView(
                             .semantics { contentDescription = "Fee Slider" },
                         value = feeValue.toFloat(),
                         onValueChange = {
-                            if (viewModel.gameDifficultState.value == "Custom" || viewModel.gameDifficultState.value == "Free-Play")  {
+                            if (viewModel.gameDifficultState.value == "Custom" || viewModel.gameDifficultState.value == "Free-Play") {
                                 viewModel.setFeeValue(it.toDouble())
                             }
                         },
@@ -408,6 +435,7 @@ fun AccountView(
                 viewModel.resetInvestedValue()
                 viewModel.setGameDifficult("Unknown")
                 viewModel.setFeeValue(0.0)
+                viewModel.setGameLeverage(5)
                 viewModel.setFirstGameState(true)
                 Toast.makeText(context, "New Game started...", Toast.LENGTH_SHORT).show()
             },
@@ -415,7 +443,7 @@ fun AccountView(
         )
     }
     if (showAccountMaxValueDialog) {
-        AlertDialog("You can not set a credit higher than 6.000€") {
+        AlertDialog("You can not set a credit higher than 600 €") {
             viewModel.setShowAccountMaxValueDialog(false)
         }
     }
@@ -426,7 +454,7 @@ fun AccountView(
     }
     if (showGameWinDialog) {
         AlertDialog(
-            "Congratulations! Your account has reached the target of €10,000.\n\n" +
+            "Congratulations! Your account has reached the target of 1.000 €\n\n" +
                     "You can now reset the game to start a new game or simply continue playing to trade even more money."
         ) {
             viewModel.setShowGameWinDialog(false)

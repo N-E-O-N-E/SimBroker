@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -69,7 +70,7 @@ fun CoinsView(
     //==============================================================================================
     // 2) Helper-Funktion: Null-Vergleich
     //==============================================================================================
-    val proofValue = 0.00000001
+    val proofValue by remember { mutableDoubleStateOf(viewModel.proofValue) }
     fun isEffectivelyZero(value: Double): Boolean = abs(value) < proofValue
 
     //==============================================================================================
@@ -83,6 +84,7 @@ fun CoinsView(
     val allPortfolioPositions by viewModel.allPortfolioPositions.collectAsState()
     val allTransactionPositions by viewModel.allTransactionPositions.collectAsState()
     val gameDifficult by viewModel.gameDifficultState.collectAsState()
+    val gameLeverage by viewModel.gameLeverageState.collectAsState()
 
     //==============================================================================================
     // 4) Lokale UI-State-Variablen
@@ -113,15 +115,9 @@ fun CoinsView(
         .sumOf { it.amountRemaining * it.pricePerUnit }
     val currentPrice = coinList.find { it.uuid == selectedCoin?.uuid }?.price?.toDouble() ?: 0.0
     val currentValue = totalAmount * currentPrice
-    // Hebel basierend auf Schwierigkeitsgrad
-    val gameLeverage = when (gameDifficult) {
-        "Easy" -> 5
-        "Medium" -> 10
-        "Pro" -> 20
-        else -> 5
-    }
+
     // Profit-Wert berechnen
-    val profit = (currentValue - totalInvested).roundTo2() * gameLeverage
+    val profit = (currentValue - totalInvested).roundTo2()
     // Transaktionen für selektierten Coin
     val coinBuyTransactions = allTransactionPositions.filter {
         it.coinUuid == selectedCoin?.uuid && it.type == TransactionType.BUY && !it.isClosed
@@ -158,7 +154,7 @@ fun CoinsView(
             )
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = "Suche",
+                    text = "Search",
                     style = MaterialTheme.typography.bodySmall
                 )
                 IconButton(onClick = { openSucheSheet = !openSucheSheet }) {
@@ -248,7 +244,8 @@ fun CoinsView(
                     coinValue = coinValue,
                     accountCreditState = accountCreditState,
                     profit = profit,
-                    totalInvested = totalInvested
+                    totalInvested = totalInvested,
+                    gameLeverage = gameLeverage
                 )
             }
         }

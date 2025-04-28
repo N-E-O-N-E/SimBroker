@@ -60,19 +60,17 @@ val appModule = module {
     // 4) Repository-Implementierung
     //==============================================================================================
 
-    // RealData-Implementation (auskommentiert)
+    // RealData-Implementation
 
-    // single<SimBrokerRepositoryInterface> {
-    //     SimBrokerRepositoryImpl(get(), get())
-    // }
+//     single<SimBrokerRepositoryInterface> {
+//         SimBrokerRepositoryImpl(get(), get())
+//     }
 
-    /**
-     * Mock-Repository für Tests und einfache Demo-Daten.
-     *
-     * Implementiert [SimBrokerRepositoryInterface] auf Basis lokaler Mock-Daten.
-     */
+
+    // Mock-Repository für Tests und einfache Demo-Daten.
 
     single<SimBrokerRepositoryInterface> {
         SimBrokerRepositoryMock(get())
     }
+
 }

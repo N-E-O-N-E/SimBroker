@@ -87,14 +87,15 @@ fun PortfolioView(
     //==============================================================================================
     // Helper: Proof-Value & Null-Check
     //==============================================================================================
-    val proofValue = 0.00000001
+    val proofValue by remember { mutableDoubleStateOf(viewModel.proofValue) }
     fun isEffectivelyZero(value: Double): Boolean = abs(value) < proofValue
 
     //==============================================================================================
-    // State: Timer & Difficulty
+    // State: Timer & Difficulty & Leverage
     //==============================================================================================
     val timer by viewModel.refreshTimer.collectAsState()
     val gameDifficult by viewModel.gameDifficultState.collectAsState()
+    val gameLeverage by viewModel.gameLeverageState.collectAsState()
 
     //==============================================================================================
     // State: Coin-Auswahl & Details
@@ -203,7 +204,7 @@ fun PortfolioView(
                             modifier = Modifier.scale(1.0f),
                             painter = painterResource(id = resId),
                             contentDescription = null,
-                            colorFilter = if (accountCreditState + investedValue >= (idx + 1) * 2000)
+                            colorFilter = if (accountCreditState + investedValue >= (idx + 1) * 200)
                                 null
                             else ColorFilter.tint(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
                         )
@@ -260,6 +261,7 @@ fun PortfolioView(
                             },
                             profitCallback = { profit = it },
                             gameDifficult,
+                            gameLeverage
                         )
                     }
                 }
@@ -313,6 +315,7 @@ fun PortfolioView(
                     },
                     profitCallback = { profit = it },
                     gameDifficult,
+                    gameLeverage
                 )
             }
         }
@@ -347,7 +350,8 @@ fun PortfolioView(
                             currentPrice = currentPrice,
                             fee = feeValue
                         )
-                        viewModel.setAccountCashIn(true)
+
+                        viewModel.setAccountCashIn(true) // Zeige Erfolg-Dialog (optional)
                     },
                     notEnoughCredit = { viewModel.setShowAccountNotEnoughMoney(true) },
                     notEnoughCoins = { viewModel.setAccountNotEnoughCoins(true) },
@@ -357,7 +361,8 @@ fun PortfolioView(
                     coinValue = coinValue,
                     accountCreditState = accountCreditState,
                     profit = profit,
-                    totalInvested = totalInvested
+                    totalInvested = totalInvested,
+                    gameLeverage = gameLeverage
                 )
             }
         }

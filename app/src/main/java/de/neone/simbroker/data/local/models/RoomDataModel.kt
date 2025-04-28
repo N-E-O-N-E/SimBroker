@@ -17,11 +17,11 @@ data class PortfolioPositions(
     val iconUrl: String,
     val name: String,
     val amountBought: Double, // Ursprünglich gekaufte Menge
-    val amountRemaining: Double, // Verbleibende Menge nach Verkäufen
+    var amountRemaining: Double, // Verbleibende Menge nach Verkäufen
     val pricePerUnit: Double, // Preis pro Coin zum Zeitpunkt des Kaufs
     val totalValue: Double, // 	Gesamtwert der Position zum Kaufzeitpunkt"
     val isFavorite: Boolean = false, // Favoriten-Status
-    val isClosed: Boolean = false, // Abgeschlossen
+    var isClosed: Boolean = false, // Abgeschlossen
 )
 
 @Entity(tableName = "tbl_transaction")

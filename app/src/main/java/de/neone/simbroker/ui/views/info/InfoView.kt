@@ -30,15 +30,14 @@ fun InfoView() {
     val scrollState = rememberScrollState()
 
     // Screen-Pictures -----------------------------------------------------------------
+    val screenLoading = R.drawable.screen_loadingscreen
+
     val screenPortfolioEmpty = R.drawable.screen_portfolioemptyscreen
-    val screenAccount1 = R.drawable.screen_accountscreen1
-    val screenAccount2 = R.drawable.screen_accountscreen2
-    val screenAccount3 = R.drawable.screen_accountscreen3
+    val screenAccount = R.drawable.screen_accountscreen
     val screenCoins = R.drawable.screen_coinsscreen
     val screenCoinSearch = R.drawable.screen_coinssearchscreen
 
     val screenBuy = R.drawable.screen_buyscreen
-    val screenSell = R.drawable.screen_sellscreen
 
     val screenPortfolio1 = R.drawable.screen_portfolioscreen1
     val screenPortfolio2 = R.drawable.screen_portfolioscreen2
@@ -58,12 +57,38 @@ fun InfoView() {
         Column(modifier = Modifier.padding(15.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
 
-                Text("Basic instructions", style = MaterialTheme.typography.headlineSmall)
+                Text("SimBroker instructions", style = MaterialTheme.typography.headlineSmall)
                 Icon(painter = painterResource(id = R.drawable.sharp_chat_info_24), contentDescription = null)
             }
             Spacer(modifier = Modifier.height(5.dp))
             HorizontalDivider(color = MaterialTheme.colorScheme.outline)
             Spacer(modifier = Modifier.height(5.dp))
+
+            Row() {
+                Image(
+                    modifier = Modifier
+                        .height(350.dp)
+                        .padding(10.dp),
+                    painter = painterResource(id = screenLoading),
+                    contentDescription = "Load-Screen",
+                    contentScale = ContentScale.FillHeight,
+                )
+                Column {
+
+                    Spacer(modifier = Modifier.height(15.dp))
+
+                    Text(
+                        "Welcome to SimBroker!", style = MaterialTheme.typography.titleMedium
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    Text("Discover the thrill of trading with SimBroker!\n\n" +
+                            "SimBroker is a gamified trading platform developed as part of a final project.\n\n" +
+                            "Trade real cryptocurrencies — with zero risk and maximum excitement!",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
 
             Row() {
                 Image(
@@ -79,11 +104,13 @@ fun InfoView() {
                     Spacer(modifier = Modifier.height(15.dp))
 
                     Text(
-                        "Der erste Start", style = MaterialTheme.typography.titleMedium
+                        "Empty Portfolio", style = MaterialTheme.typography.titleMedium
                     )
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    Text("dsdfsdsfdgfdgfdgfdgfgfgfdgsfgfdgjfdslkfdsfjdslkfjdslkfjlsdadsdfchjkdslfsa",
+                    Text("When you start the game, your portfolio will be empty.\n\n" +
+                            "Go to \"Coins\" to browse the available cryptocurrencies. \n\n" +
+                            "Or visit your \"Account\" to set up the game settings and make your first crypto purchase.",
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
@@ -94,7 +121,7 @@ fun InfoView() {
                     modifier = Modifier
                         .height(350.dp)
                         .padding(10.dp),
-                    painter = painterResource(id = screenAccount2),
+                    painter = painterResource(id = screenAccount),
                     contentDescription = "Account-Screen",
                     contentScale = ContentScale.FillHeight,
                 )
@@ -107,7 +134,10 @@ fun InfoView() {
                     )
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    Text("dsdfsdsfdgfdgfdgfdgfgfgfdgsfgfdgjfdslkfdsfjdslkfjdslkfjlsdadsdfchjkdslfsa",
+                    Text("In your account, you can see how much available credit you have, as well as your invested capital.\n\n" +
+                            "You can set the game difficulty and transaction fees, or restart the game at any time. " +
+                            "A ranking system tracks your achievements. " +
+                            "Once you have earned €1,000, you win the game and playing in Free-Play mode.",
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
@@ -127,11 +157,12 @@ fun InfoView() {
                     Spacer(modifier = Modifier.height(15.dp))
 
                     Text(
-                        "Die Crypto-Übersicht", style = MaterialTheme.typography.titleMedium
+                        "The Crypto Overview", style = MaterialTheme.typography.titleMedium
                     )
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    Text("dsdfsdsfdgfdgfdgfdgfgfgfdgsfgfdgjfdslkfdsfjdslkfjdslkfjlsdadsdfchjkdslfsa",
+                    Text("Under \"Coins,\" you'll find 100 current cryptocurrencies available for trading.\n\n" +
+                            "Minute-by-minute price updates directly impact your profits and losses.",
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
@@ -151,11 +182,11 @@ fun InfoView() {
                     Spacer(modifier = Modifier.height(15.dp))
 
                     Text(
-                        "Die Suchfunktion", style = MaterialTheme.typography.titleMedium
+                        "Search", style = MaterialTheme.typography.titleMedium
                     )
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    Text("dsdfsdsfdgfdgfdgfdgfgfgfdgsfgfdgjfdslkfdsfjdslkfjdslkfjlsdadsdfchjkdslfsa",
+                    Text("Use the quick search to find coins by clicking on the magnifying glass.",
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
@@ -175,35 +206,13 @@ fun InfoView() {
                     Spacer(modifier = Modifier.height(15.dp))
 
                     Text(
-                        "Crypto kaufen", style = MaterialTheme.typography.titleMedium
+                        "Buy/Sell Crypto", style = MaterialTheme.typography.titleMedium
                     )
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    Text("dsdfsdsfdgfdgfdgfdgfgfgfdgsfgfdgjfdslkfdsfjdslkfjdslkfjlsdadsdfchjkdslfsa",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-            }
-
-            Row() {
-                Image(
-                    modifier = Modifier
-                        .height(350.dp)
-                        .padding(10.dp),
-                    painter = painterResource(id = screenSell),
-                    contentDescription = "Verkaufen-Screen",
-                    contentScale = ContentScale.FillHeight,
-                )
-                Column {
-
-                    Spacer(modifier = Modifier.height(15.dp))
-
-                    Text(
-                        "Crypto verkaufen", style = MaterialTheme.typography.titleMedium
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    Text("dsdfsdsfdgfdgfdgfdgfgfgfdgsfgfdgjfdslkfdsfjdslkfjdslkfjlsdadsdfchjkdslfsa",
+                    Text("Trade cryptocurrencies at live market prices by simply entering an amount or quantity.\n\n" +
+                            "As you level up, a powerful multiplier boosts your potential profits — or increases your risk of losses.\n\n" +
+                            "Choose wisely and master the market!",
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
@@ -227,7 +236,9 @@ fun InfoView() {
                     )
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    Text("dsdfsdsfdgfdgfdgfdgfgfgfdgsfgfdgjfdslkfdsfjdslkfjdslkfjlsdadsdfchjkdslfsa",
+                    Text("View and manage all your crypto holdings at a glance.\n\n" +
+                            "Track your current portfolio value, monitor your ranking, and easily create a list of your favorite coins for faster access.\n\n" +
+                            "Stay organized and keep an eye on your overall trading performance!",
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
@@ -247,11 +258,13 @@ fun InfoView() {
                     Spacer(modifier = Modifier.height(15.dp))
 
                     Text(
-                        "Portfolio im Detail", style = MaterialTheme.typography.titleMedium
+                        "Portfolio Details", style = MaterialTheme.typography.titleMedium
                     )
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    Text("dsdfsdsfdgfdgfdgfdgfgfgfdgsfgfdgjfdslkfdsfjdslkfjdslkfjlsdadsdfchjkdslfsa",
+                    Text("Dive deeper into each coin in your portfolio.\n\n" +
+                            "Expand detailed views to see interactive price charts, review your individual transactions, and analyze your trading history per coin.\n\n" +
+                            "Gain the insights you need to optimize your strategy!",
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
