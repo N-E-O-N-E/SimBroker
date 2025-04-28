@@ -26,20 +26,12 @@ Sim Broker ist eine kleine App, die im Rahmen meiner Abschlussarbeit für das Mo
 - Übersicht von verfügbarem und investiertem Kapital
 - Einstellungen der Spielschwierigkeit (Startkapital und Gebühren)
 - Aufladen des Kontos bis zu einem Betrag X möglich
+- Übersicht des Rankings bis zum Ziel
 
 # Grafische Aufbereitung der App-Idee
 
-## Erste Skizzen der Idee
-![image 22](https://github.com/user-attachments/assets/ee67c7e2-cb64-42d5-ba2d-b8fb8f85fe70)
-
-## Erste Low-Fidelity der App
-![image 23](https://github.com/user-attachments/assets/80488e54-49e1-4a7c-ae7b-f54870dafcd8)
-
-## UI der App kann im Light- und im Dark-Theme dargestellt werden
-![image 24](https://github.com/user-attachments/assets/9fc46b80-2c13-4428-aa2a-afd64a74ee46)
-
-## App-Preview: Stand 04.04.2025 ( ~ 70 % )
-![AppPreview](https://github.com/user-attachments/assets/dce4c9ff-04f2-4df3-9954-72dbeff535e6)
+## App-Stand: 28.05.2025
+![image 22](https://github.com/user-attachments/assets/4cb8370f-d576-429a-8988-084ebacd7722)
 
 ---
 
