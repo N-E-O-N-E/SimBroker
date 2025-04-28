@@ -355,14 +355,16 @@ fun CoinDetailSheet(
                         val amount = if (selectedOption == "amount") inputValue.toDouble()
                         else inputValue.toDouble() / selectedCoin.price.toDouble()
 
-                        val maxSellableAmount = coinAmount // allPortfolios summe ammount
+                        val maxSellableAmount = coinAmount // allPortfolios amount sum
 
                         val amountToSell = if (abs(amount - maxSellableAmount) < 0.0000001) {
-
                             maxSellableAmount
                         } else {
                             amount
                         }
+
+                        onSellClick(amountToSell, selectedCoin.price.toDouble())
+                        onDismiss()
 
                         Log.d("simDebug", amount.toString())
                         Log.d("simDebug", maxSellableAmount.toString())
@@ -374,13 +376,6 @@ fun CoinDetailSheet(
 //                            notEnoughCoins()
 //                            return@Button
 //                        }
-
-                        onSellClick(amountToSell, selectedCoin.price.toDouble())
-
-                        Log.d("simDebug", amount.toString())
-                        Log.d("simDebug", selectedCoin.price)
-
-                        onDismiss()
 
                     }) {
                     Text(text = "SELL")
