@@ -44,6 +44,7 @@ kspVersion = "2.1.20-2.0.0"
 # Coil für Bilder
 coilCompose = "3.1.0"
 coilGif = "3.1.0"
+coilSvg = "3.1.0"
 
 # Charts
 jetchart = "2.1.0"
@@ -56,6 +57,7 @@ androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecyc
 androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
 # Activity Compose
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
+
 # Navigation Compose
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 # Compose BOM
@@ -88,6 +90,7 @@ androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-co
 # Coil (Bilder & GIFs)
 coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coilCompose" }
 coil-gif = { group = "io.coil-kt.coil3", name = "coil-gif", version.ref = "coilGif" }
+coil-svg = { module = "io.coil-kt.coil3:coil-svg", version.ref = "coilSvg" }
 coil-network-okhttp = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coilCompose" }
 
 # Koin Dependency Injection

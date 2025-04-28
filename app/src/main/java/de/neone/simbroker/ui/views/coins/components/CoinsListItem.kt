@@ -28,6 +28,7 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import coil3.request.error
+import coil3.svg.SvgDecoder
 import de.neone.simbroker.R
 import de.neone.simbroker.data.helper.SBHelper.toEuroString
 import de.neone.simbroker.data.helper.SBHelper.toPercentString
@@ -59,6 +60,7 @@ fun CoinsListItem(
         .data(coin.iconUrl)
         .crossfade(true)
         .error(R.drawable.coinplaceholder)
+        .decoderFactory(factory = SvgDecoder.Factory())
         .build()
 
     //==========================================================================================
@@ -97,6 +99,7 @@ fun CoinsListItem(
                 //-------------------------------------------------------------------------------
                 // 4.1) Coin-Icon
                 //-------------------------------------------------------------------------------
+
                 AsyncImage(
                     modifier = Modifier
                         .padding(start = 5.dp, end = 10.dp)
