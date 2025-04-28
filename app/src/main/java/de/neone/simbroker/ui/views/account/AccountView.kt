@@ -143,7 +143,7 @@ fun AccountView(
                 Text("Fill your account to a maximum of 600 €", style = typography.bodySmall)
                 IconButton(onClick = {
                     if (!showAccountMaxValueDialog) {
-                        viewModel.setAccountValue(250.0)
+                        viewModel.setAccountValue(100.0)
                     }
                 }) {
                     Icon(
