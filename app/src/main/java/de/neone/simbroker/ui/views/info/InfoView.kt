@@ -34,13 +34,13 @@ fun InfoView() {
 
     val screenPortfolioEmpty = R.drawable.screen_portfolioemptyscreen
     val screenAccount = R.drawable.screen_accountscreen
-    val screenCoins = R.drawable.screen_coinsscreen
-    val screenCoinSearch = R.drawable.screen_coinssearchscreen
+    val screenCoins = R.drawable.screen_coinscreen
+    val screenCoinSearch = R.drawable.screen_coinsearchscreen
 
     val screenBuy = R.drawable.screen_buyscreen
 
-    val screenPortfolio1 = R.drawable.screen_portfolioscreen1
-    val screenPortfolio2 = R.drawable.screen_portfolioscreen2
+    val screenPortfolio1 = R.drawable.screen_portfolioscreen
+    val screenPortfolio2 = R.drawable.screen_portfolioscreendetail
 
     ViewWallpaperImageBox(
         imageLightTheme = R.drawable.simbroker_light_clear,

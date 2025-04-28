@@ -4,7 +4,7 @@
     <selectionStates>
       <SelectionState runConfigName="SimBroker">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-04-26T18:55:55.202780900Z">
+        <DropdownSelection timestamp="2025-04-28T10:50:31.088775300Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\wirtz\.android\avd\Pixel_7_Pro_Edited.avd" />
