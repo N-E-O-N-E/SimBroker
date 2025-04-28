@@ -3,7 +3,8 @@ package de.neone.simbroker.data.local.mockdata
 import de.neone.simbroker.data.remote.models.Coin
 import kotlin.random.Random
 
-val coins_Mockdata: List<Coin> = listOf(
+val coins_Mockdata: List<Coin>
+    get() = listOf(
     Coin(
         uuid = "a1f1e13e-22cb-45e2-a617-1f2b3e77ccab",
         symbol = "ZTC",
