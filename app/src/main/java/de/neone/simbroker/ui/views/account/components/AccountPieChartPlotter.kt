@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import de.neone.simbroker.data.helper.SBHelper.roundTo
@@ -57,11 +58,15 @@ fun AccountPieChartPlotter(
             modifier = modifier.fillMaxWidth(),
             circularData = dataSet1,
             circularForeground = DonutForegroundStrategy(
-                strokeWidth = 80f,
+                strokeWidth = 90f,
                 radiusMultiplier = 1.3f
             ),
             circularDecoration = CircularDecoration.donutChartDecorations(
                 textColor = MaterialTheme.colorScheme.onSurface,
+                colorList = listOf(
+                    Color(red = 9, green = 155, blue = 222, alpha = 255),
+                    Color(red = 241, green = 52, blue = 52, alpha = 255)
+                )
             ),
         )
 
