@@ -600,7 +600,7 @@ class SimBrokerViewModel(
             val leveragedProfit = profit * gameLeverageState.value  // Hier 5-facher Profit
 
             val updatedAccount =
-                (currentAccount + totalInvestReduction + leveragedProfit - fee).coerceAtLeast(0.0)
+                (currentAccount + totalInvestReduction + leveragedProfit - fee ).coerceAtLeast(0.0)
 
             val allPositionsSold = repository.getAllPortfolioPositions()
                 .first()

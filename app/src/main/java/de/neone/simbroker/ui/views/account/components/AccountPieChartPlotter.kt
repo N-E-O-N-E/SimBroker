@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import de.neone.simbroker.data.helper.SBHelper.roundTo
 import dev.anirban.charts.circular.charts.DonutRowPlotStrategy
 import dev.anirban.charts.circular.data.ListDataStrategy
 import dev.anirban.charts.circular.decoration.CircularDecoration
@@ -36,7 +37,7 @@ fun AccountPieChartPlotter(
     //==============================================================================================
     val dataSet1 = ListDataStrategy(
         itemsList = listOf(
-            Pair("Wallet", creditValue.toFloat()),
+            Pair("Wallet", creditValue.toFloat().roundTo(2)),
             Pair("Investments", investedValue.toFloat())
         ),
         unit = "€" // Einheit für die Beschriftung
