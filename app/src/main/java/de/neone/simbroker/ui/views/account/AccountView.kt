@@ -140,7 +140,7 @@ fun AccountView(
         ) {
             if (selectedOption == "Custom") {
                 // Custom-Modus Aufforderung und Euro-Icon
-                Text("Fill your account to a maximum of 600 €", style = typography.bodySmall)
+                Text("Fill your account to a maximum of 800 €", style = typography.bodySmall)
                 IconButton(onClick = {
                     if (!showAccountMaxValueDialog) {
                         viewModel.setAccountValue(100.0)
@@ -341,10 +341,10 @@ fun AccountView(
                     ) {
                         // RadioButtons für Easy, Medium, Pro, Custom
                         listOf(
-                            "Easy" to (600.0 to 1.5),
+                            "Easy" to (800.0 to 2.0),
                             "Medium" to (400.0 to 3.5),
                             "Pro" to (200.0 to 8.0),
-                            "Custom" to (500.0 to 2.0)
+                            "Custom" to (100.0 to 1.0)
                         ).forEach { (label, pair) ->
                             val (startValue, fee) = pair
                             RadioButton(
@@ -443,7 +443,7 @@ fun AccountView(
         )
     }
     if (showAccountMaxValueDialog) {
-        AlertDialog("You can not set a credit higher than 600 €") {
+        AlertDialog("You can not set a credit higher than 800 €") {
             viewModel.setShowAccountMaxValueDialog(false)
         }
     }
