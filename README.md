@@ -4,33 +4,53 @@
 
 ![Group 1](https://github.com/user-attachments/assets/ef223552-32b3-4815-a96a-10977768d6dc)
 
-Sim Broker ist eine kleine App, die im Rahmen meiner Abschlussarbeit für das Modul "Kotlin mit Jetpack Compose" programmiert wird. Sie vermittelt spielerisch erste Erfahrungen mit dem Handel von Kryptowährungen. Mithilfe eines virtuellen Guthabens und der Anbindung externer Kursdaten über eine Schnittstelle wirkt das Handelserlebnis nahezu realistisch. Nutzer können aus einer Auswahl bekannter Kryptowährungen wählen, Gewinne erzielen und Verluste erleben – ganz ohne Risiko. Die Spieleinstellungen erlauben vordefinierte Level (Easy, Medium, Pro) mit vordefiniertem Startkapital und einer niedrigen oder hohen Transaktionsgebühr. Die Gebühr lässt sich im Anschluss immer noch verändern, ebenso das Guthaben, welches man bis zu einem Maximalbetrag aufladen kann. Sollte die API keine Daten liefern - da diese nur für den Zeitrasum der Prüfungsphase altiv ist - kann mit sog. Mockdaten exemplarisch gespielt werden. 
+Sim Broker ist eine mobile Spiel-App, die im Rahmen meiner Abschlussarbeit für das Modul „Kotlin mit Jetpack Compose“ entwickelt wurde. Die App bietet einen spielerischen Einstieg in die Welt des Kryptowährungshandels – völlig risikofrei und realitätsnah durch die Anbindung an echte Kursdaten.
+Mit virtuellem Startkapital und variablen Spielparametern simuliert Sim Broker den Handel mit bekannten Kryptowährungen. Die App kombiniert modernes UI/UX mit einer sauberen Architektur, um eine realistische, gleichzeitig aber leicht zugängliche Spielerfahrung zu ermöglichen.
 
-# Kernfunktionen
+# Features
 
 ## PortfolioScreen
-- Übersicht aktiver Investments mit der Möglichkeit Details (Charts, Transaktionen pro Coin) anzuzeigen
-- Auch hier kann mit Klick auf den Coin die View zum Kauf/Verkauf anzegeit werden.
+- Übersicht aller aktiven Investments 
+- Detailansicht pro Coin inkl. Wochenchart & Transaktionshistorie 
+- Coins als Favoriten markieren 
+- Schnellzugriff auf Kauf-/Verkaufsfunktionen
 
 ## CoinScreen
-- Auflistung der Coins aus API mit Pagination (segmentiertes Laden der Daten)
-- Schnelle Suchfunktion über alle verfügbaren Kryptowährungen
-- Counter der alle X Sekunden die Daten neu Abruft
+- Liste aller Kryptowährungen aus der API
+- Interaktive Wochencharts je Coin 
+- Echtzeit-Datenabruf alle X Sekunden 
+- Suchfunktion für schnellen Zugriff
 
 ## Buy/Sell Screen
-- Anzeige relevanter Informationen zur gewählten Kryptowährung
-- Möglichkeit zum Kauf und Verkauf der ausgewählten Kryptowährung
-- Kauf / Verkauf über Betrag X oder Anteil Coins
+- Informationen zur ausgewählten Kryptowährung 
+- Kaufen/Verkaufen über festen Betrag oder Coin-Anteile 
+- Berechnung inkl. dynamischer Transaktionsgebühr
 
 ## Account Screen
-- Übersicht von verfügbarem und investiertem Kapital
-- Einstellungen der Spielschwierigkeit (Startkapital und Gebühren)
-- Aufladen des Kontos bis zu einem Betrag X möglich
-- Übersicht des Rankings bis zum Ziel
+- Übersicht über verfügbares & investiertes Kapital 
+- Auswahl der Spielstufen (Easy, Medium, Pro, Custom)
+- Anpassung von Startkapital und Gebühren 
+- Kontoaufladung im Custom-Modus 
+- Persönliches Spieler-Ranking
 
-# Grafische Aufbereitung der App-Idee
+# Technologien & Architektur
 
-## App-Stand: 28.05.2025
+# Technologien
+- Kotlin als Hauptprogrammiersprache der App 
+- Jetpack Compose, ein modernes, deklaratives UI-Toolkit von Android 
+- MVVM, Architekturpattern für klare Trennung von UI und Logik 
+- Room, lokale Datenbank zur Speicherung von Transaktionen & User-Daten 
+- DataStore, für persistenten Zugriff auf Einstellungen (z.B. Schwierigkeitsgrad, Gebühren)
+- Dependency Injection (DI), strukturierte Abhängigkeitsverwaltung mit z.B. Koil 
+- API zum Abruf von Echtzeitkursen über eine externe Schnittstelle 
+- Mock-Daten für Offline-Support durch vorgefertigte Beispiel-Daten
+
+# Hinweise zur API-Nutzung
+
+Die API zur Kursabfrage steht nur im Rahmen der Prüfungsphase zur Verfügung. Sollte die Schnittstelle nicht erreichbar sein, kann mit Mockdaten gespielt werden, um die Funktionen der App vollständig zu testen.
+
+
+## Screens App-Stand: 02.05.2025
 ![image 22](https://github.com/user-attachments/assets/4cb8370f-d576-429a-8988-084ebacd7722)
 
 ---
