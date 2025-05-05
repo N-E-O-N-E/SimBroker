@@ -44,7 +44,7 @@ Mit virtuellem Startkapital und variablen Spielparametern simuliert Sim Broker d
 
 # Hinweise zur API-Nutzung
 
-Die API zur Kursabfrage steht nur im Rahmen der Prüfungsphase zur Verfügung. Sollte die Schnittstelle nicht erreichbar sein, kann mit Mockdaten gespielt werden, um die Funktionen der App vollständig zu testen.
+Die API "Coinranking" zur Kursabfrage steht nur im Rahmen der Prüfungsphase zur Verfügung. Sollte die Schnittstelle nicht erreichbar sein, kann mit Mockdaten gespielt werden, um exemplarisch die Funktionen der App testen. Das Einbinden eines eigenen API Keys erfolgt ansonsten über die local.properties mit (API_KEY = "your key").
 
 
 ## Screens App-Stand: 02.05.2025
