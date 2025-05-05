@@ -49,6 +49,7 @@ import de.neone.simbroker.data.helper.SBHelper.toEuroString
 import de.neone.simbroker.ui.SimBrokerViewModel
 import de.neone.simbroker.ui.theme.activity.ViewWallpaperImageBox
 import de.neone.simbroker.ui.views.account.components.AccountPieChartPlotter
+import de.neone.simbroker.ui.views.account.components.WinnerAnim
 import de.neone.simbroker.ui.views.components.AlertDialog
 import de.neone.simbroker.ui.views.components.AlertDialogEraseAll
 
@@ -110,315 +111,331 @@ fun AccountView(
     val firstGame by viewModel.firstGameState.collectAsState()
     val isFreePlay = {
         when (selectedOption) {
-            "Free-Play" -> false
-            else -> true
+            "Free-Play" -> true
+            else -> false
         }
     }
 
     //==============================================================================================
     // 3) Haupt-Layout
     //==============================================================================================
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top
-    ) {
+    Box() {
 
-        //------------------------------------------------------------------------------------------
-        // 3.1) Header-Zeile
-        //------------------------------------------------------------------------------------------
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(35.dp)
-                .background(MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.9f))
-                .padding(horizontal = 10.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            if (selectedOption == "Custom") {
-                // Custom-Modus Aufforderung und Euro-Icon
-                Text("Fill your account to a maximum of 800 €", style = typography.bodySmall)
-                IconButton(onClick = {
-                    if (!showAccountMaxValueDialog) {
-                        viewModel.setAccountValue(100.0)
-                    }
-                }) {
-                    Icon(
-                        modifier = Modifier.scale(1.0f),
-                        painter = painterResource(id = R.drawable.baseline_euro_24),
-                        contentDescription = null
-                    )
-                }
-            } else {
-                // Anzeige des Schwierigkeitsgrades
-                Text("Game Difficulty: ${selectedOption.uppercase()}", style = typography.bodySmall)
-            }
-        }
-
-        //------------------------------------------------------------------------------------------
-        // 3.2) Body: Scrollbar & Cards
-        //------------------------------------------------------------------------------------------
-        val scrollState = rememberScrollState()
         Column(
             modifier = Modifier
-                .verticalScroll(scrollState)
                 .fillMaxSize()
-                .padding(vertical = 5.dp)
-                .padding(horizontal = 10.dp),
+                .padding(),
             horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
         ) {
 
-            //--------------------------------------------------------------------------------------
-            // Wallet-Anzeige mit Easter Egg Klick
-            //--------------------------------------------------------------------------------------
-            Card(
+            //------------------------------------------------------------------------------------------
+            // 3.1) Header-Zeile
+            //------------------------------------------------------------------------------------------
+            Row(
                 modifier = Modifier
-                    .padding(vertical = 3.dp)
-                    .height(60.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.8f),
-                )
+                    .fillMaxWidth()
+                    .height(35.dp)
+                    .background(MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.9f))
+                    .padding(horizontal = 10.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 15.dp),
-                    horizontalArrangement = Arrangement.SpaceAround
-                ) {
+                if (selectedOption == "Custom") {
+                    // Custom-Modus Aufforderung und Euro-Icon
+                    Text("Fill your account to a maximum of 800 €", style = typography.bodySmall)
+                    IconButton(onClick = {
+                        if (!showAccountMaxValueDialog) {
+                            viewModel.setAccountValue(100.0)
+                        }
+                    }) {
+                        Icon(
+                            modifier = Modifier.scale(1.0f),
+                            painter = painterResource(id = R.drawable.baseline_euro_24),
+                            contentDescription = null
+                        )
+                    }
+                } else {
+                    // Anzeige des Schwierigkeitsgrades
                     Text(
-                        modifier = Modifier.clickable {
-                            if (accountCreditState < 10000) {
-                                klicker--
-                                if (klicker == 0) {
-                                    viewModel.setGameEndAccountValue()
-                                    viewModel.setGameDifficult("Free-Play")
-                                    viewModel.setFirstGameState(false)
-                                    Toast.makeText(
-                                        context,
-                                        "Winner winner chicken dinner!",
-                                        Toast.LENGTH_LONG
-                                    ).show()
-                                    klicker = 3
-                                }
-                            }
-                        },
-                        text = "Account: ${(accountCreditState + totalInvested).toEuroString()}",
-                        style = typography.headlineSmall
-                    )
-                    Image(
-                        modifier = Modifier.scale(2.5f),
-                        painter = rememberAsyncImagePainter(
-                            model = ImageRequest.Builder(LocalContext.current)
-                                .data(R.drawable.coinanim)
-                                .build(),
-                            filterQuality = FilterQuality.High,
-                        ),
-                        contentDescription = "Coin animation",
+                        "Game Difficulty: ${selectedOption.uppercase()}",
+                        style = typography.bodySmall
                     )
                 }
             }
 
-            //--------------------------------------------------------------------------------------
-            // Ranking-Anzeige mit Meilensteinen
-            //--------------------------------------------------------------------------------------
-            Card(
+            //------------------------------------------------------------------------------------------
+            // 3.2) Body: Scrollbar & Cards
+            //------------------------------------------------------------------------------------------
+            val scrollState = rememberScrollState()
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 3.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.0f),
-                )
+                    .verticalScroll(scrollState)
+                    .fillMaxSize()
+                    .padding(vertical = 5.dp)
+                    .padding(horizontal = 10.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Box {
-                    Image(
-                        modifier = Modifier
-                            .scale(4.0f)
-                            .height(120.dp)
-                            .fillMaxWidth(),
-                        painter = rememberAsyncImagePainter(
-                            model = ImageRequest.Builder(LocalContext.current)
-                                .data(R.drawable.load2)
-                                .build(),
-                            filterQuality = FilterQuality.High,
-                        ),
-                        contentDescription = "Coin animation",
-                        alpha = 0.2f
+
+                //--------------------------------------------------------------------------------------
+                // Wallet-Anzeige mit Easter Egg Klick
+                //--------------------------------------------------------------------------------------
+                Card(
+                    modifier = Modifier
+                        .padding(vertical = 3.dp)
+                        .height(60.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.8f),
                     )
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 15.dp),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ) {
+                        Text(
+                            modifier = Modifier.clickable {
+                                if (accountCreditState < 10000) {
+                                    klicker--
+                                    if (klicker == 0) {
+                                        viewModel.setGameEndAccountValue()
+                                        viewModel.setGameDifficult("Free-Play")
+                                        viewModel.setFirstGameState(false)
+                                        Toast.makeText(
+                                            context,
+                                            "Winner winner chicken dinner!",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                        klicker = 3
+                                    }
+                                }
+                            },
+                            text = "Account: ${(accountCreditState + totalInvested).toEuroString()}",
+                            style = typography.headlineSmall
+                        )
+                        Image(
+                            modifier = Modifier.scale(2.5f),
+                            painter = rememberAsyncImagePainter(
+                                model = ImageRequest.Builder(LocalContext.current)
+                                    .data(R.drawable.coinanim)
+                                    .build(),
+                                filterQuality = FilterQuality.High,
+                            ),
+                            contentDescription = "Coin animation",
+                        )
+                    }
+                }
+
+                //--------------------------------------------------------------------------------------
+                // Ranking-Anzeige mit Meilensteinen
+                //--------------------------------------------------------------------------------------
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 3.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.0f),
+                    )
+                ) {
+                    Box {
+                        Image(
+                            modifier = Modifier
+                                .scale(4.0f)
+                                .height(120.dp)
+                                .fillMaxWidth(),
+                            painter = rememberAsyncImagePainter(
+                                model = ImageRequest.Builder(LocalContext.current)
+                                    .data(R.drawable.load2)
+                                    .build(),
+                                filterQuality = FilterQuality.High,
+                            ),
+                            contentDescription = "Coin animation",
+                            alpha = 0.2f
+                        )
+                        Column(
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                "Ranking",
+                                style = typography.titleLarge,
+                                modifier = Modifier.padding(vertical = 2.dp)
+                            )
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 25.dp),
+                                horizontalArrangement = Arrangement.SpaceEvenly
+                            ) {
+                                listOf(
+                                    R.drawable.m1,
+                                    R.drawable.m2,
+                                    R.drawable.m3,
+                                    R.drawable.m4,
+                                    R.drawable.m5
+                                )
+                                    .forEachIndexed { idx, resId ->
+                                        Image(
+                                            modifier = Modifier.scale(2.7f),
+                                            painter = painterResource(id = resId),
+                                            contentDescription = null,
+                                            colorFilter = if (accountCreditState + totalInvested >= (idx + 1) * 200)
+                                                null else ColorFilter.tint(
+                                                color = MaterialTheme.colorScheme.onSurface.copy(
+                                                    alpha = 0.7f
+                                                )
+                                            )
+                                        )
+                                    }
+                            }
+                        }
+                    }
+                }
+
+                //--------------------------------------------------------------------------------------
+                // Pie-Chart: Guthaben / Investition / Gebühren
+                //--------------------------------------------------------------------------------------
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 3.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.8f),
+                    )
+                ) {
+                    AccountPieChartPlotter(
+                        creditValue = accountCreditState,
+                        investedValue = totalInvested,
+                        fees = allFeesSum
+                    )
+                }
+
+                //--------------------------------------------------------------------------------------
+                // Spielschwierigkeitsauswahl (RadioButtons)
+                //--------------------------------------------------------------------------------------
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 3.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.8f),
+                    )
+                ) {
                     Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(5.dp),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(
-                            "Ranking",
-                            style = typography.titleLarge,
-                            modifier = Modifier.padding(vertical = 2.dp)
-                        )
+
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 25.dp),
-                            horizontalArrangement = Arrangement.SpaceEvenly
+                                .padding(horizontal = 15.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
+                            Text("Game difficulty", style = typography.bodyLarge)
+                            Text("Leverage: $gameLeverage x", style = typography.bodyLarge)
+                        }
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 10.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            // RadioButtons für Easy, Medium, Pro, Custom
                             listOf(
-                                R.drawable.m1,
-                                R.drawable.m2,
-                                R.drawable.m3,
-                                R.drawable.m4,
-                                R.drawable.m5
-                            )
-                                .forEachIndexed { idx, resId ->
-                                    Image(
-                                        modifier = Modifier.scale(2.7f),
-                                        painter = painterResource(id = resId),
-                                        contentDescription = null,
-                                        colorFilter = if (accountCreditState + totalInvested >= (idx + 1) * 200)
-                                            null else ColorFilter.tint(
-                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                                        )
-                                    )
-                                }
+                                "Easy" to (800.0 to 2.0),
+                                "Medium" to (400.0 to 3.5),
+                                "Pro" to (200.0 to 8.0),
+                                "Custom" to (100.0 to 1.0)
+                            ).forEach { (label, pair) ->
+                                val (startValue, fee) = pair
+                                RadioButton(
+                                    selected = selectedOption == label,
+                                    onClick = {
+                                        if (firstGame) {
+                                            viewModel.setGameDifficult(label)
+                                            when (label) {
+                                                "Pro" -> viewModel.setGameLeverage(15)
+                                                "Medium" -> viewModel.setGameLeverage(10)
+                                                else -> viewModel.setGameLeverage(5)
+                                            }
+                                            viewModel.setFirstGameState(false)
+                                            viewModel.setShowGameDifficultDialog(true)
+                                            viewModel.setFirstGameAccountValue(startValue)
+                                            viewModel.setFeeValue(fee)
+                                            Toast.makeText(
+                                                context,
+                                                "Game Difficulty is now: $label.",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        } else {
+                                            viewModel.setShowFirstGameAccountValueDialog(true)
+                                        }
+                                    },
+                                    enabled = !isFreePlay()
+                                )
+                                Text(label, style = typography.bodyMedium)
+                            }
                         }
                     }
                 }
-            }
 
-            //--------------------------------------------------------------------------------------
-            // Pie-Chart: Guthaben / Investition / Gebühren
-            //--------------------------------------------------------------------------------------
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 3.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.8f),
-                )
-            ) {
-                AccountPieChartPlotter(
-                    creditValue = accountCreditState,
-                    investedValue = totalInvested,
-                    fees = allFeesSum
-                )
-            }
-
-            //--------------------------------------------------------------------------------------
-            // Spielschwierigkeitsauswahl (RadioButtons)
-            //--------------------------------------------------------------------------------------
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 3.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.8f),
-                )
-            ) {
-                Column(
+                //--------------------------------------------------------------------------------------
+                // Fee-Slider (nur im Custom-Modus)
+                //--------------------------------------------------------------------------------------
+                Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(5.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 15.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text("Game difficulty", style = typography.bodyLarge)
-                        Text("Leverage: $gameLeverage x", style = typography.bodyLarge)
-                    }
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 10.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        // RadioButtons für Easy, Medium, Pro, Custom
-                        listOf(
-                            "Easy" to (800.0 to 2.0),
-                            "Medium" to (400.0 to 3.5),
-                            "Pro" to (200.0 to 8.0),
-                            "Custom" to (100.0 to 1.0)
-                        ).forEach { (label, pair) ->
-                            val (startValue, fee) = pair
-                            RadioButton(
-                                selected = selectedOption == label,
-                                onClick = {
-                                    if (firstGame) {
-                                        viewModel.setGameDifficult(label)
-                                        when (label) {
-                                            "Pro" -> viewModel.setGameLeverage(15)
-                                            "Medium" -> viewModel.setGameLeverage(10)
-                                            else -> viewModel.setGameLeverage(5)
-                                        }
-                                        viewModel.setFirstGameState(false)
-                                        viewModel.setShowGameDifficultDialog(true)
-                                        viewModel.setFirstGameAccountValue(startValue)
-                                        viewModel.setFeeValue(fee)
-                                        Toast.makeText(
-                                            context,
-                                            "Game Difficulty is now: $label.",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    } else {
-                                        viewModel.setShowFirstGameAccountValueDialog(true)
-                                    }
-                                },
-                                enabled = isFreePlay()
-                            )
-                            Text(label, style = typography.bodyMedium)
-                        }
-                    }
-                }
-            }
-
-            //--------------------------------------------------------------------------------------
-            // Fee-Slider (nur im Custom-Modus)
-            //--------------------------------------------------------------------------------------
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 3.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.8f),
-                )
-            ) {
-                Column(modifier = Modifier.padding(10.dp), horizontalAlignment = Alignment.Start) {
-                    Text("Fee value: ${feeValue.toEuroString()}", style = typography.bodyMedium)
-                    Slider(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 15.dp)
-                            .semantics { contentDescription = "Fee Slider" },
-                        value = feeValue.toFloat(),
-                        onValueChange = {
-                            if (viewModel.gameDifficultState.value == "Custom" || viewModel.gameDifficultState.value == "Free-Play") {
-                                viewModel.setFeeValue(it.toDouble())
-                            }
-                        },
-                        valueRange = 0f..10f,
-                        steps = 19
+                        .padding(vertical = 3.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.8f),
                     )
+                ) {
+                    Column(
+                        modifier = Modifier.padding(10.dp),
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        Text("Fee value: ${feeValue.toEuroString()}", style = typography.bodyMedium)
+                        Slider(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 15.dp)
+                                .semantics { contentDescription = "Fee Slider" },
+                            value = feeValue.toFloat(),
+                            onValueChange = {
+                                if (viewModel.gameDifficultState.value == "Custom" || viewModel.gameDifficultState.value == "Free-Play") {
+                                    viewModel.setFeeValue(it.toDouble())
+                                }
+                            },
+                            valueRange = 0f..10f,
+                            steps = 19
+                        )
+                    }
                 }
-            }
 
-            //--------------------------------------------------------------------------------------
-            // Reset Game Button
-            //--------------------------------------------------------------------------------------
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = { viewModel.setShowEraseDialog(true) },
-                elevation = ButtonDefaults.buttonElevation(3.dp)
-            ) {
-                Text("RESET GAME", style = typography.titleMedium)
+                //--------------------------------------------------------------------------------------
+                // Reset Game Button
+                //--------------------------------------------------------------------------------------
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = { viewModel.setShowEraseDialog(true) },
+                    elevation = ButtonDefaults.buttonElevation(3.dp)
+                ) {
+                    Text("RESET GAME", style = typography.titleMedium)
+                }
             }
         }
+
+        if (isFreePlay() && (accountCreditState + totalInvested) == 1000.0) {
+            WinnerAnim()
+        }
+
     }
 
     //==============================================================================================
